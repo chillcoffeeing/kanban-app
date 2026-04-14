@@ -1,0 +1,31 @@
+import { UsersThree, Stack } from '@phosphor-icons/react'
+import type { Board } from '@/shared/types/domain'
+
+interface BoardCardProps {
+  board: Board
+  onClick: () => void
+}
+
+export function BoardCard({ board, onClick }: BoardCardProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`group relative h-32 w-full cursor-pointer overflow-hidden rounded-xl p-4 text-left text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02] ${board.background}`}
+    >
+      <div className="relative z-10">
+        <h3 className="text-lg font-bold leading-tight">{board.name}</h3>
+        <div className="mt-auto flex items-center gap-3 pt-8 text-sm text-white/80">
+          <span className="flex items-center gap-1">
+            <Stack size={20} weight="duotone" />
+            {board.stages?.length || 0} etapas
+          </span>
+          <span className="flex items-center gap-1">
+            <UsersThree size={20} weight="duotone" />
+            {board.members?.length || 0}
+          </span>
+        </div>
+      </div>
+      <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+    </button>
+  )
+}
