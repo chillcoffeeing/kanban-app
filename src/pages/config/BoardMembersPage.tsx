@@ -65,6 +65,16 @@ export function BoardMembersPage() {
     );
   };
 
+  const handleDeleteInvitation = async (invitationId: string, email: string) => {
+    try {
+      await api<void>(`/invitations/${invitationId}`, { method: "DELETE" });
+      setPendingInvites((prev) => prev.filter((inv) => inv.id !== invitationId));
+      log(ACTIVITY_TYPES.MEMBER_REMOVED, `eliminó la invitación de "${email}"`);
+    } catch (err) {
+      console.error("Error deleting invitation:", err);
+    }
+  };
+
   const togglePermission = (userId: string, permission: Permission) => {
     const member = currentBoard.members.find((m) => m.userId === userId);
     if (!member) return;
@@ -108,40 +118,40 @@ export function BoardMembersPage() {
               key={member.userId}
               className="rounded-card border border-border-default p-3"
             >
-               <div className="flex items-center justify-between">
-                 <div className="flex items-center gap-3">
-                   {member.user?.avatarUrl ? (
-                     <img
-                       src={member.user.avatarUrl}
-                       alt={member.user.name}
-                       className="h-10 w-10 rounded-full object-cover"
-                     />
-                   ) : (
-                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
-                       <User size={20} className="text-fg-muted" />
-                     </div>
-                   )}
-                   <div>
-                     <div className="flex items-center gap-2">
-                       <span className="text-content font-medium text-fg-default">
-                         {member.user?.name || member.email || "Propietario"}
-                       </span>
-                       <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
-                         {member.role}
-                       </span>
-                     </div>
-                     {member.user?.createdAt && (
-                       <p className="text-card-meta text-fg-subtle">
-                         Miembro desde {new Date(member.user.createdAt).toLocaleDateString()}
-                       </p>
-                     )}
-                     {member.invitedAt && (
-                       <p className="text-card-meta text-fg-subtle">
-                         Invitado: {new Date(member.invitedAt).toLocaleDateString()}
-                       </p>
-                     )}
-                   </div>
-                 </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {member.user?.avatarUrl ? (
+                    <img
+                      src={member.user.avatarUrl}
+                      alt={member.user.name}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
+                      <User size={20} className="text-fg-muted" />
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-content font-medium text-fg-default">
+                        {member.user?.name || member.email || "Propietario"}
+                      </span>
+                      <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
+                        {member.role}
+                      </span>
+                    </div>
+                    {member.user?.createdAt && (
+                      <p className="text-card-meta text-fg-subtle">
+                        Miembro desde {new Date(member.user.createdAt).toLocaleDateString()}
+                      </p>
+                    )}
+                    {member.invitedAt && (
+                      <p className="text-card-meta text-fg-subtle">
+                        Invitado: {new Date(member.invitedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 {member.role !== "owner" && (
                   <button
                     onClick={() => handleRemoveMember(member)}
@@ -163,9 +173,7 @@ export function BoardMembersPage() {
                       <input
                         type="checkbox"
                         checked={member.permissions.includes(perm)}
-                        onChange={() =>
-                          togglePermission(member.userId, perm)
-                        }
+                        onChange={() => togglePermission(member.userId, perm)}
                         className="h-4 w-4 rounded border-border-default"
                       />
                       {label}
@@ -173,50 +181,57 @@ export function BoardMembersPage() {
                   ))}
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {pendingInvites.length > 0 && (
+        <div className="pt-4 border-t border-border-default">
+          <h3 className="mb-3 text-content font-semibold text-fg-default flex items-center gap-2">
+            <Clock size={18} weight="duotone" />
+            Invitaciones pendientes
+          </h3>
+          <div className="flex flex-col gap-3">
+            {pendingInvites.map((inv) => (
+              <div
+                key={inv.id}
+                className="rounded-card border border-border-default p-3 opacity-75"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
+                      <User size={20} className="text-fg-muted" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-content font-medium text-fg-default">
+                          {inv.email}
+                        </span>
+                        <span className="rounded-pill bg-yellow-100 px-2 py-0.5 text-card-meta text-yellow-700">
+                          Pendiente
+                        </span>
+                        <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
+                          {inv.role}
+                        </span>
+                      </div>
+                      <p className="text-card-meta text-fg-subtle">
+                        Invitado: {new Date(inv.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteInvitation(inv.id, inv.email)}
+                    className="cursor-pointer text-fg-muted hover:text-red-500"
+                  >
+                    <Trash size={20} weight="duotone" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
-
-        {pendingInvites.length > 0 && (
-          <div className="pt-4 border-t border-border-default">
-            <h3 className="mb-3 text-content font-semibold text-fg-default flex items-center gap-2">
-              <Clock size={18} weight="duotone" />
-              Invitaciones pendientes
-            </h3>
-            <div className="flex flex-col gap-3">
-              {pendingInvites.map((inv) => (
-                <div
-                  key={inv.id}
-                  className="rounded-card border border-border-default p-3 opacity-75"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
-                        <User size={20} className="text-fg-muted" />
-                      </div>
-                      <div>
-                        <span className="text-content font-medium text-fg-default">
-                          {inv.email}
-                        </span>
-                        <span className="ml-2 rounded-pill bg-yellow-100 px-2 py-0.5 text-card-meta text-yellow-700">
-                          Pendiente
-                        </span>
-                        <span className="ml-2 rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
-                          {inv.role}
-                        </span>
-                        <p className="text-card-meta text-fg-subtle">
-                          Invitado: {new Date(inv.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

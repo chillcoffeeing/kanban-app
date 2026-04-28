@@ -173,6 +173,16 @@ export function BoardSettingsModal({ isOpen, onClose, board }: BoardSettingsModa
     )
   }
 
+  const handleDeleteInvitation = async (invitationId: string, email: string) => {
+    try {
+      await api<void>(`/invitations/${invitationId}`, { method: "DELETE" })
+      setPendingInvites((prev) => prev.filter((inv) => inv.id !== invitationId))
+      log(ACTIVITY_TYPES.MEMBER_REMOVED, `eliminó la invitación de "${email}"`)
+    } catch (err) {
+      console.error("Error deleting invitation:", err)
+    }
+  }
+
   const togglePermission = (userId: string, permission: Permission) => {
     const member = board.members.find((m) => m.userId === userId)
     if (!member) return
@@ -347,32 +357,40 @@ export function BoardSettingsModal({ isOpen, onClose, board }: BoardSettingsModa
                     </h4>
                     <div className="flex flex-col gap-3">
                       {pendingInvites.map((inv) => (
-                        <div
-                          key={inv.id}
-                          className="rounded-lg border border-surface-200 p-3 opacity-75"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-100">
-                              <User size={20} className="text-surface-500" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-surface-900">
-                                  {inv.email}
-                                </span>
-                                <span className="rounded bg-yellow-100 px-1.5 py-0.5 text-xs text-yellow-700">
-                                  Pendiente
-                                </span>
-                                <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
-                                  {inv.role}
-                                </span>
-                              </div>
-                              <p className="text-xs text-surface-500">
-                                Invitado: {new Date(inv.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+                         <div
+                           key={inv.id}
+                           className="rounded-lg border border-surface-200 p-3 opacity-75"
+                         >
+                           <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-3">
+                               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-100">
+                                 <User size={20} className="text-surface-500" />
+                               </div>
+                               <div>
+                                 <div className="flex items-center gap-2">
+                                   <span className="text-sm font-medium text-surface-900">
+                                     {inv.email}
+                                   </span>
+                                   <span className="rounded bg-yellow-100 px-1.5 py-0.5 text-xs text-yellow-700">
+                                     Pendiente
+                                   </span>
+                                   <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
+                                     {inv.role}
+                                   </span>
+                                 </div>
+                                 <p className="text-xs text-surface-500">
+                                   Invitado: {new Date(inv.createdAt).toLocaleDateString()}
+                                 </p>
+                               </div>
+                             </div>
+                             <button
+                               onClick={() => handleDeleteInvitation(inv.id, inv.email)}
+                               className="cursor-pointer text-red-500 hover:text-red-600"
+                             >
+                               <Trash size={20} weight="duotone" />
+                             </button>
+                           </div>
+                         </div>
                       ))}
                     </div>
                   </div>

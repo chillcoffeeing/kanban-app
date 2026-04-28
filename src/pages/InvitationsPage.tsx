@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { Button } from "@/shared/components/Button";
-import { api, getAccessToken as getToken, API_BASE_URL } from "@/services/api";
-import { CheckIcon, XIcon } from "@phosphor-icons/react";
+import { api } from "@/services/api";
+import { CheckCircle, XCircle } from "@phosphor-icons/react";
 
 interface PendingInvitation {
   id: string;
+  token: string;
   boardId: string;
   boardName?: string;
   email: string;
@@ -63,7 +64,7 @@ export function InvitationsPage() {
   const accept = async (invitation: PendingInvitation) => {
     setActionInProgress(invitation.id);
     try {
-      await api(`/invitations/${invitation.id}/accept`, { auth: true });
+      await api(`/invitations/${invitation.token}/accept`, { method: "POST" });
       navigate(`/boards/${invitation.boardId}`);
     } catch (e: unknown) {
       console.error(e);
@@ -75,7 +76,7 @@ export function InvitationsPage() {
   const reject = async (invitation: PendingInvitation) => {
     setActionInProgress(invitation.id);
     try {
-      await api(`/invitations/${invitation.id}`, { auth: true });
+      await api(`/invitations/${invitation.id}`, { method: "DELETE" });
       setInvitations(invitations.filter((i) => i.id !== invitation.id));
     } catch (e: unknown) {
       console.error(e);
@@ -144,14 +145,14 @@ export function InvitationsPage() {
                 onClick={() => reject(invitation)}
                 disabled={actionInProgress === invitation.id}
               >
-                <XIcon size={18} /> Rechazar
+                <XCircle size={18} /> Rechazar
               </Button>
               <Button
                 size="sm"
                 onClick={() => accept(invitation)}
                 disabled={actionInProgress === invitation.id}
               >
-                <CheckIcon size={18} /> Aceptar
+                <CheckCircle size={18} /> Aceptar
               </Button>
             </div>
           </div>
