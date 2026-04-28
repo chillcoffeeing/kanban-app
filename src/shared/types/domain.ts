@@ -58,6 +58,7 @@ export interface BoardMember {
   user?: {
     name: string;
     avatarUrl: string | null;
+    createdAt: string;
   };
 }
 

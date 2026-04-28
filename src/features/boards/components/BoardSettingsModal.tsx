@@ -19,6 +19,7 @@ import {
   ChatCircle,
   CheckSquare,
   Image as ImageIcon,
+  User,
 } from '@phosphor-icons/react'
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
 import { getBoardPreferences, canManageMembers } from '../utils/boardPreferences'
@@ -251,15 +252,40 @@ export function BoardSettingsModal({ isOpen, onClose, board }: BoardSettingsModa
                     key={member.userId}
                     className="rounded-lg border border-surface-200 p-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-sm font-medium text-surface-900">
-                          {member.email || 'Propietario'}
-                        </span>
-                        <span className="ml-2 rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
-                          {member.role}
-                        </span>
-                      </div>
+                     <div className="flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                         {member.user?.avatarUrl ? (
+                           <img
+                             src={member.user.avatarUrl}
+                             alt={member.user.name}
+                             className="h-10 w-10 rounded-full object-cover"
+                           />
+                         ) : (
+                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-200">
+                             <User size={20} className="text-surface-500" />
+                           </div>
+                         )}
+                         <div>
+                           <div className="flex items-center gap-2">
+                             <span className="text-sm font-medium text-surface-900">
+                               {member.user?.name || member.email || 'Propietario'}
+                             </span>
+                             <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
+                               {member.role}
+                             </span>
+                           </div>
+                           {member.user?.createdAt && (
+                             <p className="text-xs text-surface-500">
+                               Miembro desde {new Date(member.user.createdAt).toLocaleDateString()}
+                             </p>
+                           )}
+                           {member.invitedAt && (
+                             <p className="text-xs text-surface-500">
+                               Invitado: {new Date(member.invitedAt).toLocaleDateString()}
+                             </p>
+                           )}
+                         </div>
+                       </div>
                       {member.role !== 'owner' && canManage && (
                         <button
                           onClick={() => handleRemoveMember(member)}

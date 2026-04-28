@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useBoardStore } from "@/stores/boardStore";
 import { Button } from "@/shared/components/Button";
 import { Input } from "@/shared/components/Input";
-import { Trash, UserPlus } from "@phosphor-icons/react";
+import { Trash, UserPlus, User } from "@phosphor-icons/react";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
 import { PERMISSIONS } from "@/shared/utils/constants";
@@ -91,15 +91,40 @@ export function BoardMembersPage() {
               key={member.userId}
               className="rounded-card border border-border-default p-3"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-content font-medium text-fg-default">
-                    {member.email || "Propietario"}
-                  </span>
-                  <span className="ml-2 rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
-                    {member.role}
-                  </span>
-                </div>
+               <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-3">
+                   {member.user?.avatarUrl ? (
+                     <img
+                       src={member.user.avatarUrl}
+                       alt={member.user.name}
+                       className="h-10 w-10 rounded-full object-cover"
+                     />
+                   ) : (
+                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
+                       <User size={20} className="text-fg-muted" />
+                     </div>
+                   )}
+                   <div>
+                     <div className="flex items-center gap-2">
+                       <span className="text-content font-medium text-fg-default">
+                         {member.user?.name || member.email || "Propietario"}
+                       </span>
+                       <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
+                         {member.role}
+                       </span>
+                     </div>
+                     {member.user?.createdAt && (
+                       <p className="text-card-meta text-fg-subtle">
+                         Miembro desde {new Date(member.user.createdAt).toLocaleDateString()}
+                       </p>
+                     )}
+                     {member.invitedAt && (
+                       <p className="text-card-meta text-fg-subtle">
+                         Invitado: {new Date(member.invitedAt).toLocaleDateString()}
+                       </p>
+                     )}
+                   </div>
+                 </div>
                 {member.role !== "owner" && (
                   <button
                     onClick={() => handleRemoveMember(member)}

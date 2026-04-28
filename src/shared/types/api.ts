@@ -71,6 +71,7 @@ export interface BackendMember {
   user?: {
     name: string;
     avatarUrl: string | null;
+    createdAt: string;
   };
 }
 
