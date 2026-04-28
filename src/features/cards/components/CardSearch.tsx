@@ -1,54 +1,69 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
-import { MagnifyingGlass, X } from '@phosphor-icons/react'
-import { useBoardStore } from '@/stores/boardStore'
-import type { Card, Stage } from '@/shared/types/domain'
+import { useState, useMemo, useRef, useEffect } from "react";
+import { MagnifyingGlass, X } from "@phosphor-icons/react";
+import { useBoardStore } from "@/stores/boardStore";
+import type { Card, Stage } from "@/shared/types/domain";
 
 interface CardSearchProps {
-  boardId: string
-  onSelectCard: (card: Card, stageId: string) => void
+  boardId: string;
+  onSelectCard: (card: Card, stageId: string) => void;
 }
 
 interface Match {
-  card: Card
-  stage: Stage
+  card: Card;
+  stage: Stage;
 }
 
 export function CardSearch({ onSelectCard }: CardSearchProps) {
-  const [query, setQuery] = useState('')
-  const [isOpen, setIsOpen] = useState(false)
-  const board = useBoardStore((s) => s.currentBoard)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const board = useBoardStore((s) => s.currentBoard);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const results = useMemo<Match[]>(() => {
-    if (!query.trim() || !board) return []
-    const q = query.toLowerCase()
-    const matches: Match[] = []
+    if (!query.trim() || !board) return [];
+    const q = query.toLowerCase();
+    const matches: Match[] = [];
     for (const stage of board.stages) {
       for (const card of stage.cards) {
-        const matchTitle = card.title.toLowerCase().includes(q)
-        const matchDesc = card.description?.toLowerCase().includes(q)
-        const matchLabel = card.labels?.some((l) => l.name.toLowerCase().includes(q))
-        const matchMember = card.members?.some((m) => m.toLowerCase().includes(q))
-        const matchChecklist = card.checklist?.some((c) => c.text.toLowerCase().includes(q))
+        const matchTitle = card.title.toLowerCase().includes(q);
+        const matchDesc = card.description?.toLowerCase().includes(q);
+        const matchLabel = card.labels?.some((l) =>
+          l.name.toLowerCase().includes(q),
+        );
+        const matchMember = card.members?.some((member) =>
+          member.user.name.toLowerCase().includes(q),
+        );
+        const matchChecklist = card.checklist?.some((c) =>
+          c.text.toLowerCase().includes(q),
+        );
 
-        if (matchTitle || matchDesc || matchLabel || matchMember || matchChecklist) {
-          matches.push({ card, stage })
+        if (
+          matchTitle ||
+          matchDesc ||
+          matchLabel ||
+          matchMember ||
+          matchChecklist
+        ) {
+          matches.push({ card, stage });
         }
       }
     }
-    return matches
-  }, [query, board])
+    return matches;
+  }, [query, board]);
 
   return (
     <div ref={containerRef} className="relative">
@@ -60,15 +75,18 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
           placeholder="Buscar tarjetas..."
           value={query}
           onChange={(e) => {
-            setQuery(e.target.value)
-            setIsOpen(true)
+            setQuery(e.target.value);
+            setIsOpen(true);
           }}
           onFocus={() => query && setIsOpen(true)}
           className="w-40 bg-transparent text-sm text-white placeholder:text-white/50 focus:outline-none focus:w-56 transition-all"
         />
         {query && (
           <button
-            onClick={() => { setQuery(''); setIsOpen(false) }}
+            onClick={() => {
+              setQuery("");
+              setIsOpen(false);
+            }}
             className="cursor-pointer text-white/60 hover:text-white"
           >
             <X size={18} weight="bold" />
@@ -80,7 +98,7 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
         <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-surface-200 bg-white shadow-xl">
           <div className="border-b border-surface-100 px-3 py-2">
             <span className="text-xs font-medium text-surface-400">
-              {results.length} resultado{results.length !== 1 ? 's' : ''}
+              {results.length} resultado{results.length !== 1 ? "s" : ""}
             </span>
           </div>
           <div className="max-h-72 overflow-y-auto">
@@ -93,9 +111,9 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
                 <button
                   key={card.id}
                   onClick={() => {
-                    onSelectCard(card, stage.id)
-                    setIsOpen(false)
-                    setQuery('')
+                    onSelectCard(card, stage.id);
+                    setIsOpen(false);
+                    setQuery("");
                   }}
                   className="flex w-full cursor-pointer flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-surface-50"
                 >
@@ -104,9 +122,9 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
                       <div className="flex gap-0.5">
                         {card.labels.slice(0, 3).map((l) => (
                           <span
-                            key={l.value}
+                            key={l.color}
                             className="h-1.5 w-4 rounded-full"
-                            style={{ backgroundColor: l.value }}
+                            style={{ backgroundColor: l.color }}
                           />
                         ))}
                       </div>
@@ -116,7 +134,10 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
                     </span>
                   </div>
                   <span className="text-xs text-surface-400">
-                    en <span className="font-medium text-surface-500">{stage.name}</span>
+                    en{" "}
+                    <span className="font-medium text-surface-500">
+                      {stage.name}
+                    </span>
                   </span>
                 </button>
               ))
@@ -125,5 +146,5 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

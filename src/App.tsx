@@ -1,63 +1,50 @@
-import { useEffect, useState } from 'react'
-import { useAuthStore } from '@/stores/authStore'
-import { Header } from '@/shared/components/Header'
-import { Footer } from '@/shared/components/Footer'
-import { SettingsPanel } from '@/shared/components/SettingsPanel'
-import { useApplySettings } from '@/shared/hooks/useApplySettings'
-import { AuthPage } from '@/pages/AuthPage'
-import { BoardsPage } from '@/pages/BoardsPage'
-import { BoardView } from '@/pages/BoardView'
-
-type View = 'boards' | 'board' | 'settings'
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "@/stores/authStore";
+import { Header } from "@/shared/components/Header";
+import { Footer } from "@/shared/components/Footer";
+import { useApplySettings } from "@/shared/hooks/useApplySettings";
+import { useSocket } from "@/shared/hooks/useSocket";
+import { AuthPage } from "@/pages/AuthPage";
+import { BoardsPage } from "@/pages/BoardsPage";
+import { BoardRoute } from "@/pages/BoardRoute";
+import { BoardConfigPage } from "@/pages/BoardConfigPage";
+import { UserConfigPage } from "@/pages/UserConfigPage";
+import { InvitationsPage } from "@/pages/InvitationsPage";
 
 function App() {
-  useApplySettings()
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  const hydrate = useAuthStore((s) => s.hydrate)
-  const [currentView, setCurrentView] = useState<View>('boards')
-  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  useApplySettings();
+  useSocket(); // Connect to WebSocket when authenticated
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const hydrate = useAuthStore((s) => s.hydrate);
+  const location = useLocation();
 
   useEffect(() => {
-    void hydrate()
-  }, [hydrate])
+    void hydrate();
+  }, [hydrate]);
 
   if (!isAuthenticated) {
-    return <AuthPage />
-  }
-
-  const handleNavigate = (view: View) => {
-    if (view === 'settings') {
-      setSettingsOpen(true)
-      return
-    }
-    setCurrentView(view)
-    if (view === 'boards') setSelectedBoardId(null)
-  }
-
-  const handleSelectBoard = (boardId: string) => {
-    setSelectedBoardId(boardId)
-    setCurrentView('board')
+    return <AuthPage />;
   }
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[var(--container-app)] flex-col">
-      <Header onNavigate={handleNavigate} currentView={currentView} />
+    <div className="mx-auto flex min-h-screen w-full flex-col">
+      <Header />
       <main className="flex flex-1 flex-col">
-        {currentView === 'boards' && (
-          <BoardsPage onSelectBoard={handleSelectBoard} />
-        )}
-        {currentView === 'board' && selectedBoardId && (
-          <BoardView boardId={selectedBoardId} />
-        )}
+        <Routes>
+          <Route path="/invitations" element={<InvitationsPage />} />
+          <Route path="/config/*" element={<UserConfigPage />} />
+          <Route path="/boards/:boardId/config/*" element={<BoardConfigPage />} />
+          <Route path="/boards/:boardId" element={<BoardRoute />} />
+          <Route path="/board/:boardId" element={<BoardRoute />} />
+          <Route path="/boards" element={<BoardsPage />} />
+          <Route path="/" element={<Navigate to="/boards" replace />} />
+          <Route path="*" element={<Navigate to="/boards" replace />} />
+        </Routes>
       </main>
-      {currentView === 'boards' && <Footer />}
-      <SettingsPanel
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-      />
+      {location.pathname === "/boards" && <Footer />}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

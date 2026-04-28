@@ -17,7 +17,6 @@ export const PERMISSIONS = {
   MODIFY_CARD: 'modify_card',
   DELETE_CARD: 'delete_card',
   INVITE_MEMBER: 'invite_member',
-  MODIFY_BOARD: 'modify_board',
 } as const satisfies Record<string, Permission>
 
 export const ALL_PERMISSIONS: Permission[] = Object.values(PERMISSIONS)

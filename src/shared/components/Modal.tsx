@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
-import { X } from '@phosphor-icons/react'
+import {  XIcon } from '@phosphor-icons/react'
 
 interface ModalProps {
   isOpen: boolean
@@ -39,20 +39,17 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg-overlay p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-bg-overlay p-2"
       onClick={(e) => e.target === overlayRef.current && onClose()}
     >
-      <div className={`w-full ${sizes[size]} rounded-modal bg-bg-card shadow-modal`}>
-        <div className="flex items-center justify-between border-b border-border-default px-5 py-4">
-          <h2 className="text-heading-md font-semibold text-fg-default">{title}</h2>
-          <button
+      <div className={`w-full ${sizes[size]} rounded-modal relative bg-bg-card shadow-modal`}>
+      <button
             onClick={onClose}
-            className="rounded-button p-1 text-icon-muted hover:bg-bg-muted hover:text-icon-default cursor-pointer"
+            className="rounded-button absolute top-2 right-2 p-1 text-icon-muted hover:bg-bg-muted hover:text-icon-default cursor-pointer"
           >
-            <X size={24} weight="bold" />
+            <XIcon size={24} weight="bold" />
           </button>
-        </div>
-        <div className="p-5">{children}</div>
+        <div className="p-8">{children}</div>
       </div>
     </div>
   )

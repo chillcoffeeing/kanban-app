@@ -66,15 +66,8 @@ src/
   checklist: ChecklistItem[], // {id, text, done}
   members: string[],          // userIds
   startDate, dueDate,
-  attachments: Attachment[],
-  coverAttachmentId,
   createdAt
 }
-```
-
-### Attachment
-```ts
-{ id, name, type, size, dataUrl, uploadedBy, uploadedAt }
 ```
 
 ### User
@@ -105,7 +98,7 @@ Permisos disponibles: `create_stage`, `create_card`, `modify_card`, `delete_card
 ```ts
 { id, type, user, detail, meta, timestamp }
 ```
-16 tipos: `board_created`, `stage_created/renamed/deleted`, `card_created/moved/updated/deleted`, `member_invited/removed`, `label_added`, `checklist_*`, `attachment_*`, etc.
+16 tipos: `board_created`, `stage_created/renamed/deleted`, `card_created/moved/updated/deleted`, `member_invited/removed`, `label_added`, `checklist_*`, etc.
 
 ---
 

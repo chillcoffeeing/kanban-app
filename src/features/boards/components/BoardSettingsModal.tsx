@@ -31,7 +31,6 @@ const PERMISSION_LABELS: Record<Permission, string> = {
   [PERMISSIONS.MODIFY_CARD]: 'Modificar tarjetas',
   [PERMISSIONS.DELETE_CARD]: 'Eliminar tarjetas',
   [PERMISSIONS.INVITE_MEMBER]: 'Invitar miembros',
-  [PERMISSIONS.MODIFY_BOARD]: 'Modificar tablero',
 }
 
 type TabId = 'general' | 'members' | 'preferences'

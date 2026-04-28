@@ -101,7 +101,7 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
 
               return (
                 <div key={activity.id} className="flex gap-3 px-4 py-3">
-                  <div className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full ${colorClass}`}>
+                  <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${colorClass}`}>
                     <Icon size={18} weight="duotone" />
                   </div>
                   <div className="flex-1 min-w-0">

@@ -49,15 +49,11 @@ Card (id, stage_id → Stage, board_id → Board,
       title, description,
       position NUMERIC,
       start_date, due_date,
-      cover_attachment_id → Attachment NULL,
       created_at, updated_at)
 
 CardLabel (card_id → Card, name, color)
 CardMember (card_id → Card, user_id → User)
 ChecklistItem (id, card_id → Card, text, done, position)
-
-Attachment (id, card_id → Card, name, mime_type,
-            size, url, uploaded_by → User, uploaded_at)
 
 Comment (id, card_id → Card, author_id → User,
          body, created_at, updated_at)
@@ -138,8 +134,6 @@ Base URL: `/api/v1`. Autenticación: `Authorization: Bearer <JWT>`.
 | POST/DELETE | `/cards/:id/labels` |
 | POST/DELETE | `/cards/:id/members/:userId` |
 | POST/PATCH/DELETE | `/cards/:id/checklist[/:itemId]` |
-| POST | `/cards/:id/attachments` (multipart) |
-| DELETE | `/attachments/:id` |
 | GET/POST | `/cards/:id/comments` |
 | PATCH/DELETE | `/comments/:id` |
 
@@ -159,7 +153,7 @@ Namespace: `/ws`. El cliente se une a `board:<boardId>` tras validar permisos.
 - `stage:created | updated | deleted | reordered`
 - `card:created | updated | moved | deleted`
 - `card:member_added | member_removed`
-- `checklist:changed`, `attachment:changed`, `comment:created`
+- `checklist:changed`, `comment:created`
 - `activity:new`
 - `member:joined | left | role_changed`
 
@@ -177,15 +171,7 @@ El backend emite el evento tras cada mutación REST exitosa (patrón "REST + pub
 
 ---
 
-## 6. Almacenamiento de adjuntos
-
-- Subida directa a S3/MinIO mediante **URL pre-firmada** emitida por `POST /cards/:id/attachments`.
-- El backend solo guarda metadatos (`url`, `size`, `mime_type`).
-- Límite configurable (p. ej. 10 MB) y lista blanca de MIME types.
-
----
-
-## 7. Observabilidad y operación
+## 6. Observabilidad y operación
 
 - **Logs:** Pino estructurado (JSON).
 - **Errores:** Sentry.
