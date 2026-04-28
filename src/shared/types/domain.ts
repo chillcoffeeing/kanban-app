@@ -81,6 +81,9 @@ export interface Board {
   labels: Label[];
   preferences?: BoardPreferences;
   createdAt: string;
+  stagesCount?: number;
+  membersCount?: number;
+  cardsCount?: number;
 }
 
 /* -------------------------- Activity feed --------------------------- */

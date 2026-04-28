@@ -58,6 +58,9 @@ export interface BackendBoard {
   createdAt: string;
   updatedAt: string;
   labels?: BackendLabel[];
+  stagesCount?: number;
+  membersCount?: number;
+  cardsCount?: number;
 }
 
 export interface BackendMember {

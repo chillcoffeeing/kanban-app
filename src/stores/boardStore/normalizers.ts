@@ -81,5 +81,8 @@ export function normalizeBoard(
     preferences:
       (board.preferences as unknown as Board["preferences"]) || undefined,
     createdAt: board.createdAt,
+    stagesCount: board.stagesCount,
+    membersCount: board.membersCount,
+    cardsCount: board.cardsCount,
   };
 }

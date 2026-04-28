@@ -1,4 +1,4 @@
-import { UsersThree, Stack } from '@phosphor-icons/react'
+import { UsersThree, Stack, Cards } from '@phosphor-icons/react'
 import type { Board } from '@/shared/types/domain'
 
 interface BoardCardProps {
@@ -7,6 +7,10 @@ interface BoardCardProps {
 }
 
 export function BoardCard({ board, onClick }: BoardCardProps) {
+  const stagesCount = board.stagesCount ?? board.stages?.length ?? 0
+  const membersCount = board.membersCount ?? board.members?.length ?? 0
+  const cardsCount = board.cardsCount ?? 0
+
   return (
     <button
       onClick={onClick}
@@ -17,11 +21,15 @@ export function BoardCard({ board, onClick }: BoardCardProps) {
         <div className="mt-auto flex items-center gap-3 pt-8 text-sm text-white/80">
           <span className="flex items-center gap-1">
             <Stack size={20} weight="duotone" />
-            {board.stages?.length || 0} etapas
+            {stagesCount} etapas
           </span>
           <span className="flex items-center gap-1">
             <UsersThree size={20} weight="duotone" />
-            {board.members?.length || 0}
+            {membersCount}
+          </span>
+          <span className="flex items-center gap-1">
+            <Cards size={20} weight="duotone" />
+            {cardsCount}
           </span>
         </div>
       </div>
