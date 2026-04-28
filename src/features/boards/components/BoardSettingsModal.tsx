@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { Button } from '@/shared/components/Button'
@@ -20,11 +20,13 @@ import {
   CheckSquare,
   Image as ImageIcon,
   User,
+  Clock,
 } from '@phosphor-icons/react'
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
 import { getBoardPreferences, canManageMembers } from '../utils/boardPreferences'
 import { useAuthStore } from '@/stores/authStore'
 import type { Board, BoardMember, BoardPreferences, Permission } from '@/shared/types/domain'
+import { api } from '@/services/api'
 
 const PERMISSION_LABELS: Record<Permission, string> = {
   [PERMISSIONS.CREATE_STAGE]: 'Crear etapas',
@@ -99,9 +101,18 @@ interface BoardSettingsModalProps {
   board: Board | null
 }
 
+interface PendingInvitation {
+  id: string
+  email: string
+  role: string
+  createdAt: string
+  expiresAt: string
+}
+
 export function BoardSettingsModal({ isOpen, onClose, board }: BoardSettingsModalProps) {
   const [inviteEmail, setInviteEmail] = useState('')
   const [tab, setTab] = useState<TabId>('general')
+  const [pendingInvites, setPendingInvites] = useState<PendingInvitation[]>([])
   const {
     updateBoard,
     addMember,
@@ -112,6 +123,13 @@ export function BoardSettingsModal({ isOpen, onClose, board }: BoardSettingsModa
   const [boardName, setBoardName] = useState(board?.name || '')
   const log = useActivity(board?.id)
   const currentUser = useAuthStore((s) => s.user)
+
+  useEffect(() => {
+    if (!board?.id) return
+    api<PendingInvitation[]>(`/boards/${board.id}/invitations`)
+      .then(setPendingInvites)
+      .catch(() => setPendingInvites([]))
+  }, [board?.id])
 
   if (!board) return null
 
@@ -318,12 +336,51 @@ export function BoardSettingsModal({ isOpen, onClose, board }: BoardSettingsModa
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  ))}
+                </div>
 
-          {tab === 'preferences' && (
+                {pendingInvites.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-surface-200">
+                    <h4 className="mb-3 text-sm font-semibold text-surface-700 flex items-center gap-2">
+                      <Clock size={18} weight="duotone" />
+                      Invitaciones pendientes
+                    </h4>
+                    <div className="flex flex-col gap-3">
+                      {pendingInvites.map((inv) => (
+                        <div
+                          key={inv.id}
+                          className="rounded-lg border border-surface-200 p-3 opacity-75"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-100">
+                              <User size={20} className="text-surface-500" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-surface-900">
+                                  {inv.email}
+                                </span>
+                                <span className="rounded bg-yellow-100 px-1.5 py-0.5 text-xs text-yellow-700">
+                                  Pendiente
+                                </span>
+                                <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
+                                  {inv.role}
+                                </span>
+                              </div>
+                              <p className="text-xs text-surface-500">
+                                Invitado: {new Date(inv.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+ 
+           {tab === 'preferences' && (
             <div className="flex flex-col">
               <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-surface-500">
                 Espacio de trabajo

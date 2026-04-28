@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import type { FormEvent } from "react";
 import { useBoardStore } from "@/stores/boardStore";
 import { Button } from "@/shared/components/Button";
 import { Input } from "@/shared/components/Input";
-import { Trash, UserPlus, User } from "@phosphor-icons/react";
+import { Trash, UserPlus, User, Clock } from "@phosphor-icons/react";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
 import { PERMISSIONS } from "@/shared/utils/constants";
 import type { BoardMember, Permission } from "@/shared/types/domain";
+import { api } from "@/services/api";
 
 const PERMISSION_LABELS: Record<Permission, string> = {
   [PERMISSIONS.CREATE_STAGE]: "Crear etapas",
@@ -18,9 +19,18 @@ const PERMISSION_LABELS: Record<Permission, string> = {
   [PERMISSIONS.INVITE_MEMBER]: "Invitar miembros",
 };
 
+interface PendingInvitation {
+  id: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
 export function BoardMembersPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const [inviteEmail, setInviteEmail] = useState("");
+  const [pendingInvites, setPendingInvites] = useState<PendingInvitation[]>([]);
   const {
     addMember,
     removeMember,
@@ -28,6 +38,13 @@ export function BoardMembersPage() {
   } = useBoardStore();
   const currentBoard = useBoardStore((s) => s.currentBoard);
   const log = useActivity(boardId);
+
+  useEffect(() => {
+    if (!boardId) return;
+    api<PendingInvitation[]>(`/boards/${boardId}/invitations`)
+      .then(setPendingInvites)
+      .catch(() => setPendingInvites([]));
+  }, [boardId]);
 
   if (!currentBoard || !boardId) return null;
 
@@ -156,9 +173,49 @@ export function BoardMembersPage() {
                   ))}
                 </div>
               )}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
+
+        {pendingInvites.length > 0 && (
+          <div className="pt-4 border-t border-border-default">
+            <h3 className="mb-3 text-content font-semibold text-fg-default flex items-center gap-2">
+              <Clock size={18} weight="duotone" />
+              Invitaciones pendientes
+            </h3>
+            <div className="flex flex-col gap-3">
+              {pendingInvites.map((inv) => (
+                <div
+                  key={inv.id}
+                  className="rounded-card border border-border-default p-3 opacity-75"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
+                        <User size={20} className="text-fg-muted" />
+                      </div>
+                      <div>
+                        <span className="text-content font-medium text-fg-default">
+                          {inv.email}
+                        </span>
+                        <span className="ml-2 rounded-pill bg-yellow-100 px-2 py-0.5 text-card-meta text-yellow-700">
+                          Pendiente
+                        </span>
+                        <span className="ml-2 rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
+                          {inv.role}
+                        </span>
+                        <p className="text-card-meta text-fg-subtle">
+                          Invitado: {new Date(inv.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
