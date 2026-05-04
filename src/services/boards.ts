@@ -3,7 +3,7 @@ import type {
   BackendBoard,
   BackendStage,
   BackendCard,
-  BackendMember,
+  BackendBoardMember,
   FullBoard,
 } from "@/shared/types";
 
@@ -39,18 +39,19 @@ export const stagesApi = {
 };
 
 export const membersApi = {
-  list: (boardId: string) => api<BackendMember[]>(`/boards/${boardId}/members`),
+  list: (boardId: string) =>
+    api<BackendBoardMember[]>(`/boards/${boardId}/members`),
   update: (
     boardId: string,
-    userId: string,
+    membershipId: string,
     body: { role?: "owner" | "admin" | "member"; permissions?: string[] },
   ) =>
-    api<BackendMember>(`/boards/${boardId}/members/${userId}`, {
+    api<BackendBoardMember>(`/boards/${boardId}/members/${membershipId}`, {
       method: "PATCH",
       body,
     }),
-  remove: (boardId: string, userId: string) =>
-    api<void>(`/boards/${boardId}/members/${userId}`, { method: "DELETE" }),
+  remove: (boardId: string, membershipId: string) =>
+    api<void>(`/boards/${boardId}/members/${membershipId}`, { method: "DELETE" }),
   invite: (
     boardId: string,
     email: string,

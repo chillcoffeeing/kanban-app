@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -23,9 +23,14 @@ import { CardDetailModal } from "@/features/cards/components/CardDetailModal";
 import { ActivityFeed } from "@/features/boards/components/ActivityFeed";
 import { CardSearch } from "@/features/cards/components/CardSearch";
 import { Button } from "@/shared/components/Button";
-import { PlusIcon, GearIcon, BellIcon, UserPlus } from "@phosphor-icons/react";
+import {
+  PlusIcon,
+  GearIcon,
+  BellIcon,
+  UserPlusIcon,
+} from "@phosphor-icons/react";
 import type { Card } from "@/shared/types/domain";
-import { MemberAvatar } from "@/features/cards/components/MemberAvatar";
+import { MemberAvatar } from "@/shared/components/MemberAvatar";
 
 interface BoardViewProps {
   boardId: string;
@@ -40,28 +45,139 @@ interface DragData {
 
 export function BoardView({ boardId, openCardId }: BoardViewProps) {
   const navigate = useNavigate();
-  const { currentBoard, setCurrentBoard, addStage, moveCard, loadCard, addMember } =
-    useBoardStore();
+
+  const {
+    currentBoard,
+    setCurrentBoard,
+    addStage,
+    moveCard,
+    loadCard,
+    addMember,
+  } = useBoardStore();
   const currentUser = useAuthStore((s) => s.user);
-  const isOwner = currentBoard?.ownerId === currentUser?.id;
+
+  const isOwner = currentBoard?.members?.some(
+    (m) => m.user?.id === currentUser?.id && m.role === "owner",
+  );
+
   const loadActivities = useActivityStore((s) => s.loadActivities);
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const queryCardId = openCardId ?? (searchParams.get("card-id") || undefined);
+
   const [isAddingStage, setIsAddingStage] = useState(false);
+
   const [newStageName, setNewStageName] = useState("");
+
   const [selectedCardId, setSelectedCardId] = useState<string | null>(
     () => queryCardId ?? null,
   );
+
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
+
   const [isCardLoading, setIsCardLoading] = useState(() =>
     Boolean(queryCardId),
   );
+
   const [showActivity, setShowActivity] = useState(false);
+
   const [showInvite, setShowInvite] = useState(false);
+
   const [, setActiveId] = useState<UniqueIdentifier | null>(null);
+
   const log = useActivity(boardId);
+
   const lastLoadedCardId = useRef<string | null>(null);
+
   const { joinBoard } = useSocket();
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: { distance: 5 },
+  });
+
+  const sensors = useSensors(pointerSensor);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(null);
+      if (!over) return;
+
+      const activeData = active.data.current as DragData | undefined;
+      const overData = over.data.current as DragData | undefined;
+
+      if (activeData?.type === "card") {
+        const fromStageId = activeData.stageId;
+        let toStageId = fromStageId;
+        let newIndex = 0;
+
+        if (overData?.type === "stage") {
+          toStageId = overData.stageId;
+          const toStage = currentBoard?.stages.find((s) => s.id === toStageId);
+          newIndex = toStage?.cards.length || 0;
+        } else if (overData?.type === "card") {
+          toStageId = overData.stageId;
+          const toStage = currentBoard?.stages.find((s) => s.id === toStageId);
+          newIndex = toStage?.cards.findIndex((c) => c.id === over.id) ?? 0;
+        }
+
+        if (fromStageId !== toStageId || active.id !== over.id) {
+          moveCard(
+            boardId,
+            fromStageId,
+            toStageId,
+            String(active.id),
+            newIndex,
+          );
+
+          if (fromStageId !== toStageId) {
+            const fromName = currentBoard?.stages.find(
+              (s) => s.id === fromStageId,
+            )?.name;
+            const toName = currentBoard?.stages.find(
+              (s) => s.id === toStageId,
+            )?.name;
+            const cardTitle = activeData.card?.title || "Tarjeta";
+            log(
+              ACTIVITY_TYPES.CARD_MOVED,
+              `movió "${cardTitle}" de "${fromName}" a "${toName}"`,
+            );
+          }
+        }
+      }
+    },
+    [boardId, currentBoard, moveCard, log],
+  );
+
+  const handleOpenCard = useCallback(
+    (card: Card, stageId: string) => {
+      const params = new URLSearchParams(searchParams);
+
+      params.set("card-id", card.id);
+
+      setSearchParams(params, { replace: false });
+
+      setSelectedCardId(card.id);
+
+      setSelectedStageId(stageId);
+
+      setIsCardLoading(true);
+
+      const controller = new AbortController();
+
+      loadCard(card.id).finally(() => {
+        if (!controller.signal.aborted) {
+          setIsCardLoading(false);
+        }
+      });
+    },
+    [searchParams, setSearchParams, loadCard],
+  );
 
   useEffect(() => {
     if (!currentBoard) return;
@@ -89,19 +205,40 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
     lastLoadedCardId.current = queryCardId;
     setIsCardLoading(true);
-    void loadCard(queryCardId).finally(() => {
-      setIsCardLoading(false);
+
+    const controller = new AbortController();
+
+    loadCard(queryCardId).finally(() => {
+      if (!controller.signal.aborted) {
+        setIsCardLoading(false);
+      }
     });
+
+    return () => {
+      controller.abort();
+    };
   }, [queryCardId, currentBoard, loadCard]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
-
   useEffect(() => {
-    void setCurrentBoard(boardId);
-    loadActivities(boardId);
-    joinBoard(boardId);
+    const controller = new AbortController();
+
+    const init = async () => {
+      try {
+        await setCurrentBoard(boardId);
+        loadActivities(boardId);
+        joinBoard(boardId);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          // Error handled silently
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      controller.abort();
+    };
   }, [boardId]);
 
   if (!currentBoard) {
@@ -122,63 +259,6 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     setIsAddingStage(false);
   };
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
-    if (!over) return;
-
-    const activeData = active.data.current as DragData | undefined;
-    const overData = over.data.current as DragData | undefined;
-
-    if (activeData?.type === "card") {
-      const fromStageId = activeData.stageId;
-      let toStageId = fromStageId;
-      let newIndex = 0;
-
-      if (overData?.type === "stage") {
-        toStageId = overData.stageId;
-        const toStage = currentBoard.stages.find((s) => s.id === toStageId);
-        newIndex = toStage?.cards.length || 0;
-      } else if (overData?.type === "card") {
-        toStageId = overData.stageId;
-        const toStage = currentBoard.stages.find((s) => s.id === toStageId);
-        newIndex = toStage?.cards.findIndex((c) => c.id === over.id) ?? 0;
-      }
-
-      if (fromStageId !== toStageId || active.id !== over.id) {
-        moveCard(boardId, fromStageId, toStageId, String(active.id), newIndex);
-
-        if (fromStageId !== toStageId) {
-          const fromName = currentBoard.stages.find(
-            (s) => s.id === fromStageId,
-          )?.name;
-          const toName = currentBoard.stages.find(
-            (s) => s.id === toStageId,
-          )?.name;
-          const cardTitle = activeData.card?.title || "Tarjeta";
-          log(
-            ACTIVITY_TYPES.CARD_MOVED,
-            `movió "${cardTitle}" de "${fromName}" a "${toName}"`,
-          );
-        }
-      }
-    }
-  };
-
-  const handleOpenCard = (card: Card, stageId: string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("card-id", card.id);
-    setSearchParams(params, { replace: false });
-    setSelectedCardId(card.id);
-    setSelectedStageId(stageId);
-    setIsCardLoading(true);
-    loadCard(card.id).finally(() => setIsCardLoading(false));
-  };
-
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Board header */}
@@ -191,7 +271,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
           <div className="flex -space-x-1">
             {currentBoard.members.map((m) => (
               <MemberAvatar
-                key={m.userId}
+                key={m.id}
                 name={m.user?.name || "Usuario sin nombre"}
                 avatar={m.user?.avatarUrl || undefined}
               />
@@ -209,7 +289,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
                 className="text-white/80! hover:bg-white/20! hover:text-white!"
                 onClick={() => setShowInvite(!showInvite)}
               >
-                <UserPlus size={20} weight="duotone" /> Invitar
+                <UserPlusIcon size={20} weight="duotone" /> Invitar
               </Button>
               {showInvite && (
                 <form

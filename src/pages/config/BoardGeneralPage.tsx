@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useBoardStore } from "@/stores/boardStore";
 import { Button } from "@/shared/components/Button";
 import { Input } from "@/shared/components/Input";
-import { Trash } from "@phosphor-icons/react";
+import { TrashIcon } from "@phosphor-icons/react";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
 
@@ -68,7 +68,7 @@ export function BoardGeneralPage() {
           Esta acción es irreversible.
         </p>
         <Button variant="danger" size="sm" onClick={handleDelete}>
-          <Trash size={20} weight="duotone" /> Eliminar tablero
+          <TrashIcon size={20} weight="duotone" /> Eliminar tablero
         </Button>
       </div>
     </div>

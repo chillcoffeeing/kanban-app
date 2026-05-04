@@ -48,14 +48,13 @@ export type Permission =
 export type MemberRole = "owner" | "admin" | "member";
 
 export interface BoardMember {
-  userId: string;
   email: string;
   permissions: Permission[];
   role: MemberRole;
   id: string;
-  boardId: string;
   invitedAt: string;
   user?: {
+    id: string;
     name: string;
     avatarUrl: string | null;
     createdAt: string;
@@ -75,7 +74,6 @@ export interface Board {
   id: string;
   name: string;
   background: string;
-  ownerId: string;
   members: BoardMember[];
   stages: Stage[];
   labels: Label[];

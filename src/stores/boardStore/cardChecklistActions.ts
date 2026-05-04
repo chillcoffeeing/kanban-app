@@ -45,7 +45,6 @@ export function createCardChecklistActions(set: any, get: any) {
       } catch (error) {
         // Rollback on error
         set(currentState);
-        console.error("Error adding checklist item:", error);
         throw error;
       }
     },
@@ -82,7 +81,6 @@ export function createCardChecklistActions(set: any, get: any) {
       } catch (error) {
         // Rollback on error
         set(currentState);
-        console.error("Error updating checklist item:", error);
         throw error;
       }
     },
@@ -118,7 +116,6 @@ export function createCardChecklistActions(set: any, get: any) {
       } catch (error) {
         // Rollback on error
         set(currentState);
-        console.error("Error deleting checklist item:", error);
         throw error;
       }
     },

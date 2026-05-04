@@ -1,5 +1,4 @@
 import { cardsApi } from "@/services/cards";
-import type { Board } from "@/shared/types";
 import { updateCardInState } from "./cardHelpers";
 
 export function createCardMemberActions(set: any, get: any) {
@@ -10,7 +9,7 @@ export function createCardMemberActions(set: any, get: any) {
       boardId: string,
       stageId: string,
       cardId: string,
-      userId: string,
+      boardMembershipId: string,
     ) => {
       // Optimistic update: add member locally first
       const currentState = get();
@@ -24,14 +23,21 @@ export function createCardMemberActions(set: any, get: any) {
           ...card,
           members: [
             ...card.members,
-            { userId, user: { name: "Cargando..." } }, // Placeholder
+            {
+              boardMembershipId: boardMembershipId,
+              boardMembership: {
+                user: { name: "Cargando...", avatarUrl: null, id: "" },
+              },
+            }, // Placeholder
           ],
         }),
       );
       set({ boards, currentBoard });
 
       try {
-        const res = await cardsApi.addMember(cardId, { userId });
+        const res = await cardsApi.addMember(cardId, {
+          boardMembershipId: boardMembershipId,
+        });
         // Update with real data from backend
         const { boards: updatedBoards, currentBoard: updatedCurrentBoard } =
           updateCardInState(
@@ -46,7 +52,6 @@ export function createCardMemberActions(set: any, get: any) {
       } catch (error) {
         // Rollback on error
         set(currentState);
-        console.error("Error adding card member:", error);
       }
     },
 
@@ -54,10 +59,11 @@ export function createCardMemberActions(set: any, get: any) {
       boardId: string,
       stageId: string,
       cardId: string,
-      userId: string,
+      boardMembershipId: string,
     ) => {
       // Optimistic update: remove member locally first
       const currentState = get();
+
       const { boards, currentBoard } = updateCardInState(
         currentState.boards,
         currentState.currentBoard,
@@ -66,18 +72,37 @@ export function createCardMemberActions(set: any, get: any) {
         cardId,
         (card) => ({
           ...card,
-          members: card.members.filter((member) => member.userId !== userId),
+          members: card.members.filter(
+            (member) => member.boardMembershipId !== boardMembershipId,
+          ),
         }),
       );
       set({ boards, currentBoard });
 
       try {
-        await cardsApi.removeMember(cardId, userId);
-        // Success: keep the optimistic update
+        await cardsApi.removeMember(cardId, boardMembershipId);
+
+        const { boards: updatedBoards, currentBoard: updatedCurrentBoard } =
+          updateCardInState(
+            currentState.boards,
+            currentState.currentBoard,
+            boardId,
+            stageId,
+            cardId,
+            (card) => ({
+              ...card,
+              members:
+                card.members.filter(
+                  (m) => m.boardMembershipId !== boardMembershipId,
+                ) || [],
+            }),
+          );
+        set({ boards: updatedBoards, currentBoard: updatedCurrentBoard });
       } catch (error) {
+        console.log(error);
+
         // Rollback on error
         set(currentState);
-        console.error("Error removing card member:", error);
       }
     },
   };

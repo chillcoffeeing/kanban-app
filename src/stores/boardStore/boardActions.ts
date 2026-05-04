@@ -1,6 +1,21 @@
 import { boardsApi } from "@/services/boards";
-import type { Board, FullBoard } from "@/shared/types";
+import { useAuthStore } from "@/stores/authStore";
+import { useActivityStore } from "@/stores/activityStore";
+import type { ActivityType, Board, FullBoard } from "@/shared/types";
 import { normalizeBoard, normalizeStage } from "./normalizers";
+
+function logActivity(
+  boardId: string,
+  type: ActivityType,
+  detail: string,
+  meta?: Record<string, unknown>,
+) {
+  const user = useAuthStore.getState().user;
+  const userName = user?.profile?.displayName || user?.name || "Usuario";
+  useActivityStore
+    .getState()
+    .log(boardId, { type, user: userName, detail, meta });
+}
 
 export function createBoardActions(set: any, get: any) {
   return {
@@ -10,6 +25,7 @@ export function createBoardActions(set: any, get: any) {
       set({ loading: true, error: null });
       try {
         const list = await boardsApi.list();
+
         const boards = list.map((board) => normalizeBoard(board));
         set({ boards, loading: false });
       } catch (err) {
@@ -27,8 +43,11 @@ export function createBoardActions(set: any, get: any) {
 
       try {
         const full: FullBoard = await boardsApi.getFull(boardId);
+
+        console.log(full);
+
         const stages = full.stages.map((stage) =>
-          normalizeStage(stage, stage.cards, full.members),
+          normalizeStage(stage, stage.cards),
         );
         const board = normalizeBoard(full.board, full.members, stages);
         set((state: any) => ({
@@ -49,10 +68,15 @@ export function createBoardActions(set: any, get: any) {
       const res = await boardsApi.create({ name, background });
       const board = normalizeBoard(res);
       set((state: any) => ({ boards: [...state.boards, board] }));
+      logActivity(board.id, "board_created", `creó el tablero "${name}"`);
       return board;
     },
 
     updateBoard: async (boardId: string, updates: Partial<Board>) => {
+      const board =
+        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+      const oldName = board?.name ?? boardId;
+
       const res = await boardsApi.update(boardId, {
         name: updates.name,
         background: updates.background,
@@ -80,15 +104,31 @@ export function createBoardActions(set: any, get: any) {
           }),
         ),
       }));
+      if (oldName !== res.name) {
+        logActivity(
+          boardId,
+          "board_renamed",
+          `renombró el tablero "${oldName}" a "${res.name}"`,
+        );
+      }
     },
 
     deleteBoard: async (boardId: string) => {
+      const board =
+        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+      const boardName = board?.name ?? boardId;
+
       await boardsApi.remove(boardId);
       set((state: any) => ({
         boards: state.boards.filter((b: Board) => b.id !== boardId),
         currentBoard:
           state.currentBoard?.id === boardId ? null : state.currentBoard,
       }));
+      logActivity(
+        boardId,
+        "board_renamed",
+        `eliminó el tablero "${boardName}"`,
+      );
     },
   };
 }

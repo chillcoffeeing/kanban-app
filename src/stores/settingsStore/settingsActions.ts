@@ -1,4 +1,3 @@
-import { useAuthStore } from "@/stores/authStore";
 import {
   DEFAULT_DISPLAY_PREFS,
   DEFAULT_NOTIFICATION_PREFS,
@@ -8,10 +7,11 @@ import {
   type UserPreferences,
   type UserPrivacyPrefs,
 } from "@/shared/types/user";
+import { useAuthStore } from "@/stores/authStore";
 import { composeGuestPrefs, readGuest, writeGuest } from "./utils";
-import type { PreferencesPatch } from "./types";
+import type { PreferencesPatch, SettingsView } from "./types";
 
-export function createSettingsActions() {
+export function createSettingsActions(): SettingsView {
   const user = useAuthStore((state) => state.user);
   const updatePreferences = useAuthStore((state) => state.updatePreferences);
   // Re-render on guest bumps
@@ -24,9 +24,9 @@ export function createSettingsActions() {
       privacy: { ...DEFAULT_PRIVACY_PREFS },
     };
 
-  const apply = (patch: PreferencesPatch) => {
+  const apply = async (patch: PreferencesPatch) => {
     if (user) {
-      updatePreferences(patch as Partial<UserPreferences>);
+      await updatePreferences(patch as Partial<UserPreferences>);
     } else {
       writeGuest(composeGuestPrefs(patch));
       useAuthStore.setState({ _guestBump: Date.now() });
@@ -34,7 +34,21 @@ export function createSettingsActions() {
   };
 
   return {
-    prefs,
+    // Display flat
+    theme: prefs.display.theme,
+    background: prefs.display.background,
+    density: prefs.display.density,
+    language: prefs.display.language,
+    timezone: prefs.display.timezone,
+    timeFormat: prefs.display.timeFormat,
+    dateFormat: prefs.display.dateFormat,
+    reducedMotion: prefs.display.reducedMotion,
+    showCompletedCards: prefs.display.showCompletedCards,
+
+    // Composite groups
+    notifications: prefs.notifications,
+    privacy: prefs.privacy,
+
     apply,
 
     // Display setters
@@ -54,7 +68,7 @@ export function createSettingsActions() {
     setShowCompletedCards: (v: boolean) =>
       apply({ display: { showCompletedCards: v } }),
 
-    // Notification setters
+    // Notification setter
     setNotification: <K extends keyof UserNotificationPrefs>(
       key: K,
       value: UserNotificationPrefs[K],
@@ -63,7 +77,7 @@ export function createSettingsActions() {
         notifications: { [key]: value } as Partial<UserNotificationPrefs>,
       }),
 
-    // Privacy setters
+    // Privacy setter
     setPrivacy: <K extends keyof UserPrivacyPrefs>(
       key: K,
       value: UserPrivacyPrefs[K],

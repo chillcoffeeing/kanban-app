@@ -1,22 +1,20 @@
 import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { useBoardStore } from "@/stores/boardStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
-import { generateId } from "@/shared/utils/helpers";
 import {
   UserPlusIcon,
   TrashIcon,
   PlusIcon,
   CheckCircleIcon,
-  CaretDown,
+  CaretDownIcon,
+  UserMinusIcon,
 } from "@phosphor-icons/react";
 import { LabelEditor } from "./LabelEditor";
-import type { Card, ChecklistItem, Label } from "@/shared/types/domain";
-import { BackendCardMember } from "@/shared/types";
+import type { Card, Label } from "@/shared/types/domain";
 
 interface CardDetailModalProps {
   isOpen: boolean;
@@ -36,6 +34,7 @@ export function CardDetailModal({
   isLoading = false,
 }: CardDetailModalProps) {
   const {
+    currentBoard,
     updateCard,
     deleteCard,
     addCardMember,
@@ -48,7 +47,6 @@ export function CardDetailModal({
     deleteChecklistItem,
   } = useBoardStore();
   const user = useAuthStore((s) => s.user);
-  const currentBoard = useBoardStore((s) => s.currentBoard);
   const log = useActivity(boardId);
 
   const [title, setTitle] = useState("");
@@ -74,7 +72,7 @@ export function CardDetailModal({
         title="Cargando tarjeta…"
         size="lg"
       >
-        <div className="min-h-[220px] flex items-center justify-center text-surface-500">
+        <div className="min-h-55 flex items-center justify-center text-surface-500">
           Cargando tarjeta…
         </div>
       </Modal>
@@ -131,7 +129,7 @@ export function CardDetailModal({
         );
       }
     } catch (error) {
-      console.error("Error updating card label:", error);
+      // Error handled silently
     }
   };
 
@@ -148,7 +146,7 @@ export function CardDetailModal({
       );
       setNewCheckItem("");
     } catch (error) {
-      console.error("Error adding checklist item:", error);
+      // Error handled silently
     }
   };
 
@@ -165,7 +163,7 @@ export function CardDetailModal({
         `${!item.done ? "completó" : "desmarcó"} "${item.text}" en "${title}"`,
       );
     } catch (error) {
-      console.error("Error toggling checklist item:", error);
+      // Error handled silently
     }
   };
 
@@ -173,31 +171,49 @@ export function CardDetailModal({
     try {
       await deleteChecklistItem(boardId, activeStageId, activeCard.id, itemId);
     } catch (error) {
-      console.error("Error removing checklist item:", error);
+      // Error handled silently
     }
   };
 
   const joinCard = async () => {
     const userId = user?.id;
-    if (!userId || members.some((m) => m.userId === userId)) return;
+
+    const membership = currentBoard?.members.find(
+      (boardMember) => boardMember?.user?.id === userId,
+    );
+
+    if (!userId || !membership) {
+      throw new Error("Membership not found for current user");
+    }
 
     try {
-      await addCardMember(boardId, activeStageId, activeCard.id, userId);
+      await addCardMember(boardId, activeStageId, activeCard.id, membership.id);
       log(ACTIVITY_TYPES.MEMBER_JOINED_CARD, `se unió a la tarjeta "${title}"`);
     } catch (error) {
-      console.error("Error joining card:", error);
+      // Error handled silently
     }
   };
-
   const leaveCard = async () => {
     const userId = user?.id;
-    if (!userId || !members.some((m) => m.userId === userId)) return;
+
+    const membership = currentBoard?.members.find(
+      (boardMember) => boardMember?.user?.id === userId,
+    );
+
+    if (!userId || !membership) {
+      throw new Error("Membership not found for current user");
+    }
 
     try {
-      await removeCardMember(boardId, activeStageId, activeCard.id, userId);
-      log(ACTIVITY_TYPES.MEMBER_LEFT_CARD, `salió de la tarjeta "${title}"`);
+      await removeCardMember(
+        boardId,
+        activeStageId,
+        activeCard.id,
+        membership.id,
+      );
+      log(ACTIVITY_TYPES.MEMBER_LEFT_CARD, `dejó la tarjeta "${title}"`);
     } catch (error) {
-      console.error("Error leaving card:", error);
+      // Error handled silently
     }
   };
 
@@ -232,7 +248,7 @@ export function CardDetailModal({
         `añadió la etiqueta "${label.name}" a "${title}"`,
       );
     } catch (error) {
-      console.error("Error creating label:", error);
+      // Error handled silently
     }
   };
 
@@ -357,10 +373,10 @@ export function CardDetailModal({
               <div className="flex flex-wrap gap-2">
                 {members.map((member) => (
                   <span
-                    key={member.userId}
+                    key={member.boardMembershipId}
                     className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700"
                   >
-                    {member.user.name}
+                    {member.boardMembership.user.name}
                   </span>
                 ))}
               </div>
@@ -374,14 +390,26 @@ export function CardDetailModal({
             Acciones
           </p>
           <div className="relative">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-full justify-start"
-              onClick={joinCard}
-            >
-              <UserPlusIcon size={20} weight="duotone" /> Unirme
-            </Button>
+            {members.find((m) => m.boardMembership.user.id === user?.id) ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full justify-start mt-1"
+                onClick={leaveCard}
+              >
+                <UserMinusIcon size={20} weight="duotone" /> Dejar
+              </Button>
+            ) : (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full justify-start mt-1"
+                onClick={joinCard}
+              >
+                <UserPlusIcon size={20} weight="duotone" /> Unirme
+              </Button>
+            )}
+
             <div className="relative">
               <Button
                 variant="secondary"
@@ -390,34 +418,45 @@ export function CardDetailModal({
                 onClick={() => setShowMemberDropdown(!showMemberDropdown)}
               >
                 <UserPlusIcon size={20} weight="duotone" /> Asignar
-                <CaretDown size={16} className="ml-auto" />
+                <CaretDownIcon size={16} className="ml-auto" />
               </Button>
               {showMemberDropdown && (
                 <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-surface-200 bg-white py-1 shadow-lg">
-                    {currentBoard?.members
-                      .filter((m) => m.userId !== user?.id)
-                      .map((member) => {
-                      const isMember = members.some((m) => m.userId === member.userId);
+                  {currentBoard?.members
+                    .filter((m) => m.user?.id !== user?.id)
+                    .map((member) => {
+                      const isMember = members.some(
+                        (m) => m.boardMembershipId === member.id,
+                      );
                       return (
                         <button
-                          key={member.userId}
+                          key={member.id}
                           onClick={() => {
                             if (!isMember) {
-                              addCardMember(boardId, activeStageId, activeCard.id, member.userId);
+                              addCardMember(
+                                boardId,
+                                activeStageId,
+                                activeCard.id,
+                                member.id,
+                              );
                             }
                             setShowMemberDropdown(false);
                           }}
                           disabled={isMember}
                           className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-50 ${
-                            isMember ? "text-surface-300 cursor-not-allowed" : "text-surface-700"
+                            isMember
+                              ? "text-surface-300 cursor-not-allowed"
+                              : "text-surface-700"
                           }`}
                         >
                           <span>{member.user?.name || member.email}</span>
-                          {isMember && <span className="text-xs">(asignado)</span>}
+                          {isMember && (
+                            <span className="text-xs">(asignado)</span>
+                          )}
                         </button>
                       );
                     })}
-                  </div>
+                </div>
               )}
             </div>
           </div>

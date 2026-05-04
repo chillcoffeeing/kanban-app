@@ -1,9 +1,9 @@
 import { Link, useNavigate, useParams, Outlet, useLocation } from "react-router-dom";
 import {
-  GearSix,
-  Users,
-  SlidersHorizontal,
-  ArrowLeft,
+  GearSixIcon,
+  UsersIcon,
+  SlidersHorizontalIcon,
+  ArrowLeftIcon,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
@@ -19,9 +19,9 @@ export function BoardConfigLayout({ boardId: boardIdProp }: BoardConfigLayoutPro
   
   const basePath = `/boards/${boardId}/config`;
   const TABS: Array<{ path: string; label: string; Icon: PhosphorIcon }> = [
-    { path: `${basePath}/general`, label: "General", Icon: GearSix },
-    { path: `${basePath}/miembros`, label: "Miembros", Icon: Users },
-    { path: `${basePath}/preferencias`, label: "Preferencias", Icon: SlidersHorizontal },
+    { path: `${basePath}/general`, label: "General", Icon: GearSixIcon },
+    { path: `${basePath}/miembros`, label: "Miembros", Icon: UsersIcon },
+    { path: `${basePath}/preferencias`, label: "Preferencias", Icon: SlidersHorizontalIcon },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -33,7 +33,7 @@ export function BoardConfigLayout({ boardId: boardIdProp }: BoardConfigLayoutPro
           onClick={() => navigate(`/boards/${boardId}`)}
           className="flex items-center gap-1 text-surface-600 hover:text-surface-900"
         >
-          <ArrowLeft size={20} weight="duotone" />
+          <ArrowLeftIcon size={20} weight="duotone" />
           <span>Volver al tablero</span>
         </button>
       </div>

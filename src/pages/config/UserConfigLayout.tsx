@@ -1,20 +1,20 @@
 import { Link, useNavigate, Outlet, useLocation } from "react-router-dom";
 import {
-  User,
-  PaintBucket,
-  Bell,
-  ShieldCheck,
+  UserIcon,
+  PaintBucketIcon,
+  BellIcon,
+  ShieldCheckIcon,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import {
-  ArrowLeft,
+  ArrowLeftIcon,
 } from "@phosphor-icons/react";
 
 const TABS: Array<{ path: string; label: string; Icon: PhosphorIcon }> = [
-  { path: "/config/perfil", label: "Perfil", Icon: User },
-  { path: "/config/apariencia", label: "Apariencia", Icon: PaintBucket },
-  { path: "/config/notificaciones", label: "Notificaciones", Icon: Bell },
-  { path: "/config/privacidad", label: "Privacidad", Icon: ShieldCheck },
+  { path: "/config/perfil", label: "Perfil", Icon: UserIcon },
+  { path: "/config/apariencia", label: "Apariencia", Icon: PaintBucketIcon },
+  { path: "/config/notificaciones", label: "Notificaciones", Icon: BellIcon },
+  { path: "/config/privacidad", label: "Privacidad", Icon: ShieldCheckIcon },
 ];
 
 export function UserConfigLayout() {
@@ -30,7 +30,7 @@ export function UserConfigLayout() {
           onClick={() => navigate("/boards")}
           className="flex items-center gap-1 text-surface-600 hover:text-surface-900"
         >
-          <ArrowLeft size={20} weight="duotone" />
+          <ArrowLeftIcon size={20} weight="duotone" />
           <span>Volver</span>
         </button>
       </div>

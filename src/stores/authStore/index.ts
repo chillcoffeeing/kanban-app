@@ -9,7 +9,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: readStoredUser(),
   token: getAccessToken(),
   isAuthenticated: !!getAccessToken(),
-
   ...createAuthActions(set, get),
   ...createUserActions(set, get),
 }));

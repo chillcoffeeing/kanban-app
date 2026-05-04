@@ -12,7 +12,7 @@ import { ACTIVITY_TYPES } from "@/stores/activityStore";
 import { CardItem } from "@/features/cards/components/CardItem";
 import { Button } from "@/shared/components/Button";
 import { DropdownMenu, DropdownItem } from "@/shared/components/DropdownMenu";
-import { Plus, DotsThree, Pencil, Trash } from "@phosphor-icons/react";
+import { PlusIcon, DotsThreeIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react";
 import type { Card, Stage } from "@/shared/types/domain";
 
 interface StageColumnProps {
@@ -100,7 +100,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
         <DropdownMenu
           trigger={
             <button className="cursor-pointer rounded p-1 text-surface-400 hover:bg-surface-200 hover:text-surface-600">
-              <DotsThree size={22} weight="bold" />
+              <DotsThreeIcon size={22} weight="bold" />
             </button>
           }
         >
@@ -111,7 +111,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
             }}
           >
             <span className="flex items-center gap-2">
-              <Pencil size={18} weight="duotone" /> Renombrar
+              <PencilIcon size={18} weight="duotone" /> Renombrar
             </span>
           </DropdownItem>
           <DropdownItem
@@ -127,7 +127,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
             }}
           >
             <span className="flex items-center gap-2">
-              <Trash size={18} weight="duotone" /> Eliminar
+              <TrashIcon size={18} weight="duotone" /> Eliminar
             </span>
           </DropdownItem>
         </DropdownMenu>
@@ -192,7 +192,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
             onClick={() => setIsAdding(true)}
             className="flex w-full cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-surface-500 hover:bg-surface-200 hover:text-surface-700"
           >
-            <Plus size={20} weight="duotone" /> Añadir tarjeta
+            <PlusIcon size={20} weight="duotone" /> Añadir tarjeta
           </button>
         )}
       </div>

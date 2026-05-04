@@ -27,24 +27,26 @@ export interface SettingsView {
   notifications: UserNotificationPrefs;
   privacy: UserPrivacyPrefs;
 
-  setTheme: (v: UserDisplayPrefs["theme"]) => void;
-  setBackground: (v: string) => void;
-  setDensity: (v: UserDisplayPrefs["density"]) => void;
-  setLanguage: (v: UserDisplayPrefs["language"]) => void;
-  setTimezone: (v: string) => void;
-  setTimeFormat: (v: UserDisplayPrefs["timeFormat"]) => void;
-  setDateFormat: (v: UserDisplayPrefs["dateFormat"]) => void;
-  setReducedMotion: (v: boolean) => void;
-  setShowCompletedCards: (v: boolean) => void;
+  apply: (patch: PreferencesPatch) => Promise<void>;
+
+  setTheme: (v: UserDisplayPrefs["theme"]) => Promise<void>;
+  setBackground: (v: string) => Promise<void>;
+  setDensity: (v: UserDisplayPrefs["density"]) => Promise<void>;
+  setLanguage: (v: UserDisplayPrefs["language"]) => Promise<void>;
+  setTimezone: (v: string) => Promise<void>;
+  setTimeFormat: (v: UserDisplayPrefs["timeFormat"]) => Promise<void>;
+  setDateFormat: (v: UserDisplayPrefs["dateFormat"]) => Promise<void>;
+  setReducedMotion: (v: boolean) => Promise<void>;
+  setShowCompletedCards: (v: boolean) => Promise<void>;
 
   setNotification: <K extends keyof UserNotificationPrefs>(
     key: K,
     value: UserNotificationPrefs[K],
-  ) => void;
+  ) => Promise<void>;
   setPrivacy: <K extends keyof UserPrivacyPrefs>(
     key: K,
     value: UserPrivacyPrefs[K],
-  ) => void;
+  ) => Promise<void>;
 
-  reset: () => void;
+  reset: () => Promise<void>;
 }

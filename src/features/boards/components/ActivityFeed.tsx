@@ -1,39 +1,40 @@
 import { useActivityStore, ACTIVITY_TYPES } from '@/stores/activityStore'
 import type { ActivityType } from '@/shared/types/domain'
 import {
-  Kanban,
-  Stack,
-  FileText,
-  ArrowsLeftRight,
-  Trash,
-  Tag,
-  CalendarBlank,
-  CheckCircle,
-  UserPlus,
-  UserMinus,
-  NotePencil,
+  KanbanIcon,
+  StackIcon,
+  FileTextIcon,
+  ArrowsLeftRightIcon,
+  TrashIcon,
+  TagIcon,
+  CalendarBlankIcon,
+  CheckCircleIcon,
+  UserPlusIcon,
+  UserMinusIcon,
+  NotePencilIcon,
 } from '@phosphor-icons/react'
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
+import { useMemo } from 'react'
 
 const ICON_MAP: Partial<Record<ActivityType, PhosphorIcon>> = {
-  [ACTIVITY_TYPES.BOARD_CREATED]: Kanban,
-  [ACTIVITY_TYPES.BOARD_RENAMED]: NotePencil,
-  [ACTIVITY_TYPES.STAGE_CREATED]: Stack,
-  [ACTIVITY_TYPES.STAGE_RENAMED]: NotePencil,
-  [ACTIVITY_TYPES.STAGE_DELETED]: Trash,
-  [ACTIVITY_TYPES.CARD_CREATED]: FileText,
-  [ACTIVITY_TYPES.CARD_UPDATED]: NotePencil,
-  [ACTIVITY_TYPES.CARD_MOVED]: ArrowsLeftRight,
-  [ACTIVITY_TYPES.CARD_DELETED]: Trash,
-  [ACTIVITY_TYPES.CARD_LABEL_ADDED]: Tag,
-  [ACTIVITY_TYPES.CARD_LABEL_REMOVED]: Tag,
-  [ACTIVITY_TYPES.CARD_DATE_SET]: CalendarBlank,
-  [ACTIVITY_TYPES.CARD_CHECKLIST_ADDED]: CheckCircle,
-  [ACTIVITY_TYPES.CARD_CHECKLIST_TOGGLED]: CheckCircle,
-  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: UserPlus,
-  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: UserMinus,
-  [ACTIVITY_TYPES.MEMBER_INVITED]: UserPlus,
-  [ACTIVITY_TYPES.MEMBER_REMOVED]: UserMinus,
+  [ACTIVITY_TYPES.BOARD_CREATED]: KanbanIcon,
+  [ACTIVITY_TYPES.BOARD_RENAMED]: NotePencilIcon,
+  [ACTIVITY_TYPES.STAGE_CREATED]: StackIcon,
+  [ACTIVITY_TYPES.STAGE_RENAMED]: NotePencilIcon,
+  [ACTIVITY_TYPES.STAGE_DELETED]: TrashIcon,
+  [ACTIVITY_TYPES.CARD_CREATED]: FileTextIcon,
+  [ACTIVITY_TYPES.CARD_UPDATED]: NotePencilIcon,
+  [ACTIVITY_TYPES.CARD_MOVED]: ArrowsLeftRightIcon,
+  [ACTIVITY_TYPES.CARD_DELETED]: TrashIcon,
+  [ACTIVITY_TYPES.CARD_LABEL_ADDED]: TagIcon,
+  [ACTIVITY_TYPES.CARD_LABEL_REMOVED]: TagIcon,
+  [ACTIVITY_TYPES.CARD_DATE_SET]: CalendarBlankIcon,
+  [ACTIVITY_TYPES.CARD_CHECKLIST_ADDED]: CheckCircleIcon,
+  [ACTIVITY_TYPES.CARD_CHECKLIST_TOGGLED]: CheckCircleIcon,
+  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: UserPlusIcon,
+  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: UserMinusIcon,
+  [ACTIVITY_TYPES.MEMBER_INVITED]: UserPlusIcon,
+  [ACTIVITY_TYPES.MEMBER_REMOVED]: UserMinusIcon,
 }
 
 const COLOR_MAP: Partial<Record<ActivityType, string>> = {
@@ -49,9 +50,8 @@ const COLOR_MAP: Partial<Record<ActivityType, string>> = {
 }
 
 function formatRelative(timestamp: string): string {
-  const now = new Date()
-  const date = new Date(timestamp)
-  const diffMs = now.getTime() - date.getTime()
+  const now = Date.now()
+  const diffMs = now - new Date(timestamp).getTime()
   const diffMin = Math.floor(diffMs / 60000)
   const diffHr = Math.floor(diffMs / 3600000)
   const diffDay = Math.floor(diffMs / 86400000)
@@ -60,7 +60,7 @@ function formatRelative(timestamp: string): string {
   if (diffMin < 60) return `hace ${diffMin}m`
   if (diffHr < 24) return `hace ${diffHr}h`
   if (diffDay < 7) return `hace ${diffDay}d`
-  return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+  return new Date(timestamp).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
 }
 
 interface ActivityFeedProps {
@@ -70,6 +70,22 @@ interface ActivityFeedProps {
 
 export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
   const activities = useActivityStore((s) => s.activities)
+
+  const getRelativeTime = useMemo(() => {
+    return (timestamp: string): string => {
+      const now = Date.now()
+      const diffMs = now - new Date(timestamp).getTime()
+      const diffMin = Math.floor(diffMs / 60000)
+      const diffHr = Math.floor(diffMs / 3600000)
+      const diffDay = Math.floor(diffMs / 86400000)
+
+      if (diffMin < 1) return 'Ahora'
+      if (diffMin < 60) return `hace ${diffMin}m`
+      if (diffHr < 24) return `hace ${diffHr}h`
+      if (diffDay < 7) return `hace ${diffDay}d`
+      return new Date(timestamp).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+    }
+  }, [])
 
   return (
     <div
@@ -90,13 +106,13 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
       <div className="flex-1 overflow-y-auto">
         {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-surface-400">
-            <Kanban size={40} weight="duotone" className="mb-2" />
+            <KanbanIcon size={40} weight="duotone" className="mb-2" />
             <p className="text-sm">Sin actividad aún</p>
           </div>
         ) : (
           <div className="divide-y divide-surface-100">
             {activities.map((activity) => {
-              const Icon = ICON_MAP[activity.type] || FileText
+              const Icon = ICON_MAP[activity.type] || FileTextIcon
               const colorClass = COLOR_MAP[activity.type] || 'text-primary-500 bg-primary-50'
 
               return (
@@ -109,7 +125,7 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
                       <span className="font-medium text-surface-900">{activity.user}</span>{' '}
                       {activity.detail}
                     </p>
-                    <p className="mt-0.5 text-xs text-surface-400">{formatRelative(activity.timestamp)}</p>
+                    <p className="mt-0.5 text-xs text-surface-400">{getRelativeTime(activity.timestamp)}</p>
                   </div>
                 </div>
               )

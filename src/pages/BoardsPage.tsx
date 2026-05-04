@@ -5,7 +5,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { BoardCard } from "@/features/boards/components/BoardCard";
 import { CreateBoardModal } from "@/features/boards/components/CreateBoardModal";
 import { Button } from "@/shared/components/Button";
-import { Plus } from "@phosphor-icons/react";
+import { PlusIcon } from "@phosphor-icons/react";
 
 export function BoardsPage() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export function BoardsPage() {
     try {
       await createBoard(name, background);
     } catch (err) {
-      console.error("createBoard failed", err);
+      throw err;
     }
   };
 
@@ -37,7 +37,7 @@ export function BoardsPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-surface-900">Mis Tableros</h1>
         <Button onClick={() => setShowCreate(true)}>
-          <Plus size={20} weight="duotone" /> Nuevo tablero
+          <PlusIcon size={20} weight="duotone" /> Nuevo tablero
         </Button>
       </div>
 
@@ -58,7 +58,7 @@ export function BoardsPage() {
             Crea tu primer tablero para empezar a organizar
           </p>
           <Button className="mt-4" onClick={() => setShowCreate(true)}>
-            <Plus size={20} weight="duotone" /> Crear tablero
+            <PlusIcon size={20} weight="duotone" /> Crear tablero
           </Button>
         </div>
       ) : (

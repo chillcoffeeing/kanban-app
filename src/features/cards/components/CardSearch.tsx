@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { MagnifyingGlass, X } from "@phosphor-icons/react";
+import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
 import { useBoardStore } from "@/stores/boardStore";
 import type { Card, Stage } from "@/shared/types/domain";
 
@@ -68,7 +68,7 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
   return (
     <div ref={containerRef} className="relative">
       <div className="flex items-center gap-2 rounded-lg bg-white/20 px-3 py-1.5">
-        <MagnifyingGlass size={20} weight="duotone" className="text-white/70" />
+        <MagnifyingGlassIcon size={20} weight="duotone" className="text-white/70" />
         <input
           ref={inputRef}
           type="text"
@@ -89,7 +89,7 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
             }}
             className="cursor-pointer text-white/60 hover:text-white"
           >
-            <X size={18} weight="bold" />
+            <XIcon size={18} weight="bold" />
           </button>
         )}
       </div>

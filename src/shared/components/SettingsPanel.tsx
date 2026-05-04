@@ -1,28 +1,28 @@
 import { useState } from 'react'
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import {
-  Sun,
-  Moon,
-  MoonStars,
-  Palette,
-  SquaresFour,
-  DotsNine,
-  GridFour,
-  PaintBrushBroad,
-  ArrowsInSimple,
-  ArrowsOutSimple,
-  Lightning,
-  CheckCircle,
-  ArrowCounterClockwise,
-  User,
-  PaintBucket,
-  Bell,
-  ShieldCheck,
-  Link as LinkIcon,
-  Envelope,
-  DeviceMobile,
-  At,
-  UserCircle,
+  SunIcon,
+  MoonIcon,
+  MoonStarsIcon,
+  PaletteIcon,
+  SquaresFourIcon,
+  DotsNineIcon,
+  GridFourIcon,
+  PaintBrushBroadIcon,
+  ArrowsInSimpleIcon,
+  ArrowsOutSimpleIcon,
+  LightningIcon,
+  CheckCircleIcon,
+  ArrowCounterClockwiseIcon,
+  UserIcon,
+  PaintBucketIcon,
+  BellIcon,
+  ShieldCheckIcon,
+  LinkIcon,
+  EnvelopeIcon,
+  DeviceMobileIcon,
+  AtIcon,
+  UserCircleIcon,
 } from '@phosphor-icons/react'
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
 import {
@@ -41,28 +41,28 @@ import { Button } from './Button'
 import { Toggle } from './Toggle'
 
 const THEME_OPTIONS: Array<{ id: UserDisplayPrefs['theme']; label: string; Icon: PhosphorIcon }> = [
-  { id: 'light', label: 'Claro', Icon: Sun },
-  { id: 'dark', label: 'Oscuro', Icon: Moon },
-  { id: 'midnight', label: 'Medianoche', Icon: MoonStars },
-  { id: 'solarized', label: 'Solarized', Icon: Palette },
+  { id: 'light', label: 'Claro', Icon: SunIcon },
+  { id: 'dark', label: 'Oscuro', Icon: MoonIcon },
+  { id: 'midnight', label: 'Medianoche', Icon: MoonStarsIcon },
+  { id: 'solarized', label: 'Solarized', Icon: PaletteIcon },
 ]
 
 const BG_ICONS: Record<string, PhosphorIcon> = {
-  plain: SquaresFour,
-  dots: DotsNine,
-  grid: GridFour,
-  'gradient-blue': PaintBrushBroad,
-  'gradient-sunset': PaintBrushBroad,
-  'gradient-forest': PaintBrushBroad,
+  plain: SquaresFourIcon,
+  dots: DotsNineIcon,
+  grid: GridFourIcon,
+  'gradient-blue': PaintBrushBroadIcon,
+  'gradient-sunset': PaintBrushBroadIcon,
+  'gradient-forest': PaintBrushBroadIcon,
 }
 
 type TabId = 'profile' | 'appearance' | 'notifications' | 'privacy'
 
 const TABS: Array<{ id: TabId; label: string; Icon: PhosphorIcon }> = [
-  { id: 'profile', label: 'Perfil', Icon: User },
-  { id: 'appearance', label: 'Apariencia', Icon: PaintBucket },
-  { id: 'notifications', label: 'Notificaciones', Icon: Bell },
-  { id: 'privacy', label: 'Privacidad', Icon: ShieldCheck },
+  { id: 'profile', label: 'Perfil', Icon: UserIcon },
+  { id: 'appearance', label: 'Apariencia', Icon: PaintBucketIcon },
+  { id: 'notifications', label: 'Notificaciones', Icon: BellIcon },
+  { id: 'privacy', label: 'Privacidad', Icon: ShieldCheckIcon },
 ]
 
 interface SectionProps {
@@ -228,10 +228,10 @@ function ProfileTab() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {([
             ['website', 'Sitio web', LinkIcon],
-            ['twitter', 'Twitter / X', At],
-            ['github', 'GitHub', UserCircle],
-            ['linkedin', 'LinkedIn', UserCircle],
-            ['instagram', 'Instagram', UserCircle],
+            ['twitter', 'Twitter / X', AtIcon],
+            ['github', 'GitHub', UserCircleIcon],
+            ['linkedin', 'LinkedIn', UserCircleIcon],
+            ['instagram', 'Instagram', UserCircleIcon],
           ] as Array<[keyof UserSocialLinks, string, PhosphorIcon]>).map(([key, label, Icon]) => (
             <Field key={key} label={label}>
               <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ function ProfileTab() {
               key={`${p.provider}-${p.providerId}`}
               className="inline-flex items-center gap-2 rounded-pill bg-bg-muted px-3 py-1 text-card-meta text-fg-muted capitalize"
             >
-              <ShieldCheck size={18} weight="duotone" /> {p.provider}
+              <ShieldCheckIcon size={18} weight="duotone" /> {p.provider}
             </span>
           ))}
         </div>
@@ -298,7 +298,7 @@ function AppearanceTab() {
       <Section title="Fondo">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {BACKGROUNDS.map(({ id, label }) => {
-            const Icon = BG_ICONS[id] || SquaresFour
+            const Icon = BG_ICONS[id] || SquaresFourIcon
             const active = s.background === id
             return (
               <button
@@ -328,7 +328,7 @@ function AppearanceTab() {
                 : 'border-border-default text-fg-muted hover:border-border-strong'
             }`}
           >
-            <ArrowsOutSimple size={22} weight="duotone" /> Cómoda
+            <ArrowsOutSimpleIcon size={22} weight="duotone" /> Cómoda
           </button>
           <button
             onClick={() => s.setDensity('compact')}
@@ -338,7 +338,7 @@ function AppearanceTab() {
                 : 'border-border-default text-fg-muted hover:border-border-strong'
             }`}
           >
-            <ArrowsInSimple size={22} weight="duotone" /> Compacta
+            <ArrowsInSimpleIcon size={22} weight="duotone" /> Compacta
           </button>
         </div>
       </Section>
@@ -389,7 +389,7 @@ function AppearanceTab() {
       <Section title="Accesibilidad y comportamiento">
         <div className="space-y-2">
           <Row
-            icon={Lightning}
+            icon={LightningIcon}
             title="Reducir animaciones"
             description="Desactiva transiciones no esenciales."
           >
@@ -399,7 +399,7 @@ function AppearanceTab() {
             />
           </Row>
           <Row
-            icon={CheckCircle}
+            icon={CheckCircleIcon}
             title="Mostrar tarjetas completadas"
             description="Incluir tarjetas finalizadas en las listas."
           >
@@ -419,13 +419,13 @@ function NotificationsTab() {
   const s = useSettingsStore()
   const n = s.notifications
   const rows: Array<[keyof UserNotificationPrefs, string, string, PhosphorIcon]> = [
-    ['emailEnabled', 'Notificaciones por email', 'Recibe resúmenes y alertas por correo.', Envelope],
-    ['pushEnabled', 'Notificaciones push', 'Avisos en el navegador o dispositivo.', DeviceMobile],
-    ['mentions', 'Menciones', 'Cuando alguien te menciona (@).', At],
-    ['cardAssigned', 'Tarjetas asignadas', 'Cuando te agregan a una tarjeta.', User],
-    ['cardDueSoon', 'Vencimientos próximos', 'Alerta antes de la fecha de entrega.', Bell],
-    ['boardInvites', 'Invitaciones a tableros', 'Cuando te invitan a colaborar.', Envelope],
-    ['weeklyDigest', 'Resumen semanal', 'Actividad consolidada cada lunes.', Bell],
+    ['emailEnabled', 'Notificaciones por email', 'Recibe resúmenes y alertas por correo.', EnvelopeIcon],
+    ['pushEnabled', 'Notificaciones push', 'Avisos en el navegador o dispositivo.', DeviceMobileIcon],
+    ['mentions', 'Menciones', 'Cuando alguien te menciona (@).', AtIcon],
+    ['cardAssigned', 'Tarjetas asignadas', 'Cuando te agregan a una tarjeta.', UserIcon],
+    ['cardDueSoon', 'Vencimientos próximos', 'Alerta antes de la fecha de entrega.', BellIcon],
+    ['boardInvites', 'Invitaciones a tableros', 'Cuando te invitan a colaborar.', EnvelopeIcon],
+    ['weeklyDigest', 'Resumen semanal', 'Actividad consolidada cada lunes.', BellIcon],
   ]
 
   return (
@@ -450,7 +450,7 @@ function PrivacyTab() {
   return (
     <div className="space-y-2">
       <Row
-        icon={User}
+        icon={UserIcon}
         title="Visibilidad del perfil"
         description="Quién puede ver tu perfil completo."
       >
@@ -465,28 +465,28 @@ function PrivacyTab() {
         </select>
       </Row>
       <Row
-        icon={Envelope}
+        icon={EnvelopeIcon}
         title="Mostrar email en perfil"
         description="Otros miembros pueden ver tu correo."
       >
         <Toggle checked={p.showEmail} onChange={(v) => s.setPrivacy('showEmail', v)} />
       </Row>
       <Row
-        icon={Lightning}
+        icon={LightningIcon}
         title="Mostrar actividad"
         description="Tu historial aparece en el feed del tablero."
       >
         <Toggle checked={p.showActivity} onChange={(v) => s.setPrivacy('showActivity', v)} />
       </Row>
       <Row
-        icon={At}
+        icon={AtIcon}
         title="Permitir mensajes directos"
         description="Otros miembros pueden escribirte directamente."
       >
         <Toggle checked={p.allowDM} onChange={(v) => s.setPrivacy('allowDM', v)} />
       </Row>
       <Row
-        icon={ShieldCheck}
+        icon={ShieldCheckIcon}
         title="Excluirme de analíticas"
         description="No incluir mi uso en métricas agregadas."
       >
@@ -537,7 +537,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
           <div className="mt-6 flex justify-between border-t border-border-default pt-4">
             <Button variant="ghost" onClick={reset}>
-              <ArrowCounterClockwise size={20} weight="duotone" /> Restablecer apariencia
+              <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Restablecer apariencia
             </Button>
             <Button onClick={onClose}>Listo</Button>
           </div>

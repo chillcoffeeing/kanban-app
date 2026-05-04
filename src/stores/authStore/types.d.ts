@@ -15,6 +15,6 @@ export interface AuthState {
   hydrate: () => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (patch: Partial<User> | ((u: User) => User)) => void;
-  updateProfile: (patch: Partial<User["profile"]>) => void;
-  updatePreferences: (patch: Partial<User["preferences"]>) => void;
+  updateProfile: (patch: Partial<User["profile"]>) => Promise<void>;
+  updatePreferences: (patch: Partial<User["preferences"]>) => Promise<void>;
 }

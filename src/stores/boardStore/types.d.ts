@@ -2,6 +2,7 @@ import type {
   Board,
   BoardMember,
   Card,
+  Label,
   Permission,
   Stage,
 } from "@/shared/types";
@@ -29,10 +30,10 @@ export interface BoardState {
   ) => Promise<void>;
   updateMemberPermissions: (
     boardId: string,
-    userId: string,
+    membershipId: string,
     permissions: Permission[],
   ) => Promise<void>;
-  removeMember: (boardId: string, userId: string) => Promise<void>;
+  removeMember: (boardId: string, membershipId: string) => Promise<void>;
 
   // Stages
   addStage: (boardId: string, name: string) => Promise<Stage>;
@@ -111,10 +112,18 @@ export interface BoardState {
   deleteLabel: (boardId: string, labelId: string) => Promise<void>;
 
   // Realtime actions (local state updates only)
-  realtimeUpdateCard: (cardId: string, updates: Partial<Card>) => void;
+  realtimeUpdateBoard: (boardId: string, updates: Partial<Board>) => void;
+  realtimeDeleteBoard: (boardId: string) => void;
+  realtimeUpdateCard: (
+    cardId: string,
+    updates: Partial<Card & { stageId: string }>,
+  ) => void;
   realtimeAddCard: (card: Card & { stageId: string }) => void;
   realtimeDeleteCard: (cardId: string) => void;
-  realtimeUpdateStage: (stageId: string, updates: Partial<Stage>) => void;
+  realtimeUpdateStage: (
+    stageId: string,
+    updates: Partial<Stage> & { position?: number },
+  ) => void;
   realtimeAddStage: (stage: Stage) => void;
   realtimeDeleteStage: (stageId: string) => void;
 }

@@ -4,9 +4,13 @@
  */
 
 export interface BackendCardMember {
-  userId: string;
-  user: {
-    name: string;
+  boardMembershipId: string;
+  boardMembership: {
+    user: {
+      name: string;
+      avatarUrl: string | null;
+      id: string;
+    };
   };
 }
 
@@ -53,7 +57,6 @@ export interface BackendBoard {
   id: string;
   name: string;
   background: string;
-  ownerId: string;
   preferences: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
@@ -63,15 +66,14 @@ export interface BackendBoard {
   cardsCount?: number;
 }
 
-export interface BackendMember {
+export interface BackendBoardMember {
   id: string;
-  boardId: string;
-  userId: string;
   role: "owner" | "admin" | "member";
   permissions: string[];
   invitedAt: string;
-  email?: string;
-  user?: {
+  email: string;
+  user: {
+    id: string;
     name: string;
     avatarUrl: string | null;
     createdAt: string;
@@ -80,7 +82,7 @@ export interface BackendMember {
 
 export interface FullBoard {
   board: BackendBoard;
-  members: BackendMember[];
+  members: BackendBoardMember[];
   stages: (BackendStage & { cards: BackendCard[] })[];
 }
 
@@ -90,11 +92,57 @@ export interface BackendUser {
   name: string;
   avatarUrl?: string | null;
   roles?: string[];
-  profile?: Record<string, unknown>;
-  preferences?: Record<string, unknown>;
+  profile?: BackendProfile;
+  preferences?: BackendPreferences;
   createdAt?: string;
   updatedAt?: string;
   lastLoginAt?: string | null;
+}
+
+export interface BackendProfile {
+  id: string;
+  userId: string;
+  displayName: string;
+  bio: string | null;
+  coverUrl: string | null;
+  jobTitle: string | null;
+  company: string | null;
+  location: string | null;
+  socialWebsite: string | null;
+  socialTwitter: string | null;
+  socialGithub: string | null;
+  socialLinkedin: string | null;
+  socialInstagram: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BackendPreferences {
+  id: string;
+  userId: string;
+  theme: string;
+  background: string;
+  density: string;
+  language: string;
+  timezone: string;
+  timeFormat: string;
+  dateFormat: string;
+  reducedMotion: boolean;
+  showCompletedCards: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  mentions: boolean;
+  cardAssigned: boolean;
+  cardDueSoon: boolean;
+  boardInvites: boolean;
+  weeklyDigest: boolean;
+  profileVisibility: string;
+  showEmail: boolean;
+  showActivity: boolean;
+  allowDM: boolean;
+  analyticsOptOut: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {

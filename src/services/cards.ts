@@ -44,11 +44,11 @@ export const cardsApi = {
     ),
 
   // Operaciones de miembros de cards
-  addMember: (cardId: string, body: { userId: string }) =>
+  addMember: (cardId: string, body: { boardMembershipId: string }) =>
     api<BackendCard>(`/cards/${cardId}/members`, { method: "POST", body }),
 
-  removeMember: (cardId: string, userId: string) =>
-    api<BackendCard>(`/cards/${cardId}/members/${userId}`, {
+  removeMember: (cardId: string, boardMembershipId: string) =>
+    api(`/cards/${cardId}/members/${boardMembershipId}`, {
       method: "DELETE",
     }),
 

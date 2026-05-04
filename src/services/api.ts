@@ -2,8 +2,6 @@ const API_BASE =
   (import.meta.env.VITE_API_BASE as string | undefined) ??
   "http://localhost:3000/api/v1";
 
-console.log(import.meta.env.VITE_API_BASE);
-
 const TOKEN_KEY = "canvan_token";
 const REFRESH_KEY = "canvan_refresh_token";
 
@@ -47,10 +45,15 @@ export async function api<T = unknown>(
     if (tok) headers.authorization = `Bearer ${tok}`;
   }
 
+  const controller = new AbortController();
+
+  const signal = controller.signal;
+
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
+    signal,
   });
 
   if (res.status === 204) return undefined as T;
@@ -67,6 +70,11 @@ export async function api<T = unknown>(
     throw new ApiError(msg, res.status, data);
   }
   return data as T;
+}
+
+// Helper to create an AbortController for use in effects
+export function createAbortController() {
+  return new AbortController();
 }
 
 function safeJson(s: string): unknown {

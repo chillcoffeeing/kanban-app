@@ -1,4 +1,4 @@
-import { ToggleLeft, ToggleRight } from '@phosphor-icons/react'
+import { ToggleLeftIcon, ToggleRightIcon } from '@phosphor-icons/react'
 
 export interface ToggleProps {
   checked: boolean
@@ -9,7 +9,7 @@ export interface ToggleProps {
 }
 
 /**
- * Toggle plano usando iconos de Phosphor (`ToggleLeft` / `ToggleRight`).
+ * Toggle plano usando iconos de Phosphor (`ToggleLeftIcon` / `ToggleRightIcon`).
  * Sin pelota deslizante — un solo ícono que cambia de variante y color.
  */
 export function Toggle({
@@ -19,7 +19,7 @@ export function Toggle({
   size = 32,
   label,
 }: ToggleProps) {
-  const Icon = checked ? ToggleRight : ToggleLeft
+  const Icon = checked ? ToggleRightIcon : ToggleLeftIcon
   return (
     <button
       type="button"

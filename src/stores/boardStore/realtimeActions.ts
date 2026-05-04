@@ -1,8 +1,49 @@
 import type { Board, Card, Stage } from "@/shared/types";
 
+function patchBoardInList(
+  boards: Board[],
+  boardId: string,
+  patch: (board: Board) => Board,
+) {
+  return boards.map((board) => (board.id === boardId ? patch(board) : board));
+}
+
+function patchCurrent(
+  current: Board | null,
+  boardId: string,
+  patch: (board: Board) => Board,
+) {
+  return current && current.id === boardId ? patch(current) : current;
+}
+
 export function createRealtimeActions(set: any, get: any) {
   return {
     /* ------------------------ Realtime Actions ------------------------ */
+
+    realtimeUpdateBoard: (boardId: string, updates: Partial<Board>) => {
+      set((state: any) => ({
+        boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
+          ...board,
+          ...updates,
+        })),
+        currentBoard: patchCurrent(
+          state.currentBoard,
+          boardId,
+          (board: Board) => ({
+            ...board,
+            ...updates,
+          }),
+        ),
+      }));
+    },
+
+    realtimeDeleteBoard: (boardId: string) => {
+      set((state: any) => ({
+        boards: state.boards.filter((b: Board) => b.id !== boardId),
+        currentBoard:
+          state.currentBoard?.id === boardId ? null : state.currentBoard,
+      }));
+    },
 
     realtimeUpdateCard: (
       cardId: string,

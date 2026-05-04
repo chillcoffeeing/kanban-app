@@ -2,26 +2,26 @@ import { useState } from 'react'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { RegisterForm } from '@/features/auth/components/RegisterForm'
 import {
-  Kanban,
-  ShieldCheck,
-  Lightning,
-  UsersThree,
-  ChartLineUp,
+  KanbanIcon,
+  ShieldCheckIcon,
+  LightningIcon,
+  UsersThreeIcon,
+  ChartLineUpIcon,
 } from '@phosphor-icons/react'
 
 const features = [
   {
-    icon: Lightning,
+    icon: LightningIcon,
     title: 'Flujos de trabajo ágiles',
     desc: 'Organiza tareas y proyectos con tableros diseñados para equipos de alto rendimiento.',
   },
   {
-    icon: UsersThree,
+    icon: UsersThreeIcon,
     title: 'Colaboración en tiempo real',
     desc: 'Sincroniza a todo tu equipo con actualizaciones instantáneas y permisos granulares.',
   },
   {
-    icon: ChartLineUp,
+    icon: ChartLineUpIcon,
     title: 'Visibilidad ejecutiva',
     desc: 'Métricas y reportes claros para tomar decisiones basadas en datos.',
   },
@@ -55,7 +55,7 @@ export function AuthPage() {
         <div className="relative">
           <div className="flex items-center gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/15 backdrop-blur ring-1 ring-white/25">
-              <Kanban size={36} weight="duotone" className="text-white" />
+              <KanbanIcon size={36} weight="duotone" className="text-white" />
             </div>
             <span className="text-3xl font-bold tracking-tight text-white">Canvan</span>
           </div>
@@ -63,7 +63,7 @@ export function AuthPage() {
 
         <div className="relative z-10 max-w-lg text-white">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 ring-1 ring-white/20 backdrop-blur">
-            <ShieldCheck size={18} weight="fill" /> Plataforma empresarial
+            <ShieldCheckIcon size={18} weight="fill" /> Plataforma empresarial
           </p>
           <h2 className="text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
             La forma profesional de gestionar el trabajo de tu equipo.
@@ -89,7 +89,7 @@ export function AuthPage() {
         </div>
 
         <div className="relative flex items-center gap-3 text-sm text-white/70">
-          <ShieldCheck size={24} weight="duotone" />
+          <ShieldCheckIcon size={24} weight="duotone" />
           <span>Datos cifrados · Control de accesos · Alta disponibilidad</span>
         </div>
       </aside>
@@ -100,7 +100,7 @@ export function AuthPage() {
           {/* Mobile brand */}
           <div className="mb-8 flex items-center justify-center gap-2 lg:hidden">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600">
-              <Kanban size={30} weight="duotone" className="text-white" />
+              <KanbanIcon size={30} weight="duotone" className="text-white" />
             </div>
             <span className="text-3xl font-bold tracking-tight text-surface-900">Canvan</span>
           </div>

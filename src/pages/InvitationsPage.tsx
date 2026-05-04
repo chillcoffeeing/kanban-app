@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { Button } from "@/shared/components/Button";
 import { api } from "@/services/api";
-import { CheckCircle, XCircle } from "@phosphor-icons/react";
+import { CheckCircleIcon, XCircleIcon } from "@phosphor-icons/react";
 
 interface PendingInvitation {
   id: string;
@@ -24,42 +24,33 @@ export function InvitationsPage() {
   const [loading, setLoading] = useState(true);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
-  console.log(
-    "[InvitationsPage] Rendering, user:",
-    user,
-    "isAuthenticated:",
-    isAuthenticated,
-  );
-  console.log("[InvitationsPage] invitations:", invitations);
-
   useEffect(() => {
-    console.log("[InvitationsPage] useEffect running");
-    loadInvitations().catch((e) =>
-      console.error("[InvitationsPage] loadInvitations error:", e),
-    );
+    const controller = new AbortController();
+
+    const loadData = async () => {
+      try {
+        const res = await api("/invitations/pending", {
+          auth: true,
+        });
+
+        const data = Array.isArray(res) ? res : (res as any)?.data || [];
+
+        setInvitations(data);
+      } catch (e: unknown) {
+        if ((e as any)?.name !== "AbortError") {
+          // Error handled silently
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
-
-  const loadInvitations = async () => {
-    try {
-      const token = localStorage.getItem("canvan_token");
-      console.log("[Invitations] Token:", token ? "exists" : "missing");
-      console.log("[Invitations] API_BASE:", API_BASE_URL);
-
-      const res = await api("/invitations/pending", { auth: true });
-      console.log("[Invitations] Raw response:", res);
-      console.log("[Invitations] Type:", typeof res);
-
-      const data = Array.isArray(res) ? res : (res as any)?.data || [];
-      console.log("[Invitations] Data:", data);
-      setInvitations(data);
-    } catch (e: unknown) {
-      const err = e as Error;
-      console.error("[Invitations] Error:", err?.message || err);
-      setInvitations([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const accept = async (invitation: PendingInvitation) => {
     setActionInProgress(invitation.id);
@@ -67,7 +58,9 @@ export function InvitationsPage() {
       await api(`/invitations/${invitation.token}/accept`, { method: "POST" });
       navigate(`/boards/${invitation.boardId}`);
     } catch (e: unknown) {
-      console.error(e);
+      if ((e as any)?.name !== "AbortError") {
+        // Error handled silently
+      }
     } finally {
       setActionInProgress(null);
     }
@@ -76,10 +69,14 @@ export function InvitationsPage() {
   const reject = async (invitation: PendingInvitation) => {
     setActionInProgress(invitation.id);
     try {
-      await api(`/invitations/${invitation.id}`, { method: "DELETE" });
+      await api(`/invitations/${invitation.id}`, {
+        method: "DELETE",
+      });
       setInvitations(invitations.filter((i) => i.id !== invitation.id));
     } catch (e: unknown) {
-      console.error(e);
+      if ((e as any)?.name !== "AbortError") {
+        // Error handled silently
+      }
     } finally {
       setActionInProgress(null);
     }
@@ -145,14 +142,14 @@ export function InvitationsPage() {
                 onClick={() => reject(invitation)}
                 disabled={actionInProgress === invitation.id}
               >
-                <XCircle size={18} /> Rechazar
+                <XCircleIcon size={18} /> Rechazar
               </Button>
               <Button
                 size="sm"
                 onClick={() => accept(invitation)}
                 disabled={actionInProgress === invitation.id}
               >
-                <CheckCircle size={18} /> Aceptar
+                <CheckCircleIcon size={18} /> Aceptar
               </Button>
             </div>
           </div>

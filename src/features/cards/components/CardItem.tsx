@@ -9,8 +9,9 @@ import { isOverdue } from "@/shared/utils/helpers";
 import { useFormatDate } from "@/shared/hooks/useFormatDate";
 import { useBoardStore } from "@/stores/boardStore";
 import { getBoardPreferences } from "@/features/boards/utils/boardPreferences";
+import { useShallow } from "zustand/react/shallow";
 import type { Card } from "@/shared/types/domain";
-import { MemberAvatar } from "./MemberAvatar";
+import { MemberAvatar } from "../../../shared/components/MemberAvatar";
 
 interface CardItemProps {
   card: Card;
@@ -20,7 +21,10 @@ interface CardItemProps {
 }
 
 export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
-  const board = useBoardStore((s) => s.boards.find((b) => b.id === boardId));
+  const board = useBoardStore(useShallow((s) => {
+    const found = s.boards.find((b) => b.id === boardId);
+    return found;
+  }));
   const prefs = getBoardPreferences(board);
   const formatDate = useFormatDate();
 
@@ -114,9 +118,9 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
             <div className="flex -space-x-2">
               {card.members.map((member) => (
                 <MemberAvatar
-                  key={member.userId}
-                  name={member.user.name}
-                  
+                  key={member.boardMembershipId}
+                  name={member.boardMembership.user.name}
+                  avatar={member.boardMembership.user.avatarUrl ?? undefined}
                 />
               ))}
             </div>

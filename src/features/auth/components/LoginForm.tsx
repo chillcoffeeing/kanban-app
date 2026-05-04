@@ -4,7 +4,7 @@ import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
-import { WarningCircle } from '@phosphor-icons/react'
+import { WarningCircleIcon } from '@phosphor-icons/react'
 
 interface LoginFormProps {
   onToggle: () => void
@@ -53,7 +53,7 @@ export function LoginForm({ onToggle }: LoginFormProps) {
           role="alert"
           className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
         >
-          <WarningCircle size={22} weight="fill" className="mt-0.5 flex-none text-red-500" />
+          <WarningCircleIcon size={22} weight="fill" className="mt-0.5 flex-none text-red-500" />
           <span>{error}</span>
         </div>
       )}

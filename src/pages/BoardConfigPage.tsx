@@ -34,7 +34,7 @@ export function BoardConfigPage() {
     );
   }
 
-  const isOwner = currentUser?.id === currentBoard.ownerId;
+  const isOwner = currentBoard?.members?.some(m => m.user?.id === currentUser?.id && m.role === 'owner');
 
   if (!isOwner) {
     return (

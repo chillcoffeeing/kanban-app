@@ -44,7 +44,6 @@ export function createCardLabelActions(set: any, get: any) {
       } catch (error) {
         // Rollback on error
         set(currentState);
-        console.error("Error attaching label:", error);
         throw error;
       }
     },
@@ -78,7 +77,6 @@ export function createCardLabelActions(set: any, get: any) {
       } catch (error) {
         // Rollback on error
         set(currentState);
-        console.error("Error detaching label:", error);
         throw error;
       }
     },

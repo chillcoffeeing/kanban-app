@@ -1,8 +1,21 @@
 import { cardsApi } from "@/services/cards";
-import type { Board, Card } from "@/shared/types";
+import { useAuthStore } from "@/stores/authStore";
+import { useActivityStore } from "@/stores/activityStore";
+import type { ActivityType, Board, Card } from "@/shared/types";
 import { normalizeCard } from "./normalizers";
 
 const cardLoadPromises = new Map<string, Promise<Card | null>>();
+
+function logActivity(
+  boardId: string,
+  type: ActivityType,
+  detail: string,
+  meta?: Record<string, unknown>,
+) {
+  const user = useAuthStore.getState().user;
+  const userName = user?.profile?.displayName || user?.name || "Usuario";
+  useActivityStore.getState().log(boardId, { type, user: userName, detail, meta });
+}
 
 export function createCardActions(set: any, get: any) {
   /*   const mergeCard = ; */
@@ -35,6 +48,7 @@ export function createCardActions(set: any, get: any) {
           }),
         ),
       }));
+      logActivity(boardId, "card_created", `creó la tarjeta "${title}"`);
       return card;
     },
 
@@ -44,7 +58,6 @@ export function createCardActions(set: any, get: any) {
       cardId: string,
       updates: Parameters<typeof cardsApi.update>[1],
     ) => {
-      // Campos soportados por backend:
       const syncable: Partial<Card> = {};
       if (updates.title !== undefined) syncable.title = updates.title;
       if (updates.description !== undefined)
@@ -52,14 +65,6 @@ export function createCardActions(set: any, get: any) {
       if (updates.startDate !== undefined)
         syncable.startDate = updates.startDate;
       if (updates.dueDate !== undefined) syncable.dueDate = updates.dueDate;
-
-      if (Object.keys(syncable).length > 0) {
-        try {
-          await cardsApi.update(cardId, syncable);
-        } catch {
-          /* silent — local update still applied */
-        }
-      }
 
       set((state: any) => {
         const merge = (card: Card) => ({ ...card, ...updates });
@@ -96,9 +101,23 @@ export function createCardActions(set: any, get: any) {
           ),
         };
       });
+
+      if (Object.keys(syncable).length > 0) {
+        try {
+          await cardsApi.update(cardId, syncable);
+        } catch (err) {
+          console.error("[boardStore] updateCard API failed:", err);
+          set({ error: `Failed to sync card update: ${(err as Error).message}` });
+        }
+      }
     },
 
     deleteCard: async (boardId: string, stageId: string, cardId: string) => {
+      const board = get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+      const stage = board?.stages.find((s: any) => s.id === stageId);
+      const card = stage?.cards.find((c: any) => c.id === cardId);
+      const cardTitle = card?.title ?? cardId;
+
       await cardsApi.remove(cardId);
       set((state: any) => ({
         boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
@@ -128,6 +147,7 @@ export function createCardActions(set: any, get: any) {
           }),
         ),
       }));
+      logActivity(boardId, "card_deleted", `eliminó la tarjeta "${cardTitle}"`);
     },
 
     moveCard: async (
@@ -137,7 +157,6 @@ export function createCardActions(set: any, get: any) {
       cardId: string,
       newIndex: number,
     ) => {
-      // Optimistic: aplicar el movimiento ya, después sincronizar con backend.
       const board =
         get().currentBoard ??
         get().boards.find((board: Board) => board.id === boardId);
@@ -147,6 +166,8 @@ export function createCardActions(set: any, get: any) {
       );
       const card = fromStage?.cards.find((card: any) => card.id === cardId);
       if (!card) return;
+
+      const oldIndex = fromStage.cards.findIndex((c: any) => c.id === cardId);
 
       set((state: any) => {
         const applyMove = (board: Board): Board => {
@@ -184,8 +205,41 @@ export function createCardActions(set: any, get: any) {
 
       try {
         await cardsApi.move(cardId, toStageId, newIndex);
+        const toStage = get().currentBoard?.stages.find((s: any) => s.id === toStageId);
+        const stageName = toStage?.name ?? toStageId;
+        logActivity(boardId, "card_moved", `movió "${card.title}" a "${stageName}"`);
       } catch {
-        /* silent — podría añadir rollback aquí */
+        set((state: any) => {
+          const rollbackMove = (board: Board): Board => {
+            if (board.id !== boardId) return board;
+            return {
+              ...board,
+              stages: board.stages.map((stage) => {
+                if (stage.id === toStageId && stage.id !== fromStageId) {
+                  const cards = stage.cards.filter((c) => c.id !== cardId);
+                  return { ...stage, cards };
+                }
+                if (stage.id === fromStageId && stage.id !== toStageId) {
+                  const cards = [...stage.cards];
+                  cards.splice(oldIndex, 0, card);
+                  return { ...stage, cards };
+                }
+                if (stage.id === fromStageId && stage.id === toStageId) {
+                  const cards = stage.cards.filter((c) => c.id !== cardId);
+                  cards.splice(oldIndex, 0, card);
+                  return { ...stage, cards };
+                }
+                return stage;
+              }),
+            };
+          };
+          return {
+            boards: state.boards.map(rollbackMove),
+            currentBoard: state.currentBoard
+              ? rollbackMove(state.currentBoard)
+              : null,
+          };
+        });
       }
     },
 
@@ -240,7 +294,6 @@ export function createCardActions(set: any, get: any) {
 
           return card;
         } catch (error) {
-          console.error("Error loading card:", error);
           return null;
         } finally {
           cardLoadPromises.delete(cardId);

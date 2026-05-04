@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Tag, Trash, Check } from "@phosphor-icons/react";
+import { PlusIcon, TagIcon, TrashIcon, CheckIcon } from "@phosphor-icons/react";
 import { LABEL_COLORS } from "@/shared/utils/constants";
 import type { Label } from "@/shared/types/domain";
 
@@ -38,7 +38,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
   return (
     <div>
       <p className="mb-2 flex items-center gap-2 text-card-meta font-medium text-fg-muted">
-        <Tag size={16} weight="duotone" /> Etiquetas
+        <TagIcon size={16} weight="duotone" /> Etiquetas
       </p>
 
       {labels.length > 0 && (
@@ -55,7 +55,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
                 className="cursor-pointer rounded-sm p-0.5 text-white/80 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/20 hover:text-white"
                 title="Quitar etiqueta"
               >
-                <Trash size={14} weight="duotone" />
+                <TrashIcon size={14} weight="duotone" />
               </button>
             </li>
           ))}
@@ -67,7 +67,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
           onClick={() => setAdding(true)}
           className="flex w-full cursor-pointer items-center gap-2 rounded-button border border-dashed border-border-default px-2 py-1.5 text-card-meta text-fg-muted transition-colors hover:border-border-focus hover:bg-bg-muted hover:text-fg-default"
         >
-          <Plus size={16} weight="duotone" /> Añadir etiqueta
+          <PlusIcon size={16} weight="duotone" /> Añadir etiqueta
         </button>
       ) : (
         <div className="flex flex-col gap-2 rounded-card border border-border-default bg-bg-card p-2">
@@ -103,7 +103,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
                   style={{ backgroundColor: c.value }}
                 >
                   {active && (
-                    <Check size={12} weight="bold" className="text-white" />
+                    <CheckIcon size={12} weight="bold" className="text-white" />
                   )}
                 </button>
               );
@@ -148,7 +148,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
               disabled={!name.trim()}
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-button bg-btn-primary-bg px-2 py-1 text-card-meta font-medium text-btn-primary-fg hover:bg-btn-primary-bg-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Check size={14} weight="bold" /> Crear
+              <CheckIcon size={14} weight="bold" /> Crear
             </button>
             <button
               onClick={reset}

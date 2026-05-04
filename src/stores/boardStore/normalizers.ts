@@ -5,33 +5,18 @@ import type {
   Stage,
   BackendBoard,
   BackendCard,
-  BackendMember,
+  BackendBoardMember,
   BackendStage,
 } from "@/shared/types";
 
-export function normalizeCard(
-  card: BackendCard,
-  boardMembers: BackendMember[] = [],
-): Card {
-  const members = card.members?.length
-    ? card.members
-    : (card.memberIds?.map((id) => {
-        const boardMember = boardMembers.find((member) => member.userId === id);
-        return {
-          userId: id,
-          user: {
-            name: boardMember?.user?.name ?? boardMember?.email ?? "Invitado",
-          },
-        };
-      }) ?? []);
-
+export function normalizeCard(card: BackendCard): Card {
   return {
     id: card.id,
     title: card.title,
     description: card.description ?? "",
     labels: card.labels ?? [],
     checklist: card.checklist ?? [],
-    members,
+    members: card.members || [],
     dueDate: card.dueDate,
     startDate: card.startDate,
     createdAt: card.createdAt,
@@ -42,21 +27,18 @@ export function normalizeCard(
 export function normalizeStage(
   stage: BackendStage,
   cards: BackendCard[] = [],
-  boardMembers: BackendMember[] = [],
 ): Stage {
   return {
     id: stage.id,
     name: stage.name,
-    cards: cards.map((card) => normalizeCard(card, boardMembers)),
+    cards: cards.map((card) => normalizeCard(card)),
     createdAt: stage.createdAt,
   };
 }
 
-export function normalizeMember(member: BackendMember): BoardMember {
+export function normalizeMember(member: BackendBoardMember): BoardMember {
   return {
     id: member.id,
-    boardId: member.boardId,
-    userId: member.userId,
     email: member.email ?? "",
     permissions: member.permissions as import("@/shared/types").Permission[],
     role: member.role,
@@ -67,14 +49,13 @@ export function normalizeMember(member: BackendMember): BoardMember {
 
 export function normalizeBoard(
   board: BackendBoard,
-  members: BackendMember[] = [],
+  members: BackendBoardMember[] = [],
   stages: Stage[] = [],
 ): Board {
   return {
     id: board.id,
     name: board.name,
     background: board.background,
-    ownerId: board.ownerId,
     members: members.map(normalizeMember),
     stages,
     labels: board.labels ?? [],

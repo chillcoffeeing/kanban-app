@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import {
-  Globe,
-  Lock,
-  ChatCircle,
-  UserPlus,
-  Users,
-  CheckSquare,
-  Image as ImageIcon,
+  GlobeIcon,
+  LockIcon,
+  ChatCircleIcon,
+  UserPlusIcon,
+  UsersIcon,
+  CheckSquareIcon,
+  ImageIcon,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import { useBoardStore } from "@/stores/boardStore";
@@ -59,7 +59,7 @@ export function BoardPreferencesPage() {
         Espace de trabajo
       </h3>
       <PrefRow
-        icon={prefs.visibility === "private" ? Lock : Globe}
+        icon={prefs.visibility === "private" ? LockIcon : GlobeIcon}
         title="Visibilidad"
         description={
           prefs.visibility === "private"
@@ -81,7 +81,7 @@ export function BoardPreferencesPage() {
         Permisos
       </h3>
       <PrefRow
-        icon={ChatCircle}
+        icon={ChatCircleIcon}
         title="Comentarios"
         description="Quién puede comentar en las tarjetas."
       >
@@ -96,7 +96,7 @@ export function BoardPreferencesPage() {
         </select>
       </PrefRow>
       <PrefRow
-        icon={UserPlus}
+        icon={UserPlusIcon}
         title="Añadir y eliminar miembros"
         description="Quién puede gestionar a los miembros del tablero."
       >
@@ -110,7 +110,7 @@ export function BoardPreferencesPage() {
         </select>
       </PrefRow>
       <PrefRow
-        icon={Users}
+        icon={UsersIcon}
         title="Editar el espacio de trabajo"
         description="Cualquier miembro puede editar y unirse. Deshabilita para tableros privados."
       >
@@ -126,7 +126,7 @@ export function BoardPreferencesPage() {
         Estado completado
       </h3>
       <PrefRow
-        icon={CheckSquare}
+        icon={CheckSquareIcon}
         title="Mostrar el estado completado en la tarjeta"
         description="Marca un indicador verde en tarjetas cuya checklist está completa."
       >
