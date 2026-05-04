@@ -4,7 +4,7 @@ export function Footer() {
   const year = useMemo(() => new Date().getFullYear(), []);
   
   return (
-    <footer className="border-t border-surface-200 bg-white py-4">
+    <footer className="border-t border-border-subtle bg-bg-card py-4">
       <div className="flex items-center justify-center gap-2 text-sm text-surface-400">
         <span>Canvan</span>
         <span>&middot;</span>

@@ -1,15 +1,14 @@
 @import "tailwindcss";
 
-/* ─────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────
    TAILWIND TOKEN EXPOSURE
-   Every `--color-*`, `--text-*`, `--radius-*`, `--shadow-*`
-   and `--font-weight-*` declared inside @theme becomes a
-   Tailwind utility (bg-*, text-*, rounded-*, shadow-*, etc).
-   The values point to runtime CSS vars so themes can swap
-   them at any time via [data-theme='...'].
-   ───────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────── */
+
 @theme {
-  /* Palette (kept for backwards compat) */
+  /* ── Core Palette (50-900 scale) ──────────── */
+
+  /* Primary */
+  --color-primary: var(--c-primary);
   --color-primary-50: var(--c-primary-50);
   --color-primary-100: var(--c-primary-100);
   --color-primary-200: var(--c-primary-200);
@@ -21,18 +20,65 @@
   --color-primary-800: var(--c-primary-800);
   --color-primary-900: var(--c-primary-900);
 
-  --color-surface-50: var(--c-surface-50);
-  --color-surface-100: var(--c-surface-100);
-  --color-surface-200: var(--c-surface-200);
-  --color-surface-300: var(--c-surface-300);
-  --color-surface-400: var(--c-surface-400);
-  --color-surface-500: var(--c-surface-500);
-  --color-surface-600: var(--c-surface-600);
-  --color-surface-700: var(--c-surface-700);
-  --color-surface-800: var(--c-surface-800);
-  --color-surface-900: var(--c-surface-900);
+  /* Secondary */
+  --color-secondary: var(--c-secondary);
+  --color-secondary-50: var(--c-secondary-50);
+  --color-secondary-100: var(--c-secondary-100);
+  --color-secondary-200: var(--c-secondary-200);
+  --color-secondary-300: var(--c-secondary-300);
+  --color-secondary-400: var(--c-secondary-400);
+  --color-secondary-500: var(--c-secondary-500);
+  --color-secondary-600: var(--c-secondary-600);
+  --color-secondary-700: var(--c-secondary-700);
+  --color-secondary-800: var(--c-secondary-800);
+  --color-secondary-900: var(--c-secondary-900);
 
-  /* Semantic foregrounds → text-fg-*, bg-fg-* */
+  /* Tertiary */
+  --color-tertiary: var(--c-tertiary);
+  --color-tertiary-50: var(--c-tertiary-50);
+  --color-tertiary-100: var(--c-tertiary-100);
+  --color-tertiary-200: var(--c-tertiary-200);
+  --color-tertiary-300: var(--c-tertiary-300);
+  --color-tertiary-400: var(--c-tertiary-400);
+  --color-tertiary-500: var(--c-tertiary-500);
+  --color-tertiary-600: var(--c-tertiary-600);
+  --color-tertiary-700: var(--c-tertiary-700);
+  --color-tertiary-800: var(--c-tertiary-800);
+  --color-tertiary-900: var(--c-tertiary-900);
+
+  /* Neutral Light */
+  --color-neutral-light: var(--c-neutral-light);
+  --color-neutral-light-50: var(--c-neutral-light-50);
+  --color-neutral-light-100: var(--c-neutral-light-100);
+  --color-neutral-light-200: var(--c-neutral-light-200);
+  --color-neutral-light-300: var(--c-neutral-light-300);
+  --color-neutral-light-400: var(--c-neutral-light-400);
+  --color-neutral-light-500: var(--c-neutral-light-500);
+  --color-neutral-light-600: var(--c-neutral-light-600);
+  --color-neutral-light-700: var(--c-neutral-light-700);
+  --color-neutral-light-800: var(--c-neutral-light-800);
+  --color-neutral-light-900: var(--c-neutral-light-900);
+
+  /* Neutral Dark */
+  --color-neutral-dark: var(--c-neutral-dark);
+  --color-neutral-dark-50: var(--c-neutral-dark-50);
+  --color-neutral-dark-100: var(--c-neutral-dark-100);
+  --color-neutral-dark-200: var(--c-neutral-dark-200);
+  --color-neutral-dark-300: var(--c-neutral-dark-300);
+  --color-neutral-dark-400: var(--c-neutral-dark-400);
+  --color-neutral-dark-500: var(--c-neutral-dark-500);
+  --color-neutral-dark-600: var(--c-neutral-dark-600);
+  --color-neutral-dark-700: var(--c-neutral-dark-700);
+  --color-neutral-dark-800: var(--c-neutral-dark-800);
+  --color-neutral-dark-900: var(--c-neutral-dark-900);
+
+  /* ── Individual Colors ──────────────────────────── */
+  --color-success: var(--c-success);
+  --color-warning: var(--c-warning);
+  --color-danger: var(--c-danger);
+  --color-info: var(--c-info);
+
+  /* ── Semantic Foreground ──────────────────────── */
   --color-fg-default: var(--fg-default);
   --color-fg-muted: var(--fg-muted);
   --color-fg-subtle: var(--fg-subtle);
@@ -41,51 +87,59 @@
   --color-fg-danger: var(--fg-danger);
   --color-fg-success: var(--fg-success);
   --color-fg-warning: var(--fg-warning);
+  --color-fg-info: var(--fg-info);
   --color-fg-on-brand: var(--fg-on-brand);
+  --color-fg-on-success: var(--fg-on-success);
+  --color-fg-on-warning: var(--fg-on-warning);
+  --color-fg-on-danger: var(--fg-on-danger);
+  --color-fg-on-info: var(--fg-on-info);
 
-  /* Semantic backgrounds → bg-bg-*, text-bg-* */
+  /* ── Semantic Background ───────────────────────── */
   --color-bg-app: var(--bg-app);
-  --color-bg-surface: var(--bg-surface);
   --color-bg-card: var(--bg-card);
   --color-bg-card-hover: var(--bg-card-hover);
   --color-bg-muted: var(--bg-muted);
   --color-bg-subtle: var(--bg-subtle);
-  --color-bg-elevated: var(--bg-elevated);
   --color-bg-overlay: var(--bg-overlay);
 
-  /* Text chip backgrounds (badges, tag-like) */
+  /* ── Chip/Tag Background ─────────────────────── */
   --color-bg-info: var(--bg-info);
   --color-bg-success: var(--bg-success);
   --color-bg-warning: var(--bg-warning);
   --color-bg-danger: var(--bg-danger);
 
-  /* Borders */
+  /* ── Borders ─────────────────────────────────── */
   --color-border-default: var(--border-default);
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
   --color-border-focus: var(--border-focus);
 
-  /* Icons */
+  /* ── Icons ───────────────────────────────────── */
   --color-icon-default: var(--icon-default);
   --color-icon-muted: var(--icon-muted);
   --color-icon-brand: var(--icon-brand);
   --color-icon-danger: var(--icon-danger);
   --color-icon-success: var(--icon-success);
+  --color-icon-warning: var(--icon-warning);
+  --color-icon-info: var(--icon-info);
 
-  /* Buttons */
+  /* ── Buttons ────────────────────────────────── */
   --color-btn-primary-bg: var(--btn-primary-bg);
   --color-btn-primary-bg-hover: var(--btn-primary-bg-hover);
   --color-btn-primary-fg: var(--btn-primary-fg);
   --color-btn-secondary-bg: var(--btn-secondary-bg);
   --color-btn-secondary-bg-hover: var(--btn-secondary-bg-hover);
   --color-btn-secondary-fg: var(--btn-secondary-fg);
-  --color-btn-ghost-bg-hover: var(--btn-ghost-bg-hover);
-  --color-btn-ghost-fg: var(--btn-ghost-fg);
+  --color-btn-success-bg: var(--btn-success-bg);
+  --color-btn-success-bg-hover: var(--btn-success-bg-hover);
+  --color-btn-success-fg: var(--btn-success-fg);
   --color-btn-danger-bg: var(--btn-danger-bg);
   --color-btn-danger-bg-hover: var(--btn-danger-bg-hover);
   --color-btn-danger-fg: var(--btn-danger-fg);
+  --color-btn-ghost-bg-hover: var(--btn-ghost-bg-hover);
+  --color-btn-ghost-fg: var(--btn-ghost-fg);
 
-  /* Radii → rounded-* */
+  /* ── Radii ────────────────────────────────────── */
   --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -100,14 +154,14 @@
   --radius-modal: var(--r-modal);
   --radius-avatar: var(--r-avatar);
 
-  /* Shadows → shadow-* */
+  /* ── Shadows ──────────────────────────────────── */
   --shadow-card: var(--s-card);
   --shadow-card-hover: var(--s-card-hover);
   --shadow-modal: var(--s-modal);
   --shadow-dropdown: var(--s-dropdown);
   --shadow-focus: var(--s-focus);
 
-  /* Font sizes → text-* (tuple: [size, line-height]) */
+  /* ── Font sizes ──────────────────────────────── */
   --text-card-title: 0.875rem;
   --text-card-title--line-height: 1.25rem;
   --text-card-title--font-weight: 500;
@@ -130,168 +184,213 @@
   --text-label--line-height: 1rem;
   --text-label--letter-spacing: 0.04em;
 
-  /* Font weights */
+  /* ── Font weights ──────────────────────────────── */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* App container */
+  /* ── App container ────────────────────────────── */
   --container-app: 1256px;
 }
 
-/* ─────────────────────────────────────────────────────────
-   RUNTIME THEMES
-   Override raw vars; Tailwind utilities pick up the new
-   values automatically through the @theme indirection.
-   ───────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────
+   RUNTIME THEME - LIGHT (DEFAULT)
+   ───────────────────────────────────────────────── */
 
-/* Light ------------------------------------------------ */
 :root,
-[data-theme='light'] {
-  --c-primary-50: #eff6ff;
-  --c-primary-100: #dbeafe;
-  --c-primary-200: #bfdbfe;
-  --c-primary-300: #93c5fd;
-  --c-primary-400: #60a5fa;
-  --c-primary-500: #3b82f6;
-  --c-primary-600: #2563eb;
-  --c-primary-700: #1d4ed8;
-  --c-primary-800: #1e40af;
-  --c-primary-900: #1e3a8a;
+[data-theme="default"] {
+  /* ── Palette ────────────────────────────────── */
 
-  --c-surface-50: #f8fafc;
-  --c-surface-100: #f1f5f9;
-  --c-surface-200: #e2e8f0;
-  --c-surface-300: #cbd5e1;
-  --c-surface-400: #94a3b8;
-  --c-surface-500: #64748b;
-  --c-surface-600: #475569;
-  --c-surface-700: #334155;
-  --c-surface-800: #1e293b;
-  --c-surface-900: #0f172a;
+  /* Primary (Purple) */
+  --c-primary: oklch(52.28% 0.166 264.23);
+  --c-primary-50: oklch(95.23% 0.015 269.98);
+  --c-primary-100: oklch(90.59% 0.029 266.36);
+  --c-primary-200: oklch(80.87% 0.061 267.35);
+  --c-primary-300: oklch(71.28% 0.094 266.29);
+  --c-primary-400: oklch(61.73% 0.129 265.17);
+  --c-primary-500: oklch(52.28% 0.166 264.23);
+  --c-primary-600: oklch(44.81% 0.138 264.06);
+  --c-primary-700: oklch(36.79% 0.109 264.33);
+  --c-primary-800: oklch(28.32% 0.078 264.89);
+  --c-primary-900: oklch(19.47% 0.043 264.49);
 
-  /* Foregrounds */
-  --fg-default: #0f172a;
-  --fg-muted: #475569;
-  --fg-subtle: #94a3b8;
-  --fg-inverse: #ffffff;
-  --fg-brand: #2563eb;
-  --fg-danger: #dc2626;
-  --fg-success: #16a34a;
-  --fg-warning: #d97706;
-  --fg-on-brand: #ffffff;
+  /* Secondary (Blue) */
+  --c-secondary: oklch(71.5% 0.125 250);
+  --c-secondary-50: oklch(97.5% 0.012 250);
+  --c-secondary-100: oklch(94.8% 0.025 250);
+  --c-secondary-200: oklch(90.2% 0.048 250);
+  --c-secondary-300: oklch(84.8% 0.072 250);
+  --c-secondary-400: oklch(78.5% 0.098 250);
+  --c-secondary-500: oklch(71.5% 0.125 250);
+  --c-secondary-600: oklch(61.8% 0.105 250);
+  --c-secondary-700: oklch(51.5% 0.082 250);
+  --c-secondary-800: oklch(41.2% 0.058 250);
+  --c-secondary-900: oklch(31.5% 0.038 250);
 
-  /* Backgrounds */
-  --bg-app: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f8fafc;
-  --bg-muted: #f1f5f9;
-  --bg-subtle: #e2e8f0;
-  --bg-elevated: #ffffff;
-  --bg-overlay: rgba(15, 23, 42, 0.5);
+  /* Tertiary (Green) */
+  --c-tertiary: oklch(66.2% 0.115 155);
+  --c-tertiary-50: oklch(97.5% 0.012 155);
+  --c-tertiary-100: oklch(94.8% 0.024 155);
+  --c-tertiary-200: oklch(89.2% 0.045 155);
+  --c-tertiary-300: oklch(82.5% 0.068 155);
+  --c-tertiary-400: oklch(74.8% 0.092 155);
+  --c-tertiary-500: oklch(66.2% 0.115 155);
+  --c-tertiary-600: oklch(56.8% 0.098 155);
+  --c-tertiary-700: oklch(47.5% 0.078 155);
+  --c-tertiary-800: oklch(38.2% 0.058 155);
+  --c-tertiary-900: oklch(28.8% 0.038 155);
 
-  --bg-info: #eff6ff;
-  --bg-success: #ecfdf5;
-  --bg-warning: #fffbeb;
-  --bg-danger: #fef2f2;
+  /* Neutral Light (Warm Gray) */
+  --c-neutral-light: oklch(58.84% 0.044 326.12);
+  --c-neutral-light-50: oklch(96.02% 0.003 325.6);
+  --c-neutral-light-100: oklch(92.12% 0.009 325.65);
+  --c-neutral-light-200: oklch(84.07% 0.018 325.73);
+  --c-neutral-light-300: oklch(75.93% 0.023 325.8);
+  --c-neutral-light-400: oklch(67.5% 0.033 325.94);
+  --c-neutral-light-500: oklch(58.84% 0.044 326.12);
+  --c-neutral-light-600: oklch(50.22% 0.036 326.1);
+  --c-neutral-light-700: oklch(41.22% 0.027 326.06);
+  --c-neutral-light-800: oklch(31.61% 0.022 326.09);
+  --c-neutral-light-900: oklch(21.27% 0.012 326);
+
+  /* Neutral Dark (Cool Gray) */
+  --c-neutral-dark: oklch(51.43% 0.02 61.67);
+  --c-neutral-dark-50: oklch(96.24% 0.003 48.72);
+  --c-neutral-dark-100: oklch(92.37% 0.004 56.37);
+  --c-neutral-dark-200: oklch(84.58% 0.009 56.29);
+  --c-neutral-dark-300: oklch(76.82% 0.013 63.87);
+  --c-neutral-dark-400: oklch(68.65% 0.018 61.83);
+  --c-neutral-dark-500: oklch(60.26% 0.024 60.5);
+  --c-neutral-dark-600: oklch(51.43% 0.02 61.67);
+  --c-neutral-dark-700: oklch(42.22% 0.016 63.6);
+  --c-neutral-dark-800: oklch(32.21% 0.011 55.96);
+  --c-neutral-dark-900: oklch(21.61% 0.006 56.04);
+
+  /* Individual Colors */
+  --c-success: oklch(66.2% 0.115 155);
+  --c-warning: oklch(75.5% 0.138 85);
+  --c-danger: oklch(72.5% 0.148 25);
+  --c-info: oklch(71.5% 0.125 250);
+
+  /* ── Semantic Variables ───────────────────────── */
+
+  /* Foreground */
+  --fg-default: var(--c-neutral-dark-900);
+  --fg-muted: var(--c-neutral-dark-600);
+  --fg-subtle: var(--c-neutral-dark-500);
+  --fg-inverse: var(--c-neutral-light-50);
+  --fg-brand: var(--c-primary-500);
+  --fg-danger: var(--c-danger);
+  --fg-success: var(--c-success);
+  --fg-warning: var(--c-warning);
+  --fg-info: var(--c-info);
+  --fg-on-brand: var(--c-primary-50);
+  --fg-on-success: var(--c-success-50);
+  --fg-on-warning: var(--c-warning-50);
+  --fg-on-danger: var(--c-danger-50);
+  --fg-on-info: var(--c-info-50);
+
+  /* Background */
+  --bg-app: var(--c-neutral-light-50);
+  --bg-card: var(--c-neutral-light-50);
+  --bg-card-hover: var(--c-neutral-light-200);
+  --bg-muted: var(--c-neutral-light-100);
+  --bg-subtle: var(--c-neutral-light-200);
+  --bg-overlay: oklch(0 0 0 / 0.5);
+
+  /* Chip/Tag */
+  --bg-info: var(--c-info-100);
+  --bg-success: var(--c-success-50);
+  --bg-warning: var(--c-warning-50);
+  --bg-danger: var(--c-danger-50);
 
   /* Borders */
-  --border-default: #e2e8f0;
-  --border-subtle: #f1f5f9;
-  --border-strong: #cbd5e1;
-  --border-focus: #3b82f6;
+  --border-default: var(--c-neutral-light-300);
+  --border-subtle: var(--c-neutral-light-200);
+  --border-strong: var(--c-neutral-light-400);
+  --border-focus: var(--c-primary-500);
 
   /* Icons */
-  --icon-default: #475569;
-  --icon-muted: #94a3b8;
-  --icon-brand: #2563eb;
-  --icon-danger: #dc2626;
-  --icon-success: #16a34a;
+  --icon-default: var(--c-neutral-dark-700);
+  --icon-muted: var(--c-neutral-dark-500);
+  --icon-brand: var(--c-primary-500);
+  --icon-danger: var(--c-danger);
+  --icon-success: var(--c-success);
+  --icon-warning: var(--c-warning);
+  --icon-info: var(--c-info);
 
   /* Buttons */
-  --btn-primary-bg: #2563eb;
-  --btn-primary-bg-hover: #1d4ed8;
-  --btn-primary-fg: #ffffff;
-  --btn-secondary-bg: #e2e8f0;
-  --btn-secondary-bg-hover: #cbd5e1;
-  --btn-secondary-fg: #334155;
-  --btn-ghost-bg-hover: #f1f5f9;
-  --btn-ghost-fg: #475569;
-  --btn-danger-bg: #ef4444;
-  --btn-danger-bg-hover: #dc2626;
-  --btn-danger-fg: #ffffff;
+  --btn-primary-bg: var(--c-primary-500);
+  --btn-primary-bg-hover: var(--c-primary-600);
+  --btn-primary-fg: var(--c-primary-50);
+  --btn-secondary-bg: var(--c-neutral-light-200);
+  --btn-secondary-bg-hover: var(--c-neutral-light-300);
+  --btn-secondary-fg: var(--c-neutral-dark-800);
+  --btn-success-bg: var(--c-success);
+  --btn-success-bg-hover: var(--c-tertiary-600);
+  --btn-success-fg: var(--c-success-50);
+  --btn-danger-bg: var(--c-danger);
+  --btn-danger-bg-hover: var(--c-neutral-dark-600);
+  --btn-danger-fg: var(--c-danger-50);
+  --btn-ghost-bg-hover: var(--c-neutral-light-200);
+  --btn-ghost-fg: var(--c-neutral-dark-700);
 
   /* Radii */
   --r-card: 0.5rem;
-  --r-button: 0.5rem;
-  --r-input: 0.5rem;
-  --r-badge: 0.25rem;
+  --r-button: 0.375rem;
+  --r-input: 0.375rem;
+  --r-badge: 9999px;
   --r-modal: 0.75rem;
   --r-avatar: 9999px;
 
   /* Shadows */
-  --s-card: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --s-card-hover: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --s-modal: 0 20px 40px rgba(15, 23, 42, 0.18);
-  --s-dropdown: 0 10px 24px rgba(15, 23, 42, 0.12);
-  --s-focus: 0 0 0 2px rgba(59, 130, 246, 0.4);
-
-  --surface-card: var(--bg-card);
+  --s-card: 0 1px 3px oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+  --s-card-hover: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --s-modal: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+  --s-dropdown: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --s-focus: 0 0 0 2px var(--c-primary-500);
 }
 
-/* ─── Backgrounds (lienzo) ───────────────────────────── */
-body[data-bg='plain'] {
+/* ─── Backgrounds ───────────────────────────── */
+body[data-bg="plain"] {
   background-color: var(--bg-app);
   background-image: none;
 }
 
-body[data-bg='dots'] {
+body[data-bg="dots"] {
   background-color: var(--bg-app);
-  background-image: radial-gradient(var(--c-surface-300) 1px, transparent 1px);
+  background-image: radial-gradient(var(--c-neutral-light-300) 1px, transparent 1px);
   background-size: 18px 18px;
 }
 
-body[data-bg='grid'] {
+body[data-bg="grid"] {
   background-color: var(--bg-app);
   background-image:
-    linear-gradient(to right, var(--c-surface-200) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--c-surface-200) 1px, transparent 1px);
+    linear-gradient(to right, var(--c-neutral-light-200) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--c-neutral-light-200) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
-body[data-bg='gradient-blue'] {
-  background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
-}
-
-body[data-bg='gradient-sunset'] {
-  background: linear-gradient(135deg, #f97316 0%, #db2777 60%, #7c3aed 100%);
-}
-
-body[data-bg='gradient-forest'] {
-  background: linear-gradient(135deg, #10b981 0%, #065f46 100%);
-}
-
-/* ─── Density / Motion ───────────────────────────────── */
-[data-density='compact'] {
+/* ─── Density / Motion ───────────────────────── */
+[data-density="compact"] {
   --density-gap: 0.5rem;
   --density-padding: 0.5rem;
 }
-[data-density='comfortable'] {
+[data-density="comfortable"] {
   --density-gap: 1rem;
   --density-padding: 1rem;
 }
 
-[data-reduced-motion='true'] *,
-[data-reduced-motion='true'] *::before,
-[data-reduced-motion='true'] *::after {
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
   animation-duration: 0.01ms !important;
   transition-duration: 0.01ms !important;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   color: var(--fg-default);
   min-height: 100vh;
   margin: 0;

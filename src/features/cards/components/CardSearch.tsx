@@ -95,9 +95,9 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
       </div>
 
       {isOpen && query.trim() && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-surface-200 bg-white shadow-xl">
-          <div className="border-b border-surface-100 px-3 py-2">
-            <span className="text-xs font-medium text-surface-400">
+         <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-border-subtle bg-bg-card shadow-xl">
+             <div className="border-b border-border-subtle px-3 py-2">
+             <span className="text-xs font-medium text-fg-subtle">
               {results.length} resultado{results.length !== 1 ? "s" : ""}
             </span>
           </div>

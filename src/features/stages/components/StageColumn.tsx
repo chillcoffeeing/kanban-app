@@ -77,7 +77,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
   };
 
   return (
-    <div className="flex h-full w-72 shrink-0 flex-col rounded-xl bg-surface-100">
+    <div className="flex h-full w-72 shrink-0 flex-col rounded-xl border border-border-default bg-bg-card shadow-sm">
       <div className="flex items-center justify-between px-3 py-2.5">
         {isEditing ? (
           <form onSubmit={handleRename} className="flex-1">
@@ -86,7 +86,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               onBlur={handleRename}
-              className="w-full rounded bg-white px-2 py-1 text-sm font-semibold text-surface-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
+               className="w-full rounded bg-bg-card px-2 py-1 text-sm font-semibold text-fg-default focus:outline-none focus:ring-2 focus:ring-border-focus"
             />
           </form>
         ) : (
@@ -136,7 +136,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
       <div
         ref={setNodeRef}
         className={`flex flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2 ${
-          isOver ? "bg-primary-50/50 rounded-lg" : ""
+          isOver ? "bg-brand-50/50 rounded-lg" : ""
         }`}
       >
         <SortableContext
@@ -170,7 +170,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
                 }
                 if (e.key === "Escape") setIsAdding(false);
               }}
-              className="w-full resize-none rounded-lg border border-surface-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+               className="w-full resize-none rounded-lg border border-border-default bg-bg-card px-3 py-2 text-sm shadow-sm focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus/20"
               rows={2}
             />
             <div className="flex gap-2">

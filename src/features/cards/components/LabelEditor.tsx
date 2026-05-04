@@ -103,7 +103,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
                   style={{ backgroundColor: c.value }}
                 >
                   {active && (
-                    <CheckIcon size={12} weight="bold" className="text-white" />
+                     <CheckIcon size={12} weight="bold" className="text-fg-on-brand" />
                   )}
                 </button>
               );

@@ -3,7 +3,7 @@ import type { FormEvent } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
-import { DEFAULT_BOARD_BACKGROUNDS } from '@/shared/utils/constants'
+import { BOARD_BACKGROUNDS, DEFAULT_BACKGROUND_ID } from '@/shared/utils/constants'
 
 interface CreateBoardModalProps {
   isOpen: boolean
@@ -13,14 +13,14 @@ interface CreateBoardModalProps {
 
 export function CreateBoardModal({ isOpen, onClose, onCreate }: CreateBoardModalProps) {
   const [name, setName] = useState('')
-  const [background, setBackground] = useState(DEFAULT_BOARD_BACKGROUNDS[0])
+  const [background, setBackground] = useState(DEFAULT_BACKGROUND_ID)
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!name.trim()) return
     onCreate(name.trim(), background)
     setName('')
-    setBackground(DEFAULT_BOARD_BACKGROUNDS[0])
+    setBackground(DEFAULT_BACKGROUND_ID)
     onClose()
   }
 
@@ -37,15 +37,15 @@ export function CreateBoardModal({ isOpen, onClose, onCreate }: CreateBoardModal
         />
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-surface-700">Fondo</label>
+          <label className="mb-2 block text-sm font-medium text-fg-default">Fondo</label>
           <div className="flex gap-2">
-            {DEFAULT_BOARD_BACKGROUNDS.map((bg) => (
+            {BOARD_BACKGROUNDS.map((bg) => (
               <button
-                key={bg}
+                key={bg.id}
                 type="button"
-                onClick={() => setBackground(bg)}
-                className={`h-10 w-14 cursor-pointer rounded-lg ${bg} transition-all ${
-                  background === bg ? 'ring-2 ring-primary-500 ring-offset-2' : 'hover:opacity-80'
+                onClick={() => setBackground(bg.id)}
+                className={`h-10 w-14 cursor-pointer rounded-lg ${bg.gradientClass} transition-all ${
+                  background === bg.id ? 'ring-2 ring-border-focus ring-offset-2' : 'hover:opacity-80'
                 }`}
               />
             ))}

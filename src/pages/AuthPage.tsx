@@ -105,7 +105,7 @@ export function AuthPage() {
             <span className="text-3xl font-bold tracking-tight text-surface-900">Canvan</span>
           </div>
 
-          <div className="rounded-2xl border border-surface-200 bg-white p-8 shadow-xl shadow-primary-900/5 sm:p-10">
+           <div className="rounded-2xl border border-border-subtle bg-bg-card p-8 shadow-xl shadow-primary-900/5 sm:p-10">
             {isLogin ? (
               <LoginForm onToggle={() => setIsLogin(false)} />
             ) : (
@@ -113,9 +113,9 @@ export function AuthPage() {
             )}
           </div>
 
-          <p className="mt-6 text-center text-xs text-surface-500">
-            Al continuar aceptas nuestros{' '}
-            <a href="#" className="font-medium text-surface-700 hover:text-primary-600">
+           <p className="mt-6 text-center text-xs text-fg-subtle">
+             Al continuar aceptas nuestros{' '}
+             <a href="#" className="font-medium text-fg-default hover:text-fg-brand">
               Términos
             </a>{' '}
             y{' '}

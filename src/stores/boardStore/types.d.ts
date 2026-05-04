@@ -13,6 +13,10 @@ export interface BoardState {
   loading: boolean;
   error: string | null;
 
+  // UI state for modals
+  selectedUserId: string | null;
+  setSelectedUserId: (userId: string | null) => void;
+
   // Hydration
   hydrateBoards: () => Promise<void>;
   setCurrentBoard: (boardId: string | null) => Promise<void>;

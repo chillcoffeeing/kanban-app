@@ -15,6 +15,10 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   loading: false,
   error: null,
 
+  // UI state for modals
+  selectedUserId: null,
+  setSelectedUserId: (userId: string | null) => set({ selectedUserId: userId }),
+
   ...createBoardActions(set, get),
   ...createMemberActions(set, get),
   ...createStageActions(set, get),

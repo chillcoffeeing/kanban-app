@@ -62,7 +62,7 @@ export default function MembersList({
         {member.role !== "owner" && (
           <button
             onClick={() => handleRemoveMember(member)}
-            className="cursor-pointer text-fg-muted hover:text-red-500"
+             className="cursor-pointer text-fg-muted hover:text-fg-danger"
           >
             <TrashIcon size={20} weight="duotone" />
           </button>

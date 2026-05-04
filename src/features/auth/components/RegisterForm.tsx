@@ -62,9 +62,9 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
       {error && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
+           className="flex items-start gap-2 rounded-lg border border-danger-200 bg-bg-danger px-3 py-2.5 text-sm text-fg-danger"
         >
-          <WarningCircleIcon size={22} weight="fill" className="mt-0.5 flex-none text-red-500" />
+           <WarningCircleIcon size={22} weight="fill" className="mt-0.5 flex-none text-fg-danger" />
           <span>{error}</span>
         </div>
       )}

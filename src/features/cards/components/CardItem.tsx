@@ -21,10 +21,12 @@ interface CardItemProps {
 }
 
 export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
-  const board = useBoardStore(useShallow((s) => {
-    const found = s.boards.find((b) => b.id === boardId);
-    return found;
-  }));
+  const board = useBoardStore(
+    useShallow((s) => {
+      const found = s.boards.find((b) => b.id === boardId);
+      return found;
+    }),
+  );
   const prefs = getBoardPreferences(board);
   const formatDate = useFormatDate();
 
@@ -42,7 +44,7 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragging ? "none" : transition,
   };
 
   const completedChecks = card.checklist?.filter((c) => c.done).length || 0;
@@ -59,7 +61,7 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
       {...listeners}
       onClick={onClick}
       className={`group cursor-pointer overflow-hidden rounded-card border border-border-default bg-bg-card shadow-card transition-shadow hover:shadow-card-hover hover:bg-bg-card-hover ${
-        isDragging ? "opacity-50 shadow-card-hover" : ""
+        isDragging ? "opacity-50" : ""
       }`}
     >
       {coverColor ? (
@@ -121,6 +123,7 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
                   key={member.boardMembershipId}
                   name={member.boardMembership.user.name}
                   avatar={member.boardMembership.user.avatarUrl ?? undefined}
+                  userId={member.boardMembership.user.id}
                 />
               ))}
             </div>

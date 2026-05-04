@@ -154,7 +154,7 @@ export function BoardMembersPage() {
                         <span className="text-content font-medium text-fg-default">
                           {inv.email}
                         </span>
-                        <span className="rounded-pill bg-yellow-100 px-2 py-0.5 text-card-meta text-yellow-700">
+                         <span className="rounded-pill bg-bg-warning px-2 py-0.5 text-card-meta text-fg-warning">
                           Pendiente
                         </span>
                         <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
@@ -168,7 +168,7 @@ export function BoardMembersPage() {
                   </div>
                   <button
                     onClick={() => handleDeleteInvitation(inv.id, inv.email)}
-                    className="cursor-pointer text-fg-muted hover:text-red-500"
+                     className="cursor-pointer text-fg-muted hover:text-fg-danger"
                   >
                     <TrashIcon size={20} weight="duotone" />
                   </button>

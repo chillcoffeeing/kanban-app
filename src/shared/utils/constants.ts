@@ -21,11 +21,65 @@ export const PERMISSIONS = {
 
 export const ALL_PERMISSIONS: Permission[] = Object.values(PERMISSIONS)
 
-export const DEFAULT_BOARD_BACKGROUNDS: string[] = [
-  'bg-gradient-to-br from-blue-500 to-purple-600',
-  'bg-gradient-to-br from-green-400 to-cyan-500',
-  'bg-gradient-to-br from-pink-500 to-rose-500',
-  'bg-gradient-to-br from-amber-400 to-orange-500',
-  'bg-gradient-to-br from-indigo-500 to-blue-600',
-  'bg-gradient-to-br from-emerald-500 to-teal-600',
+export const BOARD_BACKGROUNDS = [
+  { id: 'blue-purple', gradientClass: 'bg-gradient-to-br from-blue-500 to-purple-600', textColorClass: 'text-white' },
+  { id: 'green-cyan', gradientClass: 'bg-gradient-to-br from-green-400 to-cyan-500', textColorClass: 'text-white' },
+  { id: 'pink-rose', gradientClass: 'bg-gradient-to-br from-pink-500 to-rose-500', textColorClass: 'text-white' },
+  { id: 'amber-orange', gradientClass: 'bg-gradient-to-br from-amber-400 to-orange-500', textColorClass: 'text-white' },
+  { id: 'indigo-blue', gradientClass: 'bg-gradient-to-br from-indigo-500 to-blue-600', textColorClass: 'text-white' },
+  { id: 'emerald-teal', gradientClass: 'bg-gradient-to-br from-emerald-500 to-teal-600', textColorClass: 'text-white' },
+  { id: 'slate', gradientClass: 'bg-slate-700', textColorClass: 'text-white' },
+  { id: 'zinc', gradientClass: 'bg-zinc-600', textColorClass: 'text-white' }
 ]
+
+export const DEFAULT_BACKGROUND_ID = BOARD_BACKGROUNDS[0].id
+
+export function getBoardBackgroundClasses(backgroundId: string): { gradientClass: string; textColorClass: string } {
+  // Handle legacy JSON format
+  try {
+    const parsed = JSON.parse(backgroundId)
+    if (parsed.gradient && parsed.textColor) {
+      // Find matching background by gradient to get the ID
+      const matchById = BOARD_BACKGROUNDS.find(bg => bg.gradientClass === parsed.gradient)
+      if (matchById) {
+        return {
+          gradientClass: matchById.gradientClass,
+          textColorClass: matchById.textColorClass
+        }
+      }
+      // Fallback: return parsed values directly (legacy support)
+      return {
+        gradientClass: parsed.gradient,
+        textColorClass: parsed.textColor
+      }
+    }
+  } catch {
+    // Not JSON, treat as ID
+  }
+
+  const found = BOARD_BACKGROUNDS.find(bg => bg.id === backgroundId)
+  if (!found) {
+    return {
+      gradientClass: BOARD_BACKGROUNDS[0].gradientClass,
+      textColorClass: BOARD_BACKGROUNDS[0].textColorClass
+    }
+  }
+  return {
+    gradientClass: found.gradientClass,
+    textColorClass: found.textColorClass
+  }
+}
+
+// Helper to migrate old JSON backgrounds to new ID format
+export function migrateBackgroundToId(background: string): string {
+  try {
+    const parsed = JSON.parse(background)
+    if (parsed.gradient) {
+      const match = BOARD_BACKGROUNDS.find(bg => bg.gradientClass === parsed.gradient)
+      if (match) return match.id
+    }
+  } catch {
+    // Not JSON, assume it's already an ID
+  }
+  return background
+}

@@ -54,11 +54,12 @@ export function Header() {
             <DropdownMenu
               trigger={
                 <button className="cursor-pointer">
-                  <MemberAvatar
-                    name={user?.name || "U"}
-                    avatar={user?.profile.avatarUrl || undefined}
-                  />
-                </button>
+                   <MemberAvatar
+                     name={user?.name || "U"}
+                     avatar={user?.profile?.avatarUrl || undefined}
+                     onClick={() => {}}
+                   />
+                 </button>
               }
             >
               <div className="border-b border-surface-100 px-3 py-2">

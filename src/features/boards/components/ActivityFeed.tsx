@@ -38,15 +38,15 @@ const ICON_MAP: Partial<Record<ActivityType, PhosphorIcon>> = {
 }
 
 const COLOR_MAP: Partial<Record<ActivityType, string>> = {
-  [ACTIVITY_TYPES.CARD_DELETED]: 'text-red-500 bg-red-50',
-  [ACTIVITY_TYPES.STAGE_DELETED]: 'text-red-500 bg-red-50',
-  [ACTIVITY_TYPES.MEMBER_REMOVED]: 'text-red-500 bg-red-50',
-  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: 'text-amber-500 bg-amber-50',
-  [ACTIVITY_TYPES.CARD_MOVED]: 'text-blue-500 bg-blue-50',
-  [ACTIVITY_TYPES.MEMBER_INVITED]: 'text-green-500 bg-green-50',
-  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: 'text-green-500 bg-green-50',
-  [ACTIVITY_TYPES.CARD_CREATED]: 'text-green-500 bg-green-50',
-  [ACTIVITY_TYPES.STAGE_CREATED]: 'text-green-500 bg-green-50',
+  [ACTIVITY_TYPES.CARD_DELETED]: 'text-fg-danger bg-bg-danger',
+  [ACTIVITY_TYPES.STAGE_DELETED]: 'text-fg-danger bg-bg-danger',
+  [ACTIVITY_TYPES.MEMBER_REMOVED]: 'text-fg-danger bg-bg-danger',
+  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: 'text-fg-warning bg-bg-warning',
+  [ACTIVITY_TYPES.CARD_MOVED]: 'text-fg-info bg-bg-info',
+  [ACTIVITY_TYPES.MEMBER_INVITED]: 'text-fg-success bg-bg-success',
+  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: 'text-fg-success bg-bg-success',
+  [ACTIVITY_TYPES.CARD_CREATED]: 'text-fg-success bg-bg-success',
+  [ACTIVITY_TYPES.STAGE_CREATED]: 'text-fg-success bg-bg-success',
 }
 
 function formatRelative(timestamp: string): string {
@@ -89,7 +89,7 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
 
   return (
     <div
-      className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-surface-200 bg-white shadow-xl transition-transform duration-300 ${
+       className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-border-subtle bg-bg-card shadow-xl transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >

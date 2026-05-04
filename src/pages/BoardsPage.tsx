@@ -42,9 +42,9 @@ export function BoardsPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-          {error}
-        </div>
+        <div className="mb-4 rounded-lg bg-bg-danger px-3 py-2 text-sm text-fg-danger">
+           {error}
+         </div>
       )}
 
       {loading && myBoards.length === 0 ? (
@@ -52,9 +52,9 @@ export function BoardsPage() {
           Cargando tableros…
         </div>
       ) : myBoards.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-surface-200 py-16">
-          <p className="text-lg text-surface-400">No tienes tableros aún</p>
-          <p className="mt-1 text-sm text-surface-400">
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border-subtle py-16">
+          <p className="text-lg text-fg-subtle">No tienes tableros aún</p>
+           <p className="mt-1 text-sm text-fg-subtle">
             Crea tu primer tablero para empezar a organizar
           </p>
           <Button className="mt-4" onClick={() => setShowCreate(true)}>

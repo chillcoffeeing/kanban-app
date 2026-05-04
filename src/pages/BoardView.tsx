@@ -7,6 +7,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragOverlay,
 } from "@dnd-kit/core";
 import type {
   DragStartEvent,
@@ -19,18 +20,15 @@ import { useActivityStore, ACTIVITY_TYPES } from "@/stores/activityStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { useSocket } from "@/shared/hooks/useSocket";
 import { StageColumn } from "@/features/stages/components/StageColumn";
+import { CardItem } from "@/features/cards/components/CardItem";
+import { CardPreview } from "@/features/cards/components/CardPreview";
 import { CardDetailModal } from "@/features/cards/components/CardDetailModal";
+import { MemberProfileModal } from "@/shared/components/MemberProfileModal";
 import { ActivityFeed } from "@/features/boards/components/ActivityFeed";
-import { CardSearch } from "@/features/cards/components/CardSearch";
+import { BoardHeader } from "@/features/boards/components/BoardHeader";
 import { Button } from "@/shared/components/Button";
-import {
-  PlusIcon,
-  GearIcon,
-  BellIcon,
-  UserPlusIcon,
-} from "@phosphor-icons/react";
 import type { Card } from "@/shared/types/domain";
-import { MemberAvatar } from "@/shared/components/MemberAvatar";
+import { PlusIcon } from "@phosphor-icons/react";
 
 interface BoardViewProps {
   boardId: string;
@@ -54,6 +52,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     loadCard,
     addMember,
   } = useBoardStore();
+
   const currentUser = useAuthStore((s) => s.user);
 
   const isOwner = currentBoard?.members?.some(
@@ -80,11 +79,16 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     Boolean(queryCardId),
   );
 
+  const selectedUserId = useBoardStore((s) => s.selectedUserId);
+  const setSelectedUserId = useBoardStore((s) => s.setSelectedUserId);
+
   const [showActivity, setShowActivity] = useState(false);
 
   const [showInvite, setShowInvite] = useState(false);
 
-  const [, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+
+  const [activeCard, setActiveCard] = useState<Card | null>(null);
 
   const log = useActivity(boardId);
 
@@ -99,13 +103,19 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
   const sensors = useSensors(pointerSensor);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id);
+    const id = event.active.id;
+    setActiveId(id);
+    const data = event.active.data.current as DragData | undefined;
+    if (data?.type === "card" && data.card) {
+      setActiveCard(data.card);
+    }
   }, []);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
       setActiveId(null);
+      setActiveCard(null);
       if (!over) return;
 
       const activeData = active.data.current as DragData | undefined;
@@ -241,14 +251,6 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     };
   }, [boardId]);
 
-  if (!currentBoard) {
-    return (
-      <div className="flex flex-1 items-center justify-center text-surface-400">
-        Cargando tablero…
-      </div>
-    );
-  }
-
   const handleAddStage = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newStageName.trim()) return;
@@ -259,82 +261,30 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     setIsAddingStage(false);
   };
 
+  const handleInviteMember = (email: string) => {
+    addMember(boardId, email);
+    setShowInvite(false);
+  };
+
+  if (!currentBoard) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-lg text-fg-muted">Cargando tablero...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Board header */}
-      <div
-        className={`flex items-center justify-between px-4 py-3 ${currentBoard.background} text-white`}
-      >
-        <h2 className="text-lg font-bold">{currentBoard.name}</h2>
-        <div className="px-4">
-          {/* Board Members */}
-          <div className="flex -space-x-1">
-            {currentBoard.members.map((m) => (
-              <MemberAvatar
-                key={m.id}
-                name={m.user?.name || "Usuario sin nombre"}
-                avatar={m.user?.avatarUrl || undefined}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="grow"></div>
-        <div className="flex items-center gap-2">
-          <CardSearch boardId={boardId} onSelectCard={handleOpenCard} />
-          {isOwner && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white/80! hover:bg-white/20! hover:text-white!"
-                onClick={() => setShowInvite(!showInvite)}
-              >
-                <UserPlusIcon size={20} weight="duotone" /> Invitar
-              </Button>
-              {showInvite && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const email = formData.get("email") as string;
-                    if (email) {
-                      addMember(boardId, email);
-                      setShowInvite(false);
-                    }
-                  }}
-                  className="flex items-center gap-1"
-                >
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="email@ejemplo.com"
-                    className="w-40 rounded bg-white/90 px-2 py-1 text-sm text-surface-900"
-                  />
-                  <Button type="submit" size="sm">
-                    OK
-                  </Button>
-                </form>
-              )}
-            </>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white/80! hover:bg-white/20! hover:text-white!"
-            onClick={() => setShowActivity(!showActivity)}
-          >
-            <BellIcon size={20} weight="duotone" /> Actividad
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white/80! hover:bg-white/20! hover:text-white!"
-            onClick={() => navigate(`/boards/${boardId}/config/miembros`)}
-          >
-            <GearIcon size={20} weight="duotone" /> Configuración
-          </Button>
-        </div>
-      </div>
+      <BoardHeader
+        board={currentBoard}
+        isOwner={!!isOwner}
+        onInviteMember={handleInviteMember}
+        onToggleActivity={() => setShowActivity(!showActivity)}
+        onToggleInvite={() => setShowInvite(!showInvite)}
+        showInvite={showInvite}
+      />
 
       {/* Stages with horizontal scroll */}
       <DndContext
@@ -368,7 +318,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
                   onKeyDown={(e) =>
                     e.key === "Escape" && setIsAddingStage(false)
                   }
-                  className="mb-2 w-full rounded-lg border border-surface-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                  className="mb-2 w-full rounded-lg border border-border-default bg-bg-card px-3 py-2 text-sm focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus/20"
                 />
                 <div className="flex gap-2">
                   <Button size="sm" type="submit">
@@ -394,6 +344,16 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
             )}
           </div>
         </div>
+
+        <DragOverlay>
+          {activeCard ? (
+            <CardPreview
+              card={activeCard}
+              stageId={activeCard.id}
+              boardId={boardId}
+            />
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       <CardDetailModal
@@ -417,6 +377,8 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
         stageId={selectedStageId}
         boardId={boardId}
       />
+
+      <MemberProfileModal />
 
       <ActivityFeed
         isOpen={showActivity}

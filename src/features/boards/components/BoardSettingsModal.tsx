@@ -416,9 +416,9 @@ export function BoardSettingsModal({
                                 <span className="text-sm font-medium text-surface-900">
                                   {inv.email}
                                 </span>
-                                <span className="rounded bg-yellow-100 px-1.5 py-0.5 text-xs text-yellow-700">
-                                  Pendiente
-                                </span>
+                                 <span className="rounded bg-bg-warning px-1.5 py-0.5 text-xs text-fg-warning">
+                                   Pendiente
+                                 </span>
                                 <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
                                   {inv.role}
                                 </span>
@@ -433,7 +433,7 @@ export function BoardSettingsModal({
                             onClick={() =>
                               handleDeleteInvitation(inv.id, inv.email)
                             }
-                            className="cursor-pointer text-red-500 hover:text-red-600"
+                            className="cursor-pointer text-fg-danger hover:text-danger-600"
                           >
                             <TrashIcon size={20} weight="duotone" />
                           </button>

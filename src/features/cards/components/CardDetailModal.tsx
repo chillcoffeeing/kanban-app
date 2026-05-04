@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { LabelEditor } from "./LabelEditor";
 import type { Card, Label } from "@/shared/types/domain";
+import { MemberAvatar } from "@/shared/components/MemberAvatar";
 
 interface CardDetailModalProps {
   isOpen: boolean;
@@ -280,7 +281,7 @@ export function CardDetailModal({
               {labels.map((l) => (
                 <span
                   key={l.id}
-                  className="rounded-md px-2.5 py-1 text-xs font-medium text-white"
+                  className="rounded-md px-2.5 py-1 text-xs font-medium text-fg-on-brand"
                   style={{ backgroundColor: l.color }}
                 >
                   {l.name}
@@ -299,7 +300,7 @@ export function CardDetailModal({
               onChange={(e) => setDescription(e.target.value)}
               onBlur={handleDescriptionBlur}
               placeholder="Añadir una descripción más detallada..."
-              className="w-full resize-none rounded-lg border border-surface-200 px-3 py-2 text-sm text-surface-700 placeholder:text-surface-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="w-full resize-none rounded-lg border border-border-subtle px-3 py-2 text-sm text-fg-default placeholder:text-fg-subtle focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus/20"
               rows={3}
             />
           </div>
@@ -338,13 +339,13 @@ export function CardDetailModal({
                     className="h-4 w-4 rounded border-surface-300 cursor-pointer"
                   />
                   <span
-                    className={`flex-1 text-sm ${item.done ? "text-surface-400 line-through" : "text-surface-700"}`}
+                    className={`flex-1 text-sm ${item.done ? "text-fg-subtle line-through" : "text-fg-default"}`}
                   >
                     {item.text}
                   </span>
                   <button
                     onClick={() => removeCheckItem(item.id)}
-                    className="cursor-pointer opacity-0 group-hover:opacity-100 text-surface-400 hover:text-red-500"
+                    className="cursor-pointer opacity-0 group-hover:opacity-100 text-fg-subtle hover:text-fg-danger"
                   >
                     <TrashIcon size={18} weight="duotone" />
                   </button>
@@ -356,7 +357,7 @@ export function CardDetailModal({
                 placeholder="Nuevo elemento..."
                 value={newCheckItem}
                 onChange={(e) => setNewCheckItem(e.target.value)}
-                className="flex-1 rounded-md border border-surface-200 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
+                className="flex-1 rounded-md border border-border-subtle px-2.5 py-1.5 text-sm focus:border-border-focus focus:outline-none"
               />
               <Button type="submit" size="sm" variant="secondary">
                 <PlusIcon size={18} weight="duotone" />
@@ -367,17 +368,17 @@ export function CardDetailModal({
           {/* Miembros */}
           {members.length > 0 && (
             <div>
-              <h4 className="mb-1 text-sm font-medium text-surface-700">
-                Miembros
+              <h4 className="mb-1 text-sm font-medium text-fg-default">
+                Miembros de tarjeta
               </h4>
               <div className="flex flex-wrap gap-2">
                 {members.map((member) => (
-                  <span
+                  <MemberAvatar
                     key={member.boardMembershipId}
-                    className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700"
-                  >
-                    {member.boardMembership.user.name}
-                  </span>
+                    name={member.boardMembership.user.name}
+                    avatar={member.boardMembership.user.avatarUrl ?? undefined}
+                    userId={member.boardMembership.user.id}
+                  />
                 ))}
               </div>
             </div>
@@ -421,7 +422,7 @@ export function CardDetailModal({
                 <CaretDownIcon size={16} className="ml-auto" />
               </Button>
               {showMemberDropdown && (
-                <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-surface-200 bg-white py-1 shadow-lg">
+                <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-border-subtle bg-bg-card py-1 shadow-lg">
                   {currentBoard?.members
                     .filter((m) => m.user?.id !== user?.id)
                     .map((member) => {
@@ -443,7 +444,7 @@ export function CardDetailModal({
                             setShowMemberDropdown(false);
                           }}
                           disabled={isMember}
-                          className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-50 ${
+                          className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-bg-subtle ${
                             isMember
                               ? "text-surface-300 cursor-not-allowed"
                               : "text-surface-700"
