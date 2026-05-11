@@ -6,15 +6,37 @@ import {
   GithubLogoIcon,
   LinkedinLogoIcon,
   GlobeIcon,
+  UserIcon,
 } from "@phosphor-icons/react";
 import { Modal } from "./Modal";
 import { api } from "@/services/api";
 import { useBoardStore } from "@/stores/boardStore";
 
+interface MemberProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  profile?: {
+    displayName?: string;
+    bio?: string;
+    jobTitle?: string;
+    company?: string;
+    location?: string;
+    coverUrl?: string;
+    socials?: {
+      website?: string;
+      github?: string;
+      linkedin?: string;
+    };
+  };
+  createdAt?: string;
+}
+
 export function MemberProfileModal() {
   const userId = useBoardStore((s) => s.selectedUserId);
   const setSelectedUserId = useBoardStore((s) => s.setSelectedUserId);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<MemberProfile | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -26,7 +48,7 @@ export function MemberProfileModal() {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const data = await api<any>(`/users/${userId}`);
+        const data = await api<MemberProfile>(`/users/${userId}`);
         setUser(data);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -48,32 +70,23 @@ export function MemberProfileModal() {
     return (
       <Modal isOpen={!!userId} onClose={handleClose} size="md">
         <div className="flex flex-col items-center gap-4 py-8">
-          <div className="h-24 w-24 rounded-full bg-gray-200 animate-pulse" />
-          <div className="h-4 w-32 rounded bg-gray-200 animate-pulse" />
-          <div className="h-3 w-48 rounded bg-gray-200 animate-pulse" />
+          <div className="size-24 rounded-full bg-neutral-light/70 animate-pulse" />
+          <div className="h-4 w-32 rounded bg-neutral-light/70 animate-pulse" />
+          <div className="h-3 w-48 rounded bg-neutral-light/70 animate-pulse" />
         </div>
       </Modal>
     );
   }
 
-  if (!user) {
-    return (
-      <Modal isOpen={!!userId} onClose={handleClose} size="md">
-        <div className="text-center py-8 text-gray-500">
-          No se encontró información del usuario
-        </div>
-      </Modal>
-    );
-  }
+  if (!user) return null;
 
   const profile = user.profile || {};
-  const displayName = profile.displayName || "Usuario";
+  const displayName = profile.displayName || user.name || "Usuario";
   const bio = profile.bio;
   const jobTitle = profile.jobTitle;
   const company = profile.company;
   const location = profile.location;
   const coverUrl = profile.coverUrl;
-  const createdAt = user.createdAt;
   const avatarUrl = user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`;
 
   return (
@@ -90,7 +103,7 @@ export function MemberProfileModal() {
               <img
                 src={avatarUrl}
                 alt={displayName}
-                className="h-32 w-32 rounded-full object-cover ring-4 ring-white bg-white"
+                className="size-32 rounded-full object-cover ring-4 ring-surface bg-surface"
               />
             </div>
           </div>
@@ -99,83 +112,81 @@ export function MemberProfileModal() {
             <img
               src={avatarUrl}
               alt={displayName}
-              className="h-32 w-32 rounded-full object-cover ring-4 ring-white bg-white"
+              className="size-32 rounded-full object-cover ring-4 ring-surface bg-surface"
             />
           </div>
         )}
 
         <div className="px-6 pb-6">
           <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-semibold text-neutral-dark">
               {displayName}
             </h3>
             {jobTitle && (
-              <p className="text-sm text-gray-600 mt-1">{jobTitle}</p>
+              <p className="text-sm text-neutral-dark/70 mt-1">{jobTitle}</p>
             )}
             {(company || location) && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-neutral-dark/60 mt-1">
                 {[company, location].filter(Boolean).join(" • ")}
               </p>
             )}
           </div>
 
           {bio && (
-            <div className="mb-6 rounded-lg bg-gray-50 p-4">
-              <p className="text-sm text-gray-700 italic">"{bio}"</p>
+            <div className="mb-6 rounded-lg bg-neutral-light/30 p-4">
+              <p className="text-sm text-neutral-dark/70 italic">"{bio}"</p>
             </div>
           )}
 
           <div className="space-y-3 mb-6">
-            {user.email && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <EnvelopeIcon size={18} />
-                <span>{user.email}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 text-sm text-neutral-dark/70">
+              <EnvelopeIcon size={18} className="text-neutral-dark/50" />
+              <span>{user.email}</span>
+            </div>
             {company && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <BuildingIcon size={18} />
+              <div className="flex items-center gap-2 text-sm text-neutral-dark/70">
+                <BuildingIcon size={18} className="text-neutral-dark/50" />
                 <span>{company}</span>
               </div>
             )}
             {location && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <MapPinIcon size={18} />
+              <div className="flex items-center gap-2 text-sm text-neutral-dark/70">
+                <MapPinIcon size={18} className="text-neutral-dark/50" />
                 <span>{location}</span>
               </div>
             )}
           </div>
 
-          {(profile.socialWebsite || profile.socialGithub || profile.socialLinkedin) && (
+          {(profile.socials?.website || profile.socials?.github || profile.socials?.linkedin) && (
             <div className="flex flex-wrap gap-4 mb-6">
-              {profile.socialWebsite && (
+              {profile.socials.website && (
                 <a
-                  href={profile.socialWebsite}
+                  href={profile.socials.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600"
+                  className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
                 >
                   <GlobeIcon size={18} />
                   Web
                 </a>
               )}
-              {profile.socialGithub && (
+              {profile.socials.github && (
                 <a
-                  href={`https://github.com/${profile.socialGithub}`}
+                  href={`https://github.com/${profile.socials.github}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                  className="inline-flex items-center gap-2 text-sm text-neutral-dark/70 hover:text-neutral-dark"
                 >
                   <GithubLogoIcon size={18} />
                   GitHub
                 </a>
               )}
-              {profile.socialLinkedin && (
+              {profile.socials.linkedin && (
                 <a
-                  href={`https://linkedin.com/in/${profile.socialLinkedin}`}
+                  href={`https://linkedin.com/in/${profile.socials.linkedin}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-700"
+                  className="inline-flex items-center gap-2 text-sm text-primary/70 hover:text-primary"
                 >
                   <LinkedinLogoIcon size={18} />
                   LinkedIn
@@ -184,11 +195,11 @@ export function MemberProfileModal() {
             </div>
           )}
 
-          {createdAt && (
-            <div className="border-t border-gray-200 pt-4 text-center">
-              <p className="text-xs text-gray-500">
+          {user.createdAt && (
+            <div className="border-t border-neutral-light pt-4 text-center">
+              <p className="text-xs text-neutral-dark/50">
                 Miembro desde{" "}
-                {new Date(createdAt).toLocaleDateString("es-ES", {
+                {new Date(user.createdAt).toLocaleDateString("es-ES", {
                   year: "numeric",
                   month: "long",
                 })}

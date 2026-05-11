@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
@@ -68,7 +68,7 @@ function Select({ value, onChange, options }: SelectProps) {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="cursor-pointer rounded-md border border-surface-200 bg-[var(--surface-card)] px-2 py-1 text-sm text-surface-700 focus:border-primary-500 focus:outline-none"
+        className="cursor-pointer rounded-lg border border-neutral-light bg-surface px-3 py-1.5 text-sm text-neutral-dark focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>
@@ -88,19 +88,19 @@ interface PrefRowProps {
 
 function PrefRow({ icon: Icon, title, description, children }: PrefRowProps) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-surface-100 py-3 last:border-b-0">
-      <div className="flex items-start gap-2">
+    <div className="flex items-start justify-between gap-4 border-b border-neutral-light py-3 last:border-b-0">
+      <div className="flex items-start gap-3">
         {Icon && (
           <Icon
             size={22}
             weight="duotone"
-            className="mt-0.5 text-surface-500"
+            className="mt-0.5 text-primary"
           />
         )}
         <div>
-          <p className="text-sm font-medium text-surface-900">{title}</p>
+          <p className="text-sm font-medium text-neutral-dark">{title}</p>
           {description && (
-            <p className="mt-0.5 text-xs text-surface-500">{description}</p>
+            <p className="mt-0.5 text-xs text-neutral-dark/60">{description}</p>
           )}
         </div>
       </div>
@@ -206,6 +206,8 @@ export function BoardSettingsModal({
     }
   };
 
+  const formatDate = (d: string) => new Date(d).toLocaleDateString();
+
   const togglePermission = (membershipId: string, permission: Permission) => {
     const member = board.members.find((m) => m.id === membershipId);
     if (!member) return;
@@ -224,15 +226,15 @@ export function BoardSettingsModal({
       size="lg"
     >
       <div className="flex gap-4">
-        <div className="flex flex-col gap-1 border-r border-surface-200 pr-4">
+          <div className="flex flex-col gap-1 border-r border-neutral-light pr-4">
           {TABS.map(({ id, label, Icon }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
               className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-left text-sm ${
                 tab === id
-                  ? "bg-primary-50 text-primary-700 font-medium"
-                  : "text-surface-600 hover:bg-surface-50"
+                  ? "bg-info text-primary font-medium"
+                  : "text-neutral-dark hover:bg-neutral-light-hover"
               }`}
             >
               <Icon size={20} weight="duotone" />
@@ -255,7 +257,7 @@ export function BoardSettingsModal({
                   Guardar
                 </Button>
               </div>
-              <div className="pt-4 border-t border-surface-200">
+              <div className="pt-4 border-t border-neutral-light">
                 <Button
                   variant="danger"
                   size="sm"
@@ -292,7 +294,7 @@ export function BoardSettingsModal({
                   </Button>
                 </form>
               ) : (
-                <p className="rounded-card border border-border-default bg-bg-muted p-3 text-card-meta text-fg-muted">
+                <p className="rounded-lg border border-neutral-light bg-neutral-light/50 p-3 text-xs text-neutral-dark/60">
                   Solo los administradores pueden gestionar miembros en este
                   tablero (preferencia{" "}
                   <strong>Añadir y eliminar miembros</strong> = Solo
@@ -304,7 +306,7 @@ export function BoardSettingsModal({
                 {board.members.map((member) => (
                   <div
                     key={member.id}
-                    className="rounded-lg border border-surface-200 p-3"
+                    className="rounded-lg border border-neutral-light p-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -312,46 +314,34 @@ export function BoardSettingsModal({
                           <img
                             src={member.user.avatarUrl}
                             alt={member.user.name}
-                            className="h-10 w-10 rounded-full object-cover"
+                            className="size-10 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-200">
-                            <UserIcon size={20} className="text-surface-500" />
+                          <div className="flex size-10 items-center justify-center rounded-full bg-neutral-light-hover">
+                            <UserIcon size={20} className="text-neutral-dark" />
                           </div>
                         )}
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-surface-900">
+                            <span className="text-sm font-medium text-neutral-dark">
                               {member.user?.name ||
                                 member.email ||
                                 "Propietario"}
                             </span>
-                            <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
+                            <span className="rounded bg-neutral-light/50 px-1.5 py-0.5 text-xs text-neutral-dark">
                               {member.role}
                             </span>
                           </div>
                           {member.user?.createdAt && (
-                            <p className="text-xs text-surface-500">
+                            <p className="text-xs text-neutral-dark">
                               Miembro desde{" "}
-                              {useMemo(
-                                () =>
-                                  new Date(
-                                    member.user!.createdAt!,
-                                  ).toLocaleDateString(),
-                                [member.user?.createdAt],
-                              )}
+                              {formatDate(member.user!.createdAt!)}
                             </p>
                           )}
                           {member.invitedAt && (
-                            <p className="text-xs text-surface-500">
+                            <p className="text-xs text-neutral-dark">
                               Invitado:{" "}
-                              {useMemo(
-                                () =>
-                                  new Date(
-                                    member.invitedAt!,
-                                  ).toLocaleDateString(),
-                                [member.invitedAt],
-                              )}
+                              {formatDate(member.invitedAt)}
                             </p>
                           )}
                         </div>
@@ -359,7 +349,7 @@ export function BoardSettingsModal({
                       {member.role !== "owner" && canManage && (
                         <button
                           onClick={() => handleRemoveMember(member)}
-                          className="cursor-pointer text-red-500 hover:text-red-600"
+                          className="cursor-pointer text-danger hover:text-danger-hover"
                         >
                           <TrashIcon size={20} weight="duotone" />
                         </button>
@@ -374,7 +364,7 @@ export function BoardSettingsModal({
                         ).map(([perm, label]) => (
                           <label
                             key={perm}
-                            className="flex items-center gap-1 text-xs text-surface-600 cursor-pointer"
+                            className="flex items-center gap-1 text-xs text-neutral-dark cursor-pointer"
                           >
                             <input
                               type="checkbox"
@@ -392,8 +382,8 @@ export function BoardSettingsModal({
               </div>
 
               {pendingInvites.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-surface-200">
-                  <h4 className="mb-3 text-sm font-semibold text-surface-700 flex items-center gap-2">
+                <div className="mt-4 pt-4 border-t border-neutral-light">
+                  <h4 className="mb-3 text-sm font-semibold text-neutral-dark flex items-center gap-2">
                     <ClockIcon size={18} weight="duotone" />
                     Invitaciones pendientes
                   </h4>
@@ -401,30 +391,30 @@ export function BoardSettingsModal({
                     {pendingInvites.map((inv) => (
                       <div
                         key={inv.id}
-                        className="rounded-lg border border-surface-200 p-3 opacity-75"
+                        className="rounded-lg border border-neutral-light p-3 opacity-75"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-100">
-                              <UserIcon
-                                size={20}
-                                className="text-surface-500"
-                              />
-                            </div>
+                            <div className="flex size-10 items-center justify-center rounded-full bg-neutral-light-hover">
+                               <UserIcon
+                                 size={20}
+                                 className="text-neutral-dark"
+                               />
+                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-surface-900">
-                                  {inv.email}
-                                </span>
-                                 <span className="rounded bg-bg-warning px-1.5 py-0.5 text-xs text-fg-warning">
-                                   Pendiente
+                                <span className="text-sm font-medium text-neutral-dark">
+                                   {inv.email}
                                  </span>
-                                <span className="rounded bg-surface-100 px-1.5 py-0.5 text-xs text-surface-500">
-                                  {inv.role}
-                                </span>
+                                  <span className="rounded bg-warning px-1.5 py-0.5 text-xs text-warning">
+                                    Pendiente
+                                  </span>
+                                 <span className="rounded bg-neutral-light/50 px-1.5 py-0.5 text-xs text-neutral-dark">
+                                    {inv.role}
+                                  </span>
                               </div>
-                              <p className="text-xs text-surface-500">
-                                Invitado:{" "}
+                              <p className="text-xs text-neutral-dark">
+                                 Invitado:{" "}
                                 {new Date(inv.createdAt).toLocaleDateString()}
                               </p>
                             </div>
@@ -433,7 +423,7 @@ export function BoardSettingsModal({
                             onClick={() =>
                               handleDeleteInvitation(inv.id, inv.email)
                             }
-                            className="cursor-pointer text-fg-danger hover:text-danger-600"
+                            className="cursor-pointer text-danger hover:text-danger-hover"
                           >
                             <TrashIcon size={20} weight="duotone" />
                           </button>
@@ -448,7 +438,7 @@ export function BoardSettingsModal({
 
           {tab === "preferences" && (
             <div className="flex flex-col">
-              <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-surface-500">
+              <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-dark">
                 Espacio de trabajo
               </h4>
               <PrefRow
@@ -475,7 +465,7 @@ export function BoardSettingsModal({
                 />
               </PrefRow>
 
-              <h4 className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-surface-500">
+              <h4 className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-neutral-dark">
                 Permisos
               </h4>
               <PrefRow
@@ -528,7 +518,7 @@ export function BoardSettingsModal({
                 />
               </PrefRow>
 
-              <h4 className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-surface-500">
+              <h4 className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-neutral-dark">
                 Estado completado
               </h4>
               <PrefRow
@@ -542,7 +532,7 @@ export function BoardSettingsModal({
                 />
               </PrefRow>
 
-              <h4 className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-surface-500">
+              <h4 className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-neutral-dark">
                 Portadas
               </h4>
               <PrefRow

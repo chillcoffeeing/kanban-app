@@ -1,22 +1,10 @@
 /**
  * Tipos de dominio del producto (Board / Stage / Card / Activity).
- * Usa junto con `user.ts` (auth).
  */
 
-import { BackendCardMember } from "./api";
+import type { CardMember, Label, ChecklistItem } from "./api";
 
-export interface Label {
-  id: string;
-  name: string;
-  color: string;
-}
-
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  done: boolean;
-  position: number;
-}
+export type { Label, ChecklistItem };
 
 export interface Card {
   id: string;
@@ -24,7 +12,7 @@ export interface Card {
   description: string;
   labels: Label[];
   checklist: ChecklistItem[];
-  members: BackendCardMember[];
+  members: CardMember[];
   dueDate: string | null;
   startDate: string | null;
   createdAt: string;
@@ -45,7 +33,7 @@ export type Permission =
   | "delete_card"
   | "invite_member";
 
-export type MemberRole = "owner" | "admin" | "member";
+type MemberRole = "owner" | "admin" | "member";
 
 export interface BoardMember {
   email: string;

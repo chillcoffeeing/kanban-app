@@ -1,6 +1,6 @@
 import type { Board, BoardPreferences } from '@/shared/types/domain'
 
-export const BOARD_PREF_DEFAULTS: BoardPreferences = {
+const BOARD_PREF_DEFAULTS: BoardPreferences = {
   visibility: 'workspace',
   commentPermission: 'members',
   memberPermission: 'members',
@@ -35,7 +35,7 @@ export function canManageMembers(
   return true
 }
 
-export function canComment(
+function canComment(
   board: Board | null | undefined,
   userId: string | null | undefined
 ): boolean {

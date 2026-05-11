@@ -12,7 +12,12 @@ import { ACTIVITY_TYPES } from "@/stores/activityStore";
 import { CardItem } from "@/features/cards/components/CardItem";
 import { Button } from "@/shared/components/Button";
 import { DropdownMenu, DropdownItem } from "@/shared/components/DropdownMenu";
-import { PlusIcon, DotsThreeIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react";
+import {
+  PlusIcon,
+  DotsThreeIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@phosphor-icons/react";
 import type { Card, Stage } from "@/shared/types/domain";
 
 interface StageColumnProps {
@@ -29,7 +34,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
   const { addCard, updateStage, deleteStage } = useBoardStore();
   const log = useActivity(boardId);
 
-  const showCompletedCards = useSettingsStore().showCompletedCards;
+  const showCompletedCards = useSettingsStore((s) => s.showCompletedCards);
 
   const visibleCards = useMemo(() => {
     return stage.cards.filter((card) => {
@@ -77,30 +82,30 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
   };
 
   return (
-    <div className="flex h-full w-72 shrink-0 flex-col rounded-xl border border-border-default bg-bg-card shadow-sm">
-      <div className="flex items-center justify-between px-3 py-2.5">
+    <div className="flex h-full w-72 shrink-0 flex-col rounded-xl border border-neutral-light bg-surface shadow-md gap-y-(--density-gap,1rem)">
+      <div className="flex items-center justify-between px-4 pt-3">
         {isEditing ? (
           <form onSubmit={handleRename} className="flex-1">
             <input
-              autoFocus
+              autoFocus /* Intentional: auto-focus for quick rename workflow */
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               onBlur={handleRename}
-               className="w-full rounded bg-bg-card px-2 py-1 text-sm font-semibold text-fg-default focus:outline-none focus:ring-2 focus:ring-border-focus"
+              className="w-full rounded-lg border border-neutral-light bg-surface px-2 py-1 text-sm font-semibold text-neutral-dark focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </form>
         ) : (
-          <h3 className="text-sm font-semibold text-surface-700">
+          <h3 className="text-sm font-semibold text-neutral-dark flex items-center gap-2">
             {stage.name}
-            <span className="ml-2 text-xs font-normal text-surface-400">
+            <span className="ml-2 text-xs font-normal text-neutral-dark/50 bg-neutral-light/50 px-2 py-0.5 rounded-full">
               {visibleCards.length}
             </span>
           </h3>
         )}
         <DropdownMenu
           trigger={
-            <button className="cursor-pointer rounded p-1 text-surface-400 hover:bg-surface-200 hover:text-surface-600">
-              <DotsThreeIcon size={22} weight="bold" />
+            <button className="cursor-pointer rounded p-1 text-neutral-dark/50 hover:bg-neutral-light-hover hover:text-neutral-dark transition-colors">
+              <DotsThreeIcon size={18} weight="bold" />
             </button>
           }
         >
@@ -111,7 +116,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
             }}
           >
             <span className="flex items-center gap-2">
-              <PencilIcon size={18} weight="duotone" /> Renombrar
+              <PencilIcon size={16} weight="duotone" /> Renombrar
             </span>
           </DropdownItem>
           <DropdownItem
@@ -127,7 +132,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
             }}
           >
             <span className="flex items-center gap-2">
-              <TrashIcon size={18} weight="duotone" /> Eliminar
+              <TrashIcon size={16} weight="duotone" /> Eliminar
             </span>
           </DropdownItem>
         </DropdownMenu>
@@ -135,8 +140,8 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
 
       <div
         ref={setNodeRef}
-        className={`flex flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2 ${
-          isOver ? "bg-brand-50/50 rounded-lg" : ""
+        className={`flex flex-1 flex-col gap-(--density-gap,0.5rem) overflow-y-auto px-2 pb-2 ${
+          isOver ? "bg-info/20 rounded-lg" : ""
         }`}
       >
         <SortableContext
@@ -159,7 +164,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
         {isAdding ? (
           <form onSubmit={handleAddCard} className="flex flex-col gap-2">
             <textarea
-              autoFocus
+              autoFocus /* Intentional: auto-focus for quick card creation flow */
               placeholder="Título de la tarjeta..."
               value={newCardTitle}
               onChange={(e) => setNewCardTitle(e.target.value)}
@@ -170,7 +175,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
                 }
                 if (e.key === "Escape") setIsAdding(false);
               }}
-               className="w-full resize-none rounded-lg border border-border-default bg-bg-card px-3 py-2 text-sm shadow-sm focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus/20"
+              className="w-full resize-none rounded-lg border border-neutral-light bg-surface px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               rows={2}
             />
             <div className="flex gap-2">
@@ -190,9 +195,9 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="flex w-full cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-surface-500 hover:bg-surface-200 hover:text-surface-700"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-1.5 bg-transparent border-2 border-dashed border-secondary text-sm font-medium text-secondary hover:bg-secondary hover:text-secondary-fg transition-colors"
           >
-            <PlusIcon size={20} weight="duotone" /> Añadir tarjeta
+            <PlusIcon size={28} weight="duotone" /> Añadir tarjeta
           </button>
         )}
       </div>

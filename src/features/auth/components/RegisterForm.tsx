@@ -48,13 +48,13 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
           Comienza gratis
         </p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-surface-900">
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-neutral-dark">
           Crea tu cuenta
         </h1>
-        <p className="mt-2 text-sm text-surface-500">
+        <p className="mt-2 text-sm text-neutral-dark/70">
           Empieza a organizar el trabajo de tu equipo en minutos. Sin tarjeta de crédito.
         </p>
       </div>
@@ -62,9 +62,9 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
       {error && (
         <div
           role="alert"
-           className="flex items-start gap-2 rounded-lg border border-danger-200 bg-bg-danger px-3 py-2.5 text-sm text-fg-danger"
+           className="flex items-start gap-2 rounded-lg border border-danger/20 bg-danger/10 px-3 py-2.5 text-sm text-danger"
         >
-           <WarningCircleIcon size={22} weight="fill" className="mt-0.5 flex-none text-fg-danger" />
+           <WarningCircleIcon size={22} weight="fill" className="mt-0.5 flex-none text-danger/80" />
           <span>{error}</span>
         </div>
       )}
@@ -101,12 +101,12 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
         {loading ? 'Creando…' : 'Crear cuenta'}
       </Button>
 
-      <p className="text-center text-sm text-surface-500">
+      <p className="text-center text-sm text-neutral-dark/70">
         ¿Ya tienes cuenta?{' '}
         <button
           type="button"
           onClick={onToggle}
-          className="cursor-pointer font-semibold text-primary-600 hover:underline"
+          className="cursor-pointer font-semibold text-primary hover:underline"
         >
           Inicia sesión
         </button>

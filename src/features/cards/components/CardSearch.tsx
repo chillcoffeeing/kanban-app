@@ -45,7 +45,7 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
           l.name.toLowerCase().includes(q),
         );
         const matchMember = card.members?.some((member) =>
-          member.user.name.toLowerCase().includes(q),
+          member.boardMembership?.user?.name?.toLowerCase().includes(q) || false,
         );
         const matchChecklist = card.checklist?.some((c) =>
           c.text.toLowerCase().includes(q),
@@ -95,15 +95,15 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
       </div>
 
       {isOpen && query.trim() && (
-         <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-border-subtle bg-bg-card shadow-xl">
-             <div className="border-b border-border-subtle px-3 py-2">
-             <span className="text-xs font-medium text-fg-subtle">
+          <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-xl border border-neutral-light bg-surface shadow-lg">
+             <div className="border-b border-neutral-light px-3 py-2">
+             <span className="text-xs font-medium text-neutral-dark">
               {results.length} resultado{results.length !== 1 ? "s" : ""}
             </span>
           </div>
           <div className="max-h-72 overflow-y-auto">
             {results.length === 0 ? (
-              <div className="px-3 py-6 text-center text-sm text-surface-400">
+              <div className="px-3 py-6 text-center text-sm text-neutral-dark">
                 Sin resultados para "{query}"
               </div>
             ) : (
@@ -115,7 +115,7 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
                     setIsOpen(false);
                     setQuery("");
                   }}
-                  className="flex w-full cursor-pointer flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-surface-50"
+                  className="flex w-full cursor-pointer flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-neutral-light/50"
                 >
                   <div className="flex items-center gap-2">
                     {card.labels?.length > 0 && (
@@ -129,13 +129,13 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
                         ))}
                       </div>
                     )}
-                    <span className="text-sm font-medium text-surface-800 truncate">
+                    <span className="text-sm font-medium text-neutral-dark truncate">
                       {card.title}
                     </span>
                   </div>
-                  <span className="text-xs text-surface-400">
+                  <span className="text-xs text-neutral-dark/60">
                     en{" "}
-                    <span className="font-medium text-surface-500">
+                    <span className="font-medium text-neutral-dark/70">
                       {stage.name}
                     </span>
                   </span>

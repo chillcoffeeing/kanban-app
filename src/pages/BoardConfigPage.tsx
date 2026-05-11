@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Routes, Route, Navigate, useParams } from "react-router-dom";
+import { Routes, Route, Navigate, useParams, useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { useBoardStore } from "@/stores/boardStore";
 import { useAuthStore } from "@/stores/authStore";
 import { BoardConfigLayout } from "./config/BoardConfigLayout";
@@ -9,6 +10,7 @@ import { BoardPreferencesPage } from "./config/BoardPreferencesPage";
 
 export function BoardConfigPage() {
   const { boardId } = useParams<{ boardId: string }>();
+  const navigate = useNavigate();
   const setCurrentBoard = useBoardStore((s) => s.setCurrentBoard);
   const currentBoard = useBoardStore((s) => s.currentBoard);
   const currentUser = useAuthStore((s) => s.user);
@@ -20,7 +22,7 @@ export function BoardConfigPage() {
 
   if (!boardId) {
     return (
-      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4 text-surface-500">
+      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4 text-neutral-dark">
         Tablero no válido.
       </div>
     );
@@ -28,7 +30,7 @@ export function BoardConfigPage() {
 
   if (!currentBoard) {
     return (
-      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4 text-surface-500">
+      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4 text-neutral-dark">
         Cargando configuración del tablero…
       </div>
     );
@@ -37,11 +39,23 @@ export function BoardConfigPage() {
   const isOwner = currentBoard?.members?.some(m => m.user?.id === currentUser?.id && m.role === 'owner');
 
   if (!isOwner) {
-    return (
-      <div className="mx-auto w-full max-w-4xl px-4 py-12 text-center text-surface-600">
-        <p className="text-lg font-semibold text-surface-900">
-          Acceso denegado
-        </p>
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 py-8">
+      <div className="mb-6 flex items-center gap-4">
+        <button
+          onClick={() => navigate(`/boards/${boardId}`)}
+          className="flex items-center gap-1 text-neutral-dark/70 hover:text-primary transition-colors"
+        >
+          <ArrowLeftIcon size={20} weight="duotone" />
+          <span>Volver al tablero</span>
+        </button>
+      </div>
+      <h1 className="text-2xl font-bold text-neutral-dark">
+        Configuración del tablero
+      </h1>
+      <p className="mt-1 mb-6 text-sm text-neutral-dark/60">
+        Ajustes y miembros del tablero.
+      </p>
         <p className="mt-2">
           Solo el propietario del tablero puede acceder a esta configuración.
         </p>

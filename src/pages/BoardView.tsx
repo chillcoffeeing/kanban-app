@@ -269,7 +269,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
   if (!currentBoard) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-lg text-fg-muted">Cargando tablero...</p>
+        <p className="text-lg text-neutral-dark">Cargando tablero...</p>
       </div>
     );
   }
@@ -293,7 +293,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex flex-1 gap-4 overflow-x-auto p-4">
+        <div className="flex flex-1 gap-[var(--density-gap,1rem)] overflow-x-auto p-[var(--density-padding,1rem)] bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
           {currentBoard.stages.map((stage) => (
             <StageColumn
               key={stage.id}
@@ -308,19 +308,19 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
             {isAddingStage ? (
               <form
                 onSubmit={handleAddStage}
-                className="rounded-xl bg-surface-100 p-3"
+                className="rounded-xl border border-neutral-light bg-surface p-[var(--density-padding,1rem)] shadow-sm animate-scaleIn"
               >
                 <input
-                  autoFocus
+                  autoFocus /* Intentional: auto-focus for quick stage creation flow */
                   placeholder="Nombre de la etapa..."
                   value={newStageName}
                   onChange={(e) => setNewStageName(e.target.value)}
                   onKeyDown={(e) =>
                     e.key === "Escape" && setIsAddingStage(false)
                   }
-                  className="mb-2 w-full rounded-lg border border-border-default bg-bg-card px-3 py-2 text-sm focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus/20"
+                  className="mb-3 w-full rounded-lg border border-neutral-light bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
-                <div className="flex gap-2">
+                     <div className="flex gap-[var(--density-gap,0.5rem)]">
                   <Button size="sm" type="submit">
                     Añadir etapa
                   </Button>
@@ -337,9 +337,9 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
             ) : (
               <button
                 onClick={() => setIsAddingStage(true)}
-                className="flex w-full cursor-pointer items-center gap-2 rounded-xl bg-surface-100/80 px-4 py-3 text-sm font-medium text-surface-500 hover:bg-surface-200 hover:text-surface-700"
+                className="flex w-full cursor-pointer items-center gap-2 py-2 justify-center rounded-xl border-2 border-dashed border-secondary text-sm font-medium text-secondary hover:bg-secondary hover:text-secondary-fg transition-colors"
               >
-                <PlusIcon size={20} weight="duotone" /> Añadir etapa
+                <PlusIcon size={28} weight="duotone" /> Añadir etapa
               </button>
             )}
           </div>

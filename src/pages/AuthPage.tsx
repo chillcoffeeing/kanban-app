@@ -1,45 +1,45 @@
-import { useState } from 'react'
-import { LoginForm } from '@/features/auth/components/LoginForm'
-import { RegisterForm } from '@/features/auth/components/RegisterForm'
+import { useState } from "react";
+import { LoginForm } from "@/features/auth/components/LoginForm";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import {
   KanbanIcon,
   ShieldCheckIcon,
   LightningIcon,
   UsersThreeIcon,
   ChartLineUpIcon,
-} from '@phosphor-icons/react'
+} from "@phosphor-icons/react";
 
 const features = [
   {
     icon: LightningIcon,
-    title: 'Flujos de trabajo ágiles',
-    desc: 'Organiza tareas y proyectos con tableros diseñados para equipos de alto rendimiento.',
+    title: "Flujos de trabajo ágiles",
+    desc: "Organiza tareas y proyectos con tableros diseñados para equipos de alto rendimiento.",
   },
   {
     icon: UsersThreeIcon,
-    title: 'Colaboración en tiempo real',
-    desc: 'Sincroniza a todo tu equipo con actualizaciones instantáneas y permisos granulares.',
+    title: "Colaboración en tiempo real",
+    desc: "Sincroniza a todo tu equipo con actualizaciones instantáneas y permisos granulares.",
   },
   {
     icon: ChartLineUpIcon,
-    title: 'Visibilidad ejecutiva',
-    desc: 'Métricas y reportes claros para tomar decisiones basadas en datos.',
+    title: "Visibilidad ejecutiva",
+    desc: "Métricas y reportes claros para tomar decisiones basadas en datos.",
   },
-]
+];
 
 export function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
+  const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div className="min-h-screen bg-surface-50 lg:grid lg:grid-cols-2">
+    <div className="min-h-screen bg-neutral-light lg:grid lg:grid-cols-2">
       {/* Brand panel */}
-      <aside className="relative hidden overflow-hidden bg-linear-to-br from-primary-700 via-primary-600 to-primary-900 lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
+      <aside className="relative hidden overflow-hidden bg-linear-to-br from-primary via-secondary to-tertiary lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.18]"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.6) 0, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.4) 0, transparent 45%)',
+              "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.6) 0, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.4) 0, transparent 45%)",
           }}
         />
         <div
@@ -47,17 +47,19 @@ export function AuthPage() {
           className="pointer-events-none absolute inset-0 opacity-20"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
+              "linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
           }}
         />
 
         <div className="relative">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/15 backdrop-blur ring-1 ring-white/25">
+            <div className="flex size-14 items-center justify-center rounded-xl bg-white/15 backdrop-blur ring-1 ring-white/25">
               <KanbanIcon size={36} weight="duotone" className="text-white" />
             </div>
-            <span className="text-3xl font-bold tracking-tight text-white">Canvan</span>
+            <span className="text-3xl font-bold tracking-tight text-white">
+              Kanban
+            </span>
           </div>
         </div>
 
@@ -69,14 +71,14 @@ export function AuthPage() {
             La forma profesional de gestionar el trabajo de tu equipo.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-white/80">
-            Canvan unifica tableros, equipos y métricas en una sola plataforma diseñada
-            para empresas que exigen claridad, seguridad y velocidad.
+            Kanban unifica tableros, equipos y métricas en una sola plataforma
+            diseñada para empresas que exigen claridad, seguridad y velocidad.
           </p>
 
           <ul className="mt-10 space-y-5">
             {features.map(({ icon: Icon, title, desc }) => (
               <li key={title} className="flex gap-4">
-                <div className="mt-0.5 flex h-14 w-14 flex-none items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                <div className="mt-0.5 flex size-14 flex-none items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
                   <Icon size={30} weight="duotone" className="text-white" />
                 </div>
                 <div>
@@ -99,13 +101,15 @@ export function AuthPage() {
         <div className="w-full max-w-md">
           {/* Mobile brand */}
           <div className="mb-8 flex items-center justify-center gap-2 lg:hidden">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-primary">
               <KanbanIcon size={30} weight="duotone" className="text-white" />
             </div>
-            <span className="text-3xl font-bold tracking-tight text-surface-900">Canvan</span>
+            <span className="text-3xl font-bold tracking-tight text-neutral-dark">
+              Kanban
+            </span>
           </div>
 
-           <div className="rounded-2xl border border-border-subtle bg-bg-card p-8 shadow-xl shadow-primary-900/5 sm:p-10">
+          <div className="rounded-2xl border border-neutral-light bg-surface p-8 shadow-lg sm:p-10 animate-scaleIn">
             {isLogin ? (
               <LoginForm onToggle={() => setIsLogin(false)} />
             ) : (
@@ -113,13 +117,13 @@ export function AuthPage() {
             )}
           </div>
 
-           <p className="mt-6 text-center text-xs text-fg-subtle">
-             Al continuar aceptas nuestros{' '}
-             <a href="#" className="font-medium text-fg-default hover:text-fg-brand">
+          <p className="mt-6 text-center text-xs text-neutral-dark/60">
+            Al continuar aceptas nuestros{" "}
+            <a href="#" className="font-medium text-primary hover:underline">
               Términos
-            </a>{' '}
-            y{' '}
-            <a href="#" className="font-medium text-surface-700 hover:text-primary-600">
+            </a>{" "}
+            y{" "}
+            <a href="#" className="font-medium text-primary hover:underline">
               Política de privacidad
             </a>
             .
@@ -127,5 +131,5 @@ export function AuthPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

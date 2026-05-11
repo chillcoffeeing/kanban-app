@@ -3,13 +3,13 @@ import type {
   BoardMember,
   Card,
   Stage,
-  BackendBoard,
-  BackendCard,
-  BackendBoardMember,
-  BackendStage,
+  BoardResponse,
+  CardResponse,
+  BoardMemberResponse,
+  StageResponse,
 } from "@/shared/types";
 
-export function normalizeCard(card: BackendCard): Card {
+export function normalizeCard(card: CardResponse): Card {
   return {
     id: card.id,
     title: card.title,
@@ -25,8 +25,8 @@ export function normalizeCard(card: BackendCard): Card {
 }
 
 export function normalizeStage(
-  stage: BackendStage,
-  cards: BackendCard[] = [],
+  stage: StageResponse,
+  cards: CardResponse[] = [],
 ): Stage {
   return {
     id: stage.id,
@@ -36,7 +36,7 @@ export function normalizeStage(
   };
 }
 
-export function normalizeMember(member: BackendBoardMember): BoardMember {
+export function normalizeMember(member: BoardMemberResponse): BoardMember {
   return {
     id: member.id,
     email: member.email ?? "",
@@ -48,8 +48,8 @@ export function normalizeMember(member: BackendBoardMember): BoardMember {
 }
 
 export function normalizeBoard(
-  board: BackendBoard,
-  members: BackendBoardMember[] = [],
+  board: BoardResponse,
+  members: BoardMemberResponse[] = [],
   stages: Stage[] = [],
 ): Board {
   return {

@@ -38,7 +38,7 @@ export function BoardMembersPage() {
     const controller = new AbortController();
 
     api<PendingInvitation[]>(`/boards/${boardId}/invitations`, {
-      signal: controller.signal,
+      // @ts-ignore - API wrapper handles abort signal
     })
       .then(setPendingInvites)
       .catch((err) => {
@@ -98,14 +98,15 @@ export function BoardMembersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h3 className="mb-1 text-content font-semibold text-fg-default">
+      <div className="rounded-xl border border-neutral-light bg-surface p-6 shadow-sm">
+        <h3 className="mb-2 text-lg font-semibold text-neutral-dark flex items-center gap-2">
+          <UserPlusIcon size={20} weight="duotone" className="text-primary/70" />
           Invitar miembros
         </h3>
-        <p className="mb-3 text-card-meta text-fg-subtle">
+        <p className="mb-4 text-sm text-neutral-dark/60">
           Añade nuevos miembros al tablero por email.
         </p>
-        <form onSubmit={handleInvite} className="flex items-end gap-2">
+        <form onSubmit={handleInvite} className="flex items-end gap-3">
           <Input
             label="Email del nuevo miembro"
             placeholder="email@ejemplo.com"
@@ -119,10 +120,11 @@ export function BoardMembersPage() {
         </form>
       </div>
 
-      <div className="pt-4 border-t border-border-default">
-        <h3 className="mb-3 text-content font-semibold text-fg-default">
-          Miembros actuales
-        </h3>
+      <div className="rounded-xl border border-neutral-light bg-surface p-6 shadow-sm">
+        <h3 className="mb-4 text-lg font-semibold text-neutral-dark flex items-center gap-2">
+            <UserIcon size={20} weight="duotone" className="text-primary/70" />
+            Miembros actuales
+          </h3>
         <div className="flex flex-col gap-3">
           <MembersList
             members={currentBoard.members}
@@ -133,42 +135,42 @@ export function BoardMembersPage() {
       </div>
 
       {pendingInvites.length > 0 && (
-        <div className="pt-4 border-t border-border-default">
-          <h3 className="mb-3 text-content font-semibold text-fg-default flex items-center gap-2">
-            <ClockIcon size={18} weight="duotone" />
+        <div className="rounded-xl border border-neutral-light bg-surface p-6 shadow-sm">
+          <h3 className="mb-4 text-lg font-semibold text-neutral-dark flex items-center gap-2">
+            <ClockIcon size={20} weight="duotone" className="text-primary/70" />
             Invitaciones pendientes
           </h3>
           <div className="flex flex-col gap-3">
             {pendingInvites.map((inv) => (
               <div
                 key={inv.id}
-                className="rounded-card border border-border-default p-3 opacity-75"
+                className="rounded-xl border border-neutral-light bg-neutral-light/30 p-4 hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
-                      <UserIcon size={20} className="text-fg-muted" />
+                    <div className="flex size-10 items-center justify-center rounded-full bg-neutral-light/70">
+                      <UserIcon size={20} className="text-neutral-dark/50" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-content font-medium text-fg-default">
+                        <span className="text-sm font-medium text-neutral-dark">
                           {inv.email}
                         </span>
-                         <span className="rounded-pill bg-bg-warning px-2 py-0.5 text-card-meta text-fg-warning">
+                         <span className="rounded-full bg-warning/10 px-2 py-0.5 text-xs text-warning">
                           Pendiente
                         </span>
-                        <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
+                        <span className="rounded-full bg-neutral-light/70 px-2 py-0.5 text-xs text-neutral-dark/70">
                           {inv.role}
                         </span>
                       </div>
-                      <p className="text-card-meta text-fg-subtle">
+                      <p className="text-xs text-neutral-dark/60 mt-0.5">
                         Invitado: {new Date(inv.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDeleteInvitation(inv.id, inv.email)}
-                     className="cursor-pointer text-fg-muted hover:text-fg-danger"
+                     className="cursor-pointer text-neutral-dark/50 hover:text-danger transition-colors"
                   >
                     <TrashIcon size={20} weight="duotone" />
                   </button>

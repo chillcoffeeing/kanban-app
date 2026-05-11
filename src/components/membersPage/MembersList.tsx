@@ -22,38 +22,38 @@ export default function MembersList({
   return members.map((member) => (
     <div
       key={member.id}
-      className="rounded-card border border-border-default p-3"
+      className="rounded-xl border border-neutral-light bg-surface p-4 shadow-sm hover:shadow-md transition-all"
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {member.user?.avatarUrl ? (
             <img
               src={member.user.avatarUrl}
               alt={member.user.name}
-              className="h-10 w-10 rounded-full object-cover"
+              className="size-12 rounded-full object-cover ring-2 ring-neutral-light/50"
             />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-muted">
-              <UserIcon size={20} className="text-fg-muted" />
+            <div className="flex size-12 items-center justify-center rounded-full bg-neutral-light/70">
+              <UserIcon size={24} className="text-neutral-dark/50" />
             </div>
           )}
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-content font-medium text-fg-default">
+              <span className="text-sm font-medium text-neutral-dark">
                 {member.user?.name || member.email || "Propietario"}
               </span>
-              <span className="rounded-pill bg-bg-muted px-2 py-0.5 text-card-meta text-fg-muted">
+              <span className="rounded-full bg-neutral-light/70 px-2 py-0.5 text-xs text-neutral-dark/70">
                 {member.role}
               </span>
             </div>
             {member.user?.createdAt && (
-              <p className="text-card-meta text-fg-subtle">
+              <p className="mt-0.5 text-xs text-neutral-dark/60">
                 Miembro desde{" "}
                 {new Date(member.user!.createdAt!).toLocaleDateString()}
               </p>
             )}
             {member.invitedAt && (
-              <p className="text-card-meta text-fg-subtle">
+              <p className="mt-0.5 text-xs text-neutral-dark/60">
                 Invitado: {new Date(member.invitedAt!).toLocaleDateString()}
               </p>
             )}
@@ -62,30 +62,33 @@ export default function MembersList({
         {member.role !== "owner" && (
           <button
             onClick={() => handleRemoveMember(member)}
-             className="cursor-pointer text-fg-muted hover:text-fg-danger"
+             className="cursor-pointer text-neutral-dark/50 hover:text-danger transition-colors"
           >
-            <TrashIcon size={20} weight="duotone" />
+            <TrashIcon size={18} weight="duotone" />
           </button>
         )}
       </div>
       {member.role !== "owner" && (
-        <div className="mt-2 flex flex-wrap gap-2">
-          {(
-            Object.entries(PERMISSION_LABELS) as Array<[Permission, string]>
-          ).map(([perm, label]) => (
-            <label
-              key={perm}
-              className="flex items-center gap-1 text-card-meta text-fg-muted cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                checked={member.permissions.includes(perm)}
-                onChange={() => togglePermission(member.id, perm)}
-                className="h-4 w-4 rounded border-border-default"
-              />
-              {label}
-            </label>
-          ))}
+            <div className="mt-4 pt-3 border-t border-neutral-light/50">
+              <p className="mb-2 text-xs font-medium text-neutral-dark/70">Permisos:</p>
+          <div className="flex flex-wrap gap-3">
+            {(
+              Object.entries(PERMISSION_LABELS) as Array<[Permission, string]>
+            ).map(([perm, label]) => (
+              <label
+                key={perm}
+                className="flex items-center gap-1.5 text-xs text-neutral-dark/70 cursor-pointer hover:text-neutral-dark transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={member.permissions.includes(perm)}
+                  onChange={() => togglePermission(member.id, perm)}
+                  className="size-4 rounded border-neutral-light text-primary focus:ring-2 focus:ring-primary/20"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
         </div>
       )}
     </div>

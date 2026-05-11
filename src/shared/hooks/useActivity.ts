@@ -14,7 +14,7 @@ export function useActivity(boardId: string | undefined) {
     if (!boardId) return
     logActivity(boardId, {
       type,
-      user: user?.profile?.displayName || user?.name || 'Usuario',
+      user: user?.profile?.profile?.displayName || user?.name || 'Usuario',
       detail,
       meta,
     })

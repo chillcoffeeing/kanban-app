@@ -12,7 +12,7 @@ export function BoardRoute() {
 
   if (!boardId) {
     return (
-      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4 text-surface-500">
+      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4 text-neutral-dark/50">
         Tablero no encontrado.
       </div>
     );

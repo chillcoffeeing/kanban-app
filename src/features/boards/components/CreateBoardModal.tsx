@@ -32,12 +32,12 @@ export function CreateBoardModal({ isOpen, onClose, onCreate }: CreateBoardModal
           placeholder="Ej: Proyecto Web"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          autoFocus
+          autoFocus /* Intentional: auto-focus for quick board creation flow */
           required
         />
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-fg-default">Fondo</label>
+          <label className="mb-2 block text-sm font-medium text-neutral-dark/70">Fondo</label>
           <div className="flex gap-2">
             {BOARD_BACKGROUNDS.map((bg) => (
               <button
@@ -45,14 +45,14 @@ export function CreateBoardModal({ isOpen, onClose, onCreate }: CreateBoardModal
                 type="button"
                 onClick={() => setBackground(bg.id)}
                 className={`h-10 w-14 cursor-pointer rounded-lg ${bg.gradientClass} transition-all ${
-                  background === bg.id ? 'ring-2 ring-border-focus ring-offset-2' : 'hover:opacity-80'
+                  background === bg.id ? 'ring-2 ring-primary ring-offset-2' : 'hover:opacity-80 hover:scale-105'
                 }`}
               />
             ))}
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 pt-2">
+        <div className="flex justify-end gap-2 pt-4 border-t border-neutral-light">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancelar
           </Button>

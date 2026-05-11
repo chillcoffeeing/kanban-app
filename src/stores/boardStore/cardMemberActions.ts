@@ -1,56 +1,36 @@
 import { cardsApi } from "@/services/cards";
-import { updateCardInState } from "./cardHelpers";
+import type { BoardState } from "./types";
+import { forCard } from "./helpers/boardHelpers";
 
 export function createCardMemberActions(set: any, get: any) {
   return {
-    /* ------------------------ Card Members ------------------------ */
-
     addCardMember: async (
       boardId: string,
       stageId: string,
       cardId: string,
       boardMembershipId: string,
     ) => {
-      // Optimistic update: add member locally first
       const currentState = get();
-      const { boards, currentBoard } = updateCardInState(
-        currentState.boards,
-        currentState.currentBoard,
-        boardId,
-        stageId,
-        cardId,
-        (card) => ({
-          ...card,
-          members: [
-            ...card.members,
-            {
-              boardMembershipId: boardMembershipId,
-              boardMembership: {
-                user: { name: "Cargando...", avatarUrl: null, id: "" },
-              },
-            }, // Placeholder
-          ],
-        }),
-      );
-      set({ boards, currentBoard });
+
+      set((state: BoardState) => {
+        forCard(state, boardId, stageId, cardId, (card) => {
+          card.members.push({
+            boardMembershipId,
+            boardMembership: {
+              user: { name: "Cargando...", avatarUrl: null, id: "" },
+            },
+          });
+        });
+      });
 
       try {
-        const res = await cardsApi.addMember(cardId, {
-          boardMembershipId: boardMembershipId,
+        const res = await cardsApi.addMember(cardId, { boardMembershipId });
+        set((state: BoardState) => {
+          forCard(state, boardId, stageId, cardId, (card) => {
+            card.members = res.members || [];
+          });
         });
-        // Update with real data from backend
-        const { boards: updatedBoards, currentBoard: updatedCurrentBoard } =
-          updateCardInState(
-            currentState.boards,
-            currentState.currentBoard,
-            boardId,
-            stageId,
-            cardId,
-            (card) => ({ ...card, members: res.members || [] }),
-          );
-        set({ boards: updatedBoards, currentBoard: updatedCurrentBoard });
-      } catch (error) {
-        // Rollback on error
+      } catch {
         set(currentState);
       }
     },
@@ -61,47 +41,19 @@ export function createCardMemberActions(set: any, get: any) {
       cardId: string,
       boardMembershipId: string,
     ) => {
-      // Optimistic update: remove member locally first
       const currentState = get();
 
-      const { boards, currentBoard } = updateCardInState(
-        currentState.boards,
-        currentState.currentBoard,
-        boardId,
-        stageId,
-        cardId,
-        (card) => ({
-          ...card,
-          members: card.members.filter(
-            (member) => member.boardMembershipId !== boardMembershipId,
-          ),
-        }),
-      );
-      set({ boards, currentBoard });
+      set((state: BoardState) => {
+        forCard(state, boardId, stageId, cardId, (card) => {
+          card.members = card.members.filter(
+            (m) => m.boardMembershipId !== boardMembershipId,
+          );
+        });
+      });
 
       try {
         await cardsApi.removeMember(cardId, boardMembershipId);
-
-        const { boards: updatedBoards, currentBoard: updatedCurrentBoard } =
-          updateCardInState(
-            currentState.boards,
-            currentState.currentBoard,
-            boardId,
-            stageId,
-            cardId,
-            (card) => ({
-              ...card,
-              members:
-                card.members.filter(
-                  (m) => m.boardMembershipId !== boardMembershipId,
-                ) || [],
-            }),
-          );
-        set({ boards: updatedBoards, currentBoard: updatedCurrentBoard });
-      } catch (error) {
-        console.log(error);
-
-        // Rollback on error
+      } catch {
         set(currentState);
       }
     },

@@ -1,14 +1,17 @@
-import { useCallback } from 'react'
-import { useSettingsStore } from '@/stores/settingsStore'
-import { formatDate } from '@/shared/utils/helpers'
+import { useCallback } from "react";
+import { useShallow } from "zustand/react/shallow";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { formatDate } from "@/shared/utils/helpers";
 
-/**
- * Versión de `formatDate` aplicada a las preferencias del usuario actual.
- * Úsala en lugar de `formatDate` directo cuando quieras que el formato
- * respete `dateFormat` / `timeFormat` / `timezone` del perfil.
- */
 export function useFormatDate() {
-  const { dateFormat, timeFormat, timezone, language } = useSettingsStore()
+  const { dateFormat, timeFormat, timezone, language } = useSettingsStore(
+    useShallow((s) => ({
+      dateFormat: s.dateFormat,
+      timeFormat: s.timeFormat,
+      timezone: s.timezone,
+      language: s.language,
+    })),
+  );
 
   return useCallback(
     (date: string | number | Date | null | undefined, withTime = false) =>
@@ -17,8 +20,8 @@ export function useFormatDate() {
         timeFormat,
         timezone,
         withTime,
-        locale: language === 'en' ? 'en-US' : 'es-ES',
+        locale: language === "en" ? "en-US" : "es-ES",
       }),
-    [dateFormat, timeFormat, timezone, language]
-  )
+    [dateFormat, timeFormat, timezone, language],
+  );
 }

@@ -2,7 +2,9 @@ import { cardsApi } from "@/services/cards";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore } from "@/stores/activityStore";
 import type { ActivityType, Board, Card } from "@/shared/types";
-import { normalizeCard } from "./normalizers";
+import type { BoardState } from "./types";
+import { normalizeCard } from "./helpers/normalizers";
+import { forBoard, forCard } from "./helpers/boardHelpers";
 
 const cardLoadPromises = new Map<string, Promise<Card | null>>();
 
@@ -13,41 +15,54 @@ function logActivity(
   meta?: Record<string, unknown>,
 ) {
   const user = useAuthStore.getState().user;
-  const userName = user?.profile?.displayName || user?.name || "Usuario";
-  useActivityStore.getState().log(boardId, { type, user: userName, detail, meta });
+  const userName =
+    user?.profile?.profile?.displayName || user?.name || "Usuario";
+  useActivityStore
+    .getState()
+    .log(boardId, { type, user: userName, detail, meta });
+}
+
+function processCardMove(
+  state: BoardState,
+  boardId: string,
+  fromStageId: string,
+  toStageId: string,
+  cardId: string,
+  newIndex: number,
+) {
+  const process = (board: Board) => {
+    if (board.id !== boardId) return;
+    const fromStage = board.stages.find((s) => s.id === fromStageId);
+    if (!fromStage) return;
+    const ci = fromStage.cards.findIndex((c) => c.id === cardId);
+    if (ci === -1) return;
+    const [card] = fromStage.cards.splice(ci, 1);
+
+    if (fromStageId === toStageId) {
+      fromStage.cards.splice(newIndex, 0, card);
+    } else {
+      const toStage = board.stages.find((s) => s.id === toStageId);
+      if (toStage) toStage.cards.splice(newIndex, 0, card);
+    }
+  };
+
+  state.boards.forEach(process);
+  if (state.currentBoard && state.boards.every((b) => b !== state.currentBoard)) {
+    process(state.currentBoard);
+  }
 }
 
 export function createCardActions(set: any, get: any) {
-  /*   const mergeCard = ; */
-
   return {
-    /* ------------------------ Cards ------------------------ */
-
     addCard: async (boardId: string, stageId: string, title: string) => {
       const res = await cardsApi.create(stageId, { title });
       const card = normalizeCard(res);
-      set((state: any) => ({
-        boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
-          ...board,
-          stages: board.stages.map((stage) =>
-            stage.id === stageId
-              ? { ...stage, cards: [...stage.cards, card] }
-              : stage,
-          ),
-        })),
-        currentBoard: patchCurrent(
-          state.currentBoard,
-          boardId,
-          (board: Board) => ({
-            ...board,
-            stages: board.stages.map((stage) =>
-              stage.id === stageId
-                ? { ...stage, cards: [...stage.cards, card] }
-                : stage,
-            ),
-          }),
-        ),
-      }));
+      set((state: BoardState) => {
+        forBoard(state, boardId, (b) => {
+          const stage = b.stages.find((s) => s.id === stageId);
+          if (stage) stage.cards.push(card);
+        });
+      });
       logActivity(boardId, "card_created", `creó la tarjeta "${title}"`);
       return card;
     },
@@ -66,40 +81,10 @@ export function createCardActions(set: any, get: any) {
         syncable.startDate = updates.startDate;
       if (updates.dueDate !== undefined) syncable.dueDate = updates.dueDate;
 
-      set((state: any) => {
-        const merge = (card: Card) => ({ ...card, ...updates });
-        return {
-          boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
-            ...board,
-            stages: board.stages.map((stage) =>
-              stage.id !== stageId
-                ? stage
-                : {
-                    ...stage,
-                    cards: stage.cards.map((card) =>
-                      card.id === cardId ? merge(card) : card,
-                    ),
-                  },
-            ),
-          })),
-          currentBoard: patchCurrent(
-            state.currentBoard,
-            boardId,
-            (board: Board) => ({
-              ...board,
-              stages: board.stages.map((stage) =>
-                stage.id !== stageId
-                  ? stage
-                  : {
-                      ...stage,
-                      cards: stage.cards.map((card) =>
-                        card.id === cardId ? merge(card) : card,
-                      ),
-                    },
-              ),
-            }),
-          ),
-        };
+      set((state: BoardState) => {
+        forCard(state, boardId, stageId, cardId, (card) => {
+          Object.assign(card, updates);
+        });
       });
 
       if (Object.keys(syncable).length > 0) {
@@ -107,46 +92,29 @@ export function createCardActions(set: any, get: any) {
           await cardsApi.update(cardId, syncable);
         } catch (err) {
           console.error("[boardStore] updateCard API failed:", err);
-          set({ error: `Failed to sync card update: ${(err as Error).message}` });
+          set({
+            error: `Failed to sync card update: ${(err as Error).message}`,
+          });
         }
       }
     },
 
     deleteCard: async (boardId: string, stageId: string, cardId: string) => {
-      const board = get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+      const board =
+        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
       const stage = board?.stages.find((s: any) => s.id === stageId);
       const card = stage?.cards.find((c: any) => c.id === cardId);
       const cardTitle = card?.title ?? cardId;
 
       await cardsApi.remove(cardId);
-      set((state: any) => ({
-        boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
-          ...board,
-          stages: board.stages.map((stage) =>
-            stage.id === stageId
-              ? {
-                  ...stage,
-                  cards: stage.cards.filter((card) => card.id !== cardId),
-                }
-              : stage,
-          ),
-        })),
-        currentBoard: patchCurrent(
-          state.currentBoard,
-          boardId,
-          (board: Board) => ({
-            ...board,
-            stages: board.stages.map((stage) =>
-              stage.id === stageId
-                ? {
-                    ...stage,
-                    cards: stage.cards.filter((card) => card.id !== cardId),
-                  }
-                : stage,
-            ),
-          }),
-        ),
-      }));
+
+      set((state: BoardState) => {
+        forBoard(state, boardId, (b) => {
+          const s = b.stages.find((st) => st.id === stageId);
+          if (s) s.cards = s.cards.filter((c) => c.id !== cardId);
+        });
+      });
+
       logActivity(boardId, "card_deleted", `eliminó la tarjeta "${cardTitle}"`);
     },
 
@@ -159,86 +127,32 @@ export function createCardActions(set: any, get: any) {
     ) => {
       const board =
         get().currentBoard ??
-        get().boards.find((board: Board) => board.id === boardId);
+        get().boards.find((b: Board) => b.id === boardId);
       if (!board) return;
-      const fromStage = board.stages.find(
-        (stage: any) => stage.id === fromStageId,
-      );
-      const card = fromStage?.cards.find((card: any) => card.id === cardId);
+      const fromStage = board.stages.find((s: any) => s.id === fromStageId);
+      const card = fromStage?.cards.find((c: any) => c.id === cardId);
       if (!card) return;
 
       const oldIndex = fromStage.cards.findIndex((c: any) => c.id === cardId);
 
-      set((state: any) => {
-        const applyMove = (board: Board): Board => {
-          if (board.id !== boardId) return board;
-          return {
-            ...board,
-            stages: board.stages.map((stage) => {
-              if (stage.id === fromStageId && stage.id === toStageId) {
-                const cards = stage.cards.filter((card) => card.id !== cardId);
-                cards.splice(newIndex, 0, card);
-                return { ...stage, cards };
-              }
-              if (stage.id === fromStageId) {
-                return {
-                  ...stage,
-                  cards: stage.cards.filter((card) => card.id !== cardId),
-                };
-              }
-              if (stage.id === toStageId) {
-                const cards = [...stage.cards];
-                cards.splice(newIndex, 0, card);
-                return { ...stage, cards };
-              }
-              return stage;
-            }),
-          };
-        };
-        return {
-          boards: state.boards.map(applyMove),
-          currentBoard: state.currentBoard
-            ? applyMove(state.currentBoard)
-            : null,
-        };
+      set((state: BoardState) => {
+        processCardMove(state, boardId, fromStageId, toStageId, cardId, newIndex);
       });
 
       try {
         await cardsApi.move(cardId, toStageId, newIndex);
-        const toStage = get().currentBoard?.stages.find((s: any) => s.id === toStageId);
+        const toStage = get().currentBoard?.stages.find(
+          (s: any) => s.id === toStageId,
+        );
         const stageName = toStage?.name ?? toStageId;
-        logActivity(boardId, "card_moved", `movió "${card.title}" a "${stageName}"`);
+        logActivity(
+          boardId,
+          "card_moved",
+          `movió "${card.title}" a "${stageName}"`,
+        );
       } catch {
-        set((state: any) => {
-          const rollbackMove = (board: Board): Board => {
-            if (board.id !== boardId) return board;
-            return {
-              ...board,
-              stages: board.stages.map((stage) => {
-                if (stage.id === toStageId && stage.id !== fromStageId) {
-                  const cards = stage.cards.filter((c) => c.id !== cardId);
-                  return { ...stage, cards };
-                }
-                if (stage.id === fromStageId && stage.id !== toStageId) {
-                  const cards = [...stage.cards];
-                  cards.splice(oldIndex, 0, card);
-                  return { ...stage, cards };
-                }
-                if (stage.id === fromStageId && stage.id === toStageId) {
-                  const cards = stage.cards.filter((c) => c.id !== cardId);
-                  cards.splice(oldIndex, 0, card);
-                  return { ...stage, cards };
-                }
-                return stage;
-              }),
-            };
-          };
-          return {
-            boards: state.boards.map(rollbackMove),
-            currentBoard: state.currentBoard
-              ? rollbackMove(state.currentBoard)
-              : null,
-          };
+        set((state: BoardState) => {
+          processCardMove(state, boardId, toStageId, fromStageId, cardId, oldIndex);
         });
       }
     },
@@ -253,47 +167,30 @@ export function createCardActions(set: any, get: any) {
           (stage: Board["stages"][number]) => stage.cards,
         )
         .find((card: Card) => card.id === cardId);
-      if (existingCard) {
-        return existingCard;
-      }
+      if (existingCard) return existingCard;
 
       const promise = (async () => {
         try {
           const res = await cardsApi.get(cardId);
           const card = normalizeCard(res);
 
-          set((state: any) => {
-            const patchBoardCard = (board: Board): Board => ({
-              ...board,
-              stages: board.stages.map((stage) => {
-                if (stage.id !== res.stageId) {
-                  return stage;
-                }
-
-                const hasCard = stage.cards.some(
-                  (existingCard) => existingCard.id === cardId,
-                );
-                return {
-                  ...stage,
-                  cards: hasCard
-                    ? stage.cards.map((existingCard) =>
-                        existingCard.id === cardId ? card : existingCard,
-                      )
-                    : [...stage.cards, card],
-                };
-              }),
-            });
-
-            return {
-              boards: state.boards.map((board: Board) => patchBoardCard(board)),
-              currentBoard: state.currentBoard
-                ? patchBoardCard(state.currentBoard)
-                : null,
+          set((state: BoardState) => {
+            const upsert = (board: Board) => {
+              const stage = board.stages.find((s) => s.id === res.stageId);
+              if (!stage) return;
+              const idx = stage.cards.findIndex((c) => c.id === cardId);
+              if (idx !== -1) {
+                stage.cards[idx] = card;
+              } else {
+                stage.cards.push(card);
+              }
             };
+            state.boards.forEach(upsert);
+            if (state.currentBoard) upsert(state.currentBoard);
           });
 
           return card;
-        } catch (error) {
+        } catch {
           return null;
         } finally {
           cardLoadPromises.delete(cardId);
@@ -304,21 +201,4 @@ export function createCardActions(set: any, get: any) {
       return promise;
     },
   };
-}
-
-// Helper functions
-function patchBoardInList(
-  boards: Board[],
-  boardId: string,
-  patch: (board: Board) => Board,
-) {
-  return boards.map((board) => (board.id === boardId ? patch(board) : board));
-}
-
-function patchCurrent(
-  current: Board | null,
-  boardId: string,
-  patch: (board: Board) => Board,
-) {
-  return current && current.id === boardId ? patch(current) : current;
 }

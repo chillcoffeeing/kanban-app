@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { AuthResponse, BackendUser } from "@/shared/types";
+import type { AuthResponse, UserResponse } from "@/shared/types";
 
 export function login(email: string, password: string) {
   return api<AuthResponse>("/auth/login", {
@@ -18,7 +18,7 @@ export function register(email: string, name: string, password: string) {
 }
 
 export function account() {
-  return api<BackendUser>("/auth/account");
+  return api<UserResponse>("/auth/account");
 }
 
 export function logout(refreshToken: string) {

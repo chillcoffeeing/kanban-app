@@ -1,60 +1,76 @@
-import { useState, useRef, useEffect } from 'react'
-import type { ReactNode } from 'react'
+import { useState, useRef, useEffect } from "react";
+import type { ReactNode } from "react";
 
 interface DropdownMenuProps {
-  trigger: ReactNode
-  children: ReactNode
-  align?: 'left' | 'right'
+  trigger: ReactNode;
+  children: ReactNode;
+  align?: "left" | "right";
 }
 
-export function DropdownMenu({ trigger, children, align = 'right' }: DropdownMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+export function DropdownMenu({
+  trigger,
+  children,
+  align = "right",
+}: DropdownMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <div ref={ref} className="relative">
-      <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+      >
+        {trigger}
+      </div>
       {isOpen && (
-         <div
-           className={`absolute z-40 mt-1 min-w-[180px] rounded-lg border border-border-subtle bg-bg-card py-1 shadow-lg ${
-             align === 'right' ? 'right-0' : 'left-0'
-           }`}
+        <div
+          className={`absolute z-50 mt-2 min-w-50 p-1 rounded-lg border border-neutral-light bg-surface py-1 shadow-lg ${
+            align === "right" ? "right-0" : "left-0"
+          }`}
           onClick={() => setIsOpen(false)}
         >
           {children}
         </div>
       )}
     </div>
-  )
+  );
 }
 
 interface DropdownItemProps {
-  children: ReactNode
-  onClick?: () => void
-  danger?: boolean
+  children: ReactNode;
+  onClick?: () => void;
+  danger?: boolean;
 }
 
 export function DropdownItem({ children, onClick, danger }: DropdownItemProps) {
   return (
     <button
-       onClick={onClick}
-       className={`w-full cursor-pointer px-3 py-2 text-left text-sm transition-colors ${
-         danger
-           ? 'text-fg-danger hover:bg-bg-danger'
-           : 'text-fg-default hover:bg-bg-subtle'
-       }`}
+      onClick={onClick}
+      className={`w-full cursor-pointer px-4 py-2.5 text-left text-sm transition-colors ${
+        danger
+          ? "text-danger hover:bg-danger/10 rounded-md"
+          : "text-neutral-dark hover:bg-neutral-light-hover rounded-md"
+      }`}
     >
       {children}
     </button>
-  )
+  );
 }

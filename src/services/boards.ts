@@ -1,21 +1,21 @@
 import { api } from "./api";
 import type {
-  BackendBoard,
-  BackendStage,
-  BackendCard,
-  BackendBoardMember,
-  FullBoard,
+  BoardResponse,
+  StageResponse,
+  CardResponse,
+  BoardMemberResponse,
+  FullBoardResponse,
 } from "@/shared/types";
 
 export const boardsApi = {
-  list: () => api<BackendBoard[]>("/boards"),
-  get: (id: string) => api<BackendBoard>(`/boards/${id}`),
-  getFull: (id: string) => api<FullBoard>(`/boards/${id}/full`),
+  list: () => api<BoardResponse[]>("/boards"),
+  get: (id: string) => api<BoardResponse>(`/boards/${id}`),
+  getFull: (id: string) => api<FullBoardResponse>(`/boards/${id}/full`),
   create: (body: {
     name: string;
     background?: string;
     preferences?: Record<string, unknown>;
-  }) => api<BackendBoard>("/boards", { method: "POST", body }),
+  }) => api<BoardResponse>("/boards", { method: "POST", body }),
   update: (
     id: string,
     body: {
@@ -23,30 +23,30 @@ export const boardsApi = {
       background?: string;
       preferences?: Record<string, unknown>;
     },
-  ) => api<BackendBoard>(`/boards/${id}`, { method: "PATCH", body }),
+  ) => api<BoardResponse>(`/boards/${id}`, { method: "PATCH", body }),
   remove: (id: string) => api<void>(`/boards/${id}`, { method: "DELETE" }),
 };
 
 export const stagesApi = {
   create: (boardId: string, name: string) =>
-    api<BackendStage>(`/boards/${boardId}/stages`, {
+    api<StageResponse>(`/boards/${boardId}/stages`, {
       method: "POST",
       body: { name },
     }),
   update: (id: string, body: { name?: string; position?: number }) =>
-    api<BackendStage>(`/stages/${id}`, { method: "PATCH", body }),
+    api<StageResponse>(`/stages/${id}`, { method: "PATCH", body }),
   remove: (id: string) => api<void>(`/stages/${id}`, { method: "DELETE" }),
 };
 
 export const membersApi = {
   list: (boardId: string) =>
-    api<BackendBoardMember[]>(`/boards/${boardId}/members`),
+    api<BoardMemberResponse[]>(`/boards/${boardId}/members`),
   update: (
     boardId: string,
     membershipId: string,
     body: { role?: "owner" | "admin" | "member"; permissions?: string[] },
   ) =>
-    api<BackendBoardMember>(`/boards/${boardId}/members/${membershipId}`, {
+    api<BoardMemberResponse>(`/boards/${boardId}/members/${membershipId}`, {
       method: "PATCH",
       body,
     }),

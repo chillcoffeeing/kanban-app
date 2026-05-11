@@ -1,9 +1,16 @@
 import { useEffect } from "react";
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { Header } from "@/shared/components/Header";
 import { Footer } from "@/shared/components/Footer";
 import { useApplySettings } from "@/shared/hooks/useApplySettings";
+import { usePersistSettings } from "@/shared/hooks/usePersistSettings";
 import { useSocket } from "@/shared/hooks/useSocket";
 import { AuthPage } from "@/pages/AuthPage";
 import { BoardsPage } from "@/pages/BoardsPage";
@@ -13,6 +20,7 @@ import { UserConfigPage } from "@/pages/UserConfigPage";
 import { InvitationsPage } from "@/pages/InvitationsPage";
 
 function App() {
+  usePersistSettings();
   useApplySettings();
   useSocket(); // Connect to WebSocket when authenticated
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -40,11 +48,7 @@ function App() {
           <Route
             path="/login"
             element={
-              isAuthenticated ? (
-                <Navigate to="/boards" replace />
-              ) : (
-                <AuthPage />
-              )
+              isAuthenticated ? <Navigate to="/boards" replace /> : <AuthPage />
             }
           />
 
@@ -53,7 +57,10 @@ function App() {
             <>
               <Route path="/invitations" element={<InvitationsPage />} />
               <Route path="/config/*" element={<UserConfigPage />} />
-              <Route path="/boards/:boardId/config/*" element={<BoardConfigPage />} />
+              <Route
+                path="/boards/:boardId/config/*"
+                element={<BoardConfigPage />}
+              />
               <Route path="/boards/:boardId" element={<BoardRoute />} />
               <Route path="/board/:boardId" element={<BoardRoute />} />
               <Route path="/boards" element={<BoardsPage />} />

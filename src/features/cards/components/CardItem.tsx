@@ -59,15 +59,23 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
       style={style}
       {...attributes}
       {...listeners}
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className={`group cursor-pointer overflow-hidden rounded-card border border-border-default bg-bg-card shadow-card transition-shadow hover:shadow-card-hover hover:bg-bg-card-hover ${
+      onKeyDown={(e) => {
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`group cursor-pointer overflow-hidden rounded-xl border border-neutral-light bg-surface shadow-sm transition-shadow hover:shadow-md hover:outline-2 hover:outline-primary/10 ${
         isDragging ? "opacity-50" : ""
       }`}
     >
       {coverColor ? (
         <div className="h-2 w-full" style={{ backgroundColor: coverColor }} />
       ) : null}
-      <div className="p-3">
+      <div className="p-[var(--density-padding,0.75rem)]">
         {prefs.coversEnabled && card.labels?.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-1">
             {card.labels.map((label) => (
@@ -81,20 +89,22 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
           </div>
         )}
 
-        <p className="text-card-title text-fg-default">{card.title}</p>
+        <p className="text-card-title text-neutral-dark font-medium">
+          {card.title}
+        </p>
 
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-card-meta text-fg-subtle">
+        <div className="mt-2 flex flex-wrap items-center gap-[var(--density-gap,0.5rem)] text-xs text-neutral-dark/60">
           {prefs.showCompletedOnCard && isComplete && (
-            <span className="flex items-center gap-1 rounded-badge bg-bg-success px-1.5 py-0.5 text-fg-success">
+            <span className="flex items-center gap-1 rounded-full bg-success/10 px-1.5 py-0.5 text-xs text-success">
               <CheckCircleIcon size={16} weight="fill" /> Completado
             </span>
           )}
           {card.dueDate && (
             <span
-              className={`flex items-center gap-1 rounded-badge px-1.5 py-0.5 ${
-                isOverdue(card.dueDate)
-                  ? "bg-bg-danger text-fg-danger"
-                  : "bg-bg-muted"
+              className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs ${
+                isComplete
+                  ? "bg-success/20 text-success"
+                  : "bg-danger/20 text-danger"
               }`}
             >
               <CalendarBlankIcon size={16} weight="duotone" />
@@ -103,12 +113,14 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
           )}
           {totalChecks > 0 && (
             <span
-              className={`flex items-center gap-1 rounded-badge px-1.5 py-0.5 ${
-                isComplete ? "bg-bg-success text-fg-success" : "bg-bg-muted"
+              className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs ${
+                isComplete
+                  ? "bg-success/20 text-success"
+                  : "bg-danger/20 text-danger"
               }`}
             >
-              <CheckCircleIcon size={16} weight="duotone" />
-              {completedChecks}/{totalChecks}
+              <CalendarBlankIcon size={16} weight="duotone" />
+              {formatDate(card.dueDate)}
             </span>
           )}
           {card.description && (

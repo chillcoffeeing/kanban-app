@@ -3,12 +3,9 @@ import { ALL_PERMISSIONS } from "@/shared/utils/constants";
 import { membersApi } from "@/services/boards";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore } from "@/stores/activityStore";
-import type {
-  ActivityType,
-  Board,
-  BoardMember,
-  Permission,
-} from "@/shared/types";
+import type { ActivityType, BoardMember, Permission } from "@/shared/types";
+import type { BoardState } from "./types";
+import { forBoard } from "./helpers/boardHelpers";
 
 function logActivity(
   boardId: string,
@@ -17,7 +14,8 @@ function logActivity(
   meta?: Record<string, unknown>,
 ) {
   const user = useAuthStore.getState().user;
-  const userName = user?.profile?.displayName || user?.name || "Usuario";
+  const userName =
+    user?.profile?.profile?.displayName || user?.name || "Usuario";
   useActivityStore
     .getState()
     .log(boardId, { type, user: userName, detail, meta });
@@ -25,12 +23,6 @@ function logActivity(
 
 export function createMemberActions(set: any, get: any) {
   return {
-    /* ------------------------ Members ------------------------
-     * Nota: `addMember` en el MVP envía una invitación, pero hasta que el
-     * invitado acepte no aparecerá en `members[]` de verdad. Para mantener
-     * la UX previa, insertamos un placeholder local con un id temporal.
-     * TODO: sustituir por flujo real de invitaciones aceptadas. */
-
     addMember: async (
       boardId: string,
       email: string,
@@ -39,7 +31,7 @@ export function createMemberActions(set: any, get: any) {
       try {
         await membersApi.invite(boardId, email, "member");
       } catch {
-        /* ignorar: el placeholder sigue siendo útil localmente */
+        /* ignore */
       }
       const placeholderId = `pending_${generateId()}`;
 
@@ -51,20 +43,10 @@ export function createMemberActions(set: any, get: any) {
         invitedAt: new Date().toISOString(),
       };
 
-      set((state: any) => ({
-        boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
-          ...board,
-          members: [...board.members, newMember],
-        })),
-        currentBoard: patchCurrent(
-          state.currentBoard,
-          boardId,
-          (board: Board) => ({
-            ...board,
-            members: [...board.members, newMember],
-          }),
-        ),
-      }));
+      set((state: BoardState) => {
+        forBoard(state, boardId, (b) => { b.members.push(newMember); });
+      });
+
       logActivity(boardId, "member_invited", `invitó a "${email}" al tablero`);
     },
 
@@ -86,24 +68,13 @@ export function createMemberActions(set: any, get: any) {
           });
         }
       }
-      set((state: any) => ({
-        boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
-          ...board,
-          members: board.members.map((member: BoardMember) =>
-            member.id === membershipId ? { ...member, permissions } : member,
-          ),
-        })),
-        currentBoard: patchCurrent(
-          state.currentBoard,
-          boardId,
-          (board: Board) => ({
-            ...board,
-            members: board.members.map((member: BoardMember) =>
-              member.id === membershipId ? { ...member, permissions } : member,
-            ),
-          }),
-        ),
-      }));
+
+      set((state: BoardState) => {
+        forBoard(state, boardId, (b) => {
+          const m = b.members.find((mem) => mem.id === membershipId);
+          if (m) m.permissions = permissions;
+        });
+      });
     },
 
     removeMember: async (boardId: string, membershipId: string) => {
@@ -117,31 +88,20 @@ export function createMemberActions(set: any, get: any) {
           });
         }
       }
+
       const board =
-        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+        get().currentBoard ?? get().boards.find((b: any) => b.id === boardId);
       const member = board?.members.find(
         (m: BoardMember) => m.id === membershipId,
       );
       const memberEmail = member?.email ?? membershipId;
 
-      set((state: any) => ({
-        boards: patchBoardInList(state.boards, boardId, (board: Board) => ({
-          ...board,
-          members: board.members.filter(
-            (member: BoardMember) => member.id !== membershipId,
-          ),
-        })),
-        currentBoard: patchCurrent(
-          state.currentBoard,
-          boardId,
-          (board: Board) => ({
-            ...board,
-            members: board.members.filter(
-              (member: BoardMember) => member.id !== membershipId,
-            ),
-          }),
-        ),
-      }));
+      set((state: BoardState) => {
+        forBoard(state, boardId, (b) => {
+          b.members = b.members.filter((m) => m.id !== membershipId);
+        });
+      });
+
       logActivity(
         boardId,
         "member_removed",
@@ -149,21 +109,4 @@ export function createMemberActions(set: any, get: any) {
       );
     },
   };
-}
-
-// Helper functions
-function patchBoardInList(
-  boards: Board[],
-  boardId: string,
-  patch: (board: Board) => Board,
-) {
-  return boards.map((board) => (board.id === boardId ? patch(board) : board));
-}
-
-function patchCurrent(
-  current: Board | null,
-  boardId: string,
-  patch: (board: Board) => Board,
-) {
-  return current && current.id === boardId ? patch(current) : current;
 }

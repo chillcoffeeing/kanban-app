@@ -38,15 +38,15 @@ const ICON_MAP: Partial<Record<ActivityType, PhosphorIcon>> = {
 }
 
 const COLOR_MAP: Partial<Record<ActivityType, string>> = {
-  [ACTIVITY_TYPES.CARD_DELETED]: 'text-fg-danger bg-bg-danger',
-  [ACTIVITY_TYPES.STAGE_DELETED]: 'text-fg-danger bg-bg-danger',
-  [ACTIVITY_TYPES.MEMBER_REMOVED]: 'text-fg-danger bg-bg-danger',
-  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: 'text-fg-warning bg-bg-warning',
-  [ACTIVITY_TYPES.CARD_MOVED]: 'text-fg-info bg-bg-info',
-  [ACTIVITY_TYPES.MEMBER_INVITED]: 'text-fg-success bg-bg-success',
-  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: 'text-fg-success bg-bg-success',
-  [ACTIVITY_TYPES.CARD_CREATED]: 'text-fg-success bg-bg-success',
-  [ACTIVITY_TYPES.STAGE_CREATED]: 'text-fg-success bg-bg-success',
+  [ACTIVITY_TYPES.CARD_DELETED]: 'text-danger bg-danger',
+  [ACTIVITY_TYPES.STAGE_DELETED]: 'text-danger bg-danger',
+  [ACTIVITY_TYPES.MEMBER_REMOVED]: 'text-danger bg-danger',
+  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: 'text-warning bg-warning',
+  [ACTIVITY_TYPES.CARD_MOVED]: 'text-info bg-info',
+  [ACTIVITY_TYPES.MEMBER_INVITED]: 'text-success bg-success',
+  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: 'text-success bg-success',
+  [ACTIVITY_TYPES.CARD_CREATED]: 'text-success bg-success',
+  [ACTIVITY_TYPES.STAGE_CREATED]: 'text-success bg-success',
 }
 
 function formatRelative(timestamp: string): string {
@@ -89,15 +89,15 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
 
   return (
     <div
-       className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-border-subtle bg-bg-card shadow-xl transition-transform duration-300 ${
+       className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-neutral-light bg-surface shadow-xl transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
-      <div className="flex items-center justify-between border-b border-surface-200 px-4 py-3">
-        <h3 className="text-sm font-semibold text-surface-900">Actividad</h3>
+      <div className="flex items-center justify-between border-b border-neutral-light px-4 py-3">
+        <h3 className="text-sm font-semibold text-neutral-dark">Actividad</h3>
         <button
           onClick={onClose}
-          className="cursor-pointer rounded-lg px-2 py-1 text-xs text-surface-500 hover:bg-surface-100"
+           className="cursor-pointer rounded-lg px-2 py-1 text-xs text-neutral-dark/70 hover:bg-neutral-light-hover transition-colors"
         >
           Cerrar
         </button>
@@ -105,27 +105,27 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
 
       <div className="flex-1 overflow-y-auto">
         {activities.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-surface-400">
-            <KanbanIcon size={40} weight="duotone" className="mb-2" />
+          <div className="flex flex-col items-center justify-center py-16 text-neutral-dark/40">
+            <KanbanIcon size={40} weight="duotone" className="mb-2 opacity-40" />
             <p className="text-sm">Sin actividad aún</p>
           </div>
         ) : (
-          <div className="divide-y divide-surface-100">
+          <div className="divide-y divide-neutral-light/50">
             {activities.map((activity) => {
               const Icon = ICON_MAP[activity.type] || FileTextIcon
-              const colorClass = COLOR_MAP[activity.type] || 'text-primary-500 bg-primary-50'
+              const colorClass = COLOR_MAP[activity.type] || 'text-primary bg-primary/10'
 
               return (
-                <div key={activity.id} className="flex gap-3 px-4 py-3">
-                  <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${colorClass}`}>
+                 <div key={activity.id} className="flex gap-3 px-4 py-3 hover:bg-neutral-light-hover/50 transition-colors">
+                  <div className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full ${colorClass}`}>
                     <Icon size={18} weight="duotone" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-surface-700 leading-snug">
-                      <span className="font-medium text-surface-900">{activity.user}</span>{' '}
+                    <p className="text-sm text-neutral-dark leading-snug">
+                      <span className="font-medium text-neutral-dark">{activity.user}</span>{' '}
                       {activity.detail}
                     </p>
-                    <p className="mt-0.5 text-xs text-surface-400">{getRelativeTime(activity.timestamp)}</p>
+                    <p className="mt-0.5 text-xs text-neutral-dark/50">{getRelativeTime(activity.timestamp)}</p>
                   </div>
                 </div>
               )

@@ -3,7 +3,10 @@ import { socketService } from "@/services/socket";
 import { useAuthStore } from "@/stores/authStore";
 import { useBoardStore } from "@/stores/boardStore";
 import type { Stage } from "@/shared/types";
-import { normalizeCard, normalizeStage } from "@/stores/boardStore/normalizers";
+import {
+  normalizeCard,
+  normalizeStage,
+} from "@/stores/boardStore/helpers/normalizers";
 
 const REALTIME_EVENTS = [
   "card:updated",
@@ -25,7 +28,15 @@ function buildEventHandlers(): Record<string, RealtimeEventHandler> {
 
   return {
     "card:updated": (payload) => {
-      const card = payload as { id: string; stageId: string; title?: string; description?: string; position?: number; startDate?: string | null; dueDate?: string | null };
+      const card = payload as {
+        id: string;
+        stageId: string;
+        title?: string;
+        description?: string;
+        position?: number;
+        startDate?: string | null;
+        dueDate?: string | null;
+      };
       store.realtimeUpdateCard(card.id, {
         title: card.title,
         description: card.description,
@@ -61,7 +72,13 @@ function buildEventHandlers(): Record<string, RealtimeEventHandler> {
     },
 
     "stage:created": (payload) => {
-      const backendStage = payload as { id: string; name: string; boardId: string; position: number; createdAt: string };
+      const backendStage = payload as {
+        id: string;
+        name: string;
+        boardId: string;
+        position: number;
+        createdAt: string;
+      };
       const stage = normalizeStage(backendStage, []);
       store.realtimeAddStage(stage);
     },
@@ -73,11 +90,17 @@ function buildEventHandlers(): Record<string, RealtimeEventHandler> {
 
     "stage:reordered": (payload) => {
       const stage = payload as { id: string; position: number };
-      store.realtimeUpdateStage(stage.id, { position: stage.position } as Partial<Stage> & { position: number });
+      store.realtimeUpdateStage(stage.id, {
+        position: stage.position,
+      } as Partial<Stage> & { position: number });
     },
 
     "board:updated": (payload) => {
-      const board = payload as { id: string; name?: string; background?: string };
+      const board = payload as {
+        id: string;
+        name?: string;
+        background?: string;
+      };
       store.realtimeUpdateBoard(board.id, {
         name: board.name,
         background: board.background,
@@ -95,7 +118,9 @@ const useSocketImpl = () => {
   const user = useAuthStore((s) => s.user);
   const listenersRef = useRef(false);
   const connectedRef = useRef(false);
-  const socketRef = useRef<ReturnType<typeof socketService.connect> | null>(null);
+  const socketRef = useRef<ReturnType<typeof socketService.connect> | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!user) {

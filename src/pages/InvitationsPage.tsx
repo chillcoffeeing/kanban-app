@@ -84,28 +84,39 @@ export function InvitationsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center text-surface-500">
-        Debes iniciar sesión
+    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center">
+      <div className="text-center">
+        <div className="mb-4 rounded-full bg-primary/10 p-4 inline-block">
+          <XCircleIcon size={32} weight="duotone" className="text-primary" />
+        </div>
+        <p className="text-neutral-dark">Debes iniciar sesión</p>
       </div>
+    </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-[calc(100vh-80px)] items-center justify-center text-surface-500">
-        Cargando...
+    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block size-8 animate-spin rounded-full border-4 border-neutral-light border-t-primary"></div>
+        <p className="mt-4 text-neutral-dark/50">Cargando...</p>
       </div>
+    </div>
     );
   }
 
   if (invitations.length === 0) {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold text-surface-900">
-          Sin invitaciones pendientes
+        <div className="mb-4 rounded-full bg-neutral-light/50 p-6 inline-block">
+          <CheckCircleIcon size={48} weight="duotone" className="text-neutral-dark/30" />
+        </div>
+        <h1 className="text-2xl font-bold text-neutral-dark">
+           Sin invitaciones pendientes
         </h1>
-        <p className="mt-2 text-surface-600">
-          No tienes nenhuma invitación a tableros.
+        <p className="mt-2 text-neutral-dark/60">
+           No tienes ninguna invitación a tableros.
         </p>
         <Button onClick={() => navigate("/boards")} className="mt-6">
           Ir a mis tableros
@@ -116,28 +127,30 @@ export function InvitationsPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8">
-      <h1 className="text-2xl font-bold text-surface-900">
-        Invitaciones pendientes
-      </h1>
-      <p className="mt-2 mb-6 text-surface-600">
-        Has sido invitado a los siguientes tableros.
-      </p>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-neutral-dark">
+           Invitaciones pendientes
+          </h1>
+          <p className="mt-1 text-sm text-neutral-dark/60">
+            Has sido invitado a {invitations.length} tablero{invitations.length !== 1 ? 's' : ''}.
+          </p>
+        </div>
 
       <div className="space-y-3">
         {invitations.map((invitation) => (
           <div
             key={invitation.id}
-            className="flex items-center justify-between rounded-xl border border-surface-200 p-4"
+            className="flex items-center justify-between rounded-xl border border-neutral-light bg-surface p-4 shadow-sm hover:shadow-md transition-all animate-scaleIn"
           >
             <div>
-              <p className="font-medium text-surface-900">
-                {invitation.boardName || "Tablero sin nombre"}
-              </p>
-              <p className="text-sm text-surface-500">Rol: {invitation.role}</p>
+              <p className="font-medium text-neutral-dark">
+                 {invitation.boardName || "Tablero sin nombre"}
+               </p>
+               <p className="mt-0.5 text-sm text-neutral-dark/60">Rol: {invitation.role}</p>
             </div>
             <div className="flex gap-2">
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
                 onClick={() => reject(invitation)}
                 disabled={actionInProgress === invitation.id}

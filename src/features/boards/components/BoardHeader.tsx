@@ -37,17 +37,26 @@ export function BoardHeader({
 
   return (
     <div className={`flex items-center justify-between px-4 py-3 ${gradientClass} ${textColorClass}`}>
-      <h2 className="text-lg font-bold">{board.name}</h2>
+      <h2 className="text-lg font-bold flex items-center gap-2">
+        {board.name}
+        <span className="text-xs font-normal opacity-60">{board.members.length} miembros</span>
+      </h2>
       <div className="px-4">
-        <div className="flex -space-x-1">
-          {board.members.map((m) => (
+        <div className="flex -space-x-2">
+          {board.members.slice(0, 5).map((m) => (
              <MemberAvatar
                key={m.id}
                name={m.user?.name || "Usuario sin nombre"}
                avatar={m.user?.avatarUrl || undefined}
                userId={m.user?.id}
+               stopPropagation={false}
              />
            ))}
+          {board.members.length > 5 && (
+            <div className="size-8 rounded-full bg-white/20 flex items-center justify-center text-xs text-white font-medium">
+              +{board.members.length - 5}
+            </div>
+          )}
         </div>
       </div>
       <div className="grow"></div>
@@ -58,23 +67,23 @@ export function BoardHeader({
             <Button
               variant="ghost"
               size="sm"
-              className="text-white/80! hover:bg-white/20! hover:text-white!"
+              className="text-white/80! hover:bg-white/20! hover:text-white! transition-colors"
               onClick={onToggleInvite}
             >
-              <UserPlusIcon size={20} weight="duotone" /> Invitar
+              <UserPlusIcon size={18} weight="duotone" /> Invitar
             </Button>
             {showInvite && (
               <form
                 onSubmit={handleInvite}
-                className="flex items-center gap-1"
+                className="flex items-center gap-2"
               >
                 <input
                   name="email"
                   type="email"
                   placeholder="email@ejemplo.com"
-                  className="w-40 rounded bg-white/90 px-2 py-1 text-sm text-surface-900"
+                  className="w-40 rounded-lg bg-white/90 px-3 py-1.5 text-sm text-neutral-dark shadow-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
                 />
-                <Button type="submit" size="sm">OK</Button>
+                <Button type="submit" size="sm" className="bg-white/10! text-white! hover:bg-white/20!">OK</Button>
               </form>
             )}
           </>
@@ -82,18 +91,18 @@ export function BoardHeader({
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/80! hover:bg-white/20! hover:text-white!"
+          className="text-white/80! hover:bg-white/20! hover:text-white! transition-colors"
           onClick={onToggleActivity}
         >
-          <BellIcon size={20} weight="duotone" /> Actividad
+          <BellIcon size={18} weight="duotone" /> Actividad
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/80! hover:bg-white/20! hover:text-white!"
+          className="text-white/80! hover:bg-white/20! hover:text-white! transition-colors"
           onClick={() => navigate(`/boards/${board.id}/config/miembros`)}
         >
-          <GearIcon size={20} weight="duotone" /> Configuración
+          <GearIcon size={18} weight="duotone" /> Configuración
         </Button>
       </div>
     </div>

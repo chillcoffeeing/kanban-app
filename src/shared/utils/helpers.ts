@@ -1,88 +1,111 @@
-import type { UserDisplayPrefs } from '@/shared/types/user'
-
 export function generateId(): string {
-  return crypto.randomUUID()
+  return crypto.randomUUID();
 }
 
 export function getInitials(name: string): string {
   return name
-    .split(' ')
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 }
 
-type DateLike = string | number | Date | null | undefined
+type DateLike = string | number | Date | null | undefined;
 
 interface FormatOptions {
-  dateFormat?: UserDisplayPrefs['dateFormat']
-  timezone?: string
-  locale?: string
-  withTime?: boolean
-  timeFormat?: UserDisplayPrefs['timeFormat']
+  dateFormat?: string;
+  timezone?: string;
+  locale?: string;
+  withTime?: boolean;
+  timeFormat?: string;
+}
+
+const formatterCache = new Map<string, Intl.DateTimeFormat>();
+
+function getFormatter(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const key = JSON.stringify([locale, options]);
+  let fmt = formatterCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.DateTimeFormat(locale, options);
+    formatterCache.set(key, fmt);
+  }
+  return fmt;
 }
 
 const localeFor = (
-  language: 'es' | 'en' | string | undefined,
-  format: UserDisplayPrefs['dateFormat'] | undefined
+  language: "es" | "en" | string | undefined,
+  format: string | undefined,
 ): string => {
-  if (language === 'en') return format === 'MDY' ? 'en-US' : 'en-GB'
-  return 'es-ES'
+  if (language === "en") return format === "MDY" ? "en-US" : "en-GB";
+  return "es-ES";
+};
+
+interface FormatOptions {
+  dateFormat?: string;
+  timezone?: string;
+  locale?: string;
+  withTime?: boolean;
+  timeFormat?: string;
 }
 
 export function formatDate(date: DateLike, opts: FormatOptions = {}): string {
-  if (!date) return ''
-  const d = new Date(date)
-  if (Number.isNaN(d.getTime())) return ''
+  if (!date) return "";
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "";
 
-  const { dateFormat = 'DMY', timezone, withTime, timeFormat = '24h', locale } =
-    opts
+  const {
+    dateFormat = "DMY",
+    timezone,
+    withTime,
+    timeFormat = "24h",
+    locale,
+  } = opts;
 
-  if (dateFormat === 'YMD') {
-    const fmt = new Intl.DateTimeFormat('sv-SE', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
+  if (dateFormat === "YMD") {
+    const fmt = getFormatter("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
       timeZone: timezone,
-    })
-    const datePart = fmt.format(d)
-    if (!withTime) return datePart
-    const time = new Intl.DateTimeFormat('sv-SE', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: timeFormat === '12h',
+    });
+    const datePart = fmt.format(d);
+    if (!withTime) return datePart;
+    const time = getFormatter("sv-SE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: timeFormat === "12h",
       timeZone: timezone,
-    }).format(d)
-    return `${datePart} ${time}`
+    }).format(d);
+    return `${datePart} ${time}`;
   }
 
-  const resolvedLocale = locale || localeFor('es', dateFormat)
-  const datePart = new Intl.DateTimeFormat(resolvedLocale, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+  const resolvedLocale = locale || localeFor("es", dateFormat);
+  const datePart = getFormatter(resolvedLocale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
     timeZone: timezone,
-  }).format(d)
+  }).format(d);
 
-  if (!withTime) return datePart
+  if (!withTime) return datePart;
 
-  const timePart = new Intl.DateTimeFormat(resolvedLocale, {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: timeFormat === '12h',
+  const timePart = getFormatter(resolvedLocale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: timeFormat === "12h",
     timeZone: timezone,
-  }).format(d)
-  return `${datePart} · ${timePart}`
+  }).format(d);
+  return `${datePart} · ${timePart}`;
 }
 
 export function isOverdue(date: DateLike): boolean {
-  if (!date) return false
-  return new Date(date) < new Date()
+  if (!date) return false;
+  return new Date(date) < new Date();
 }
 
 export function classNames(
   ...classes: Array<string | false | null | undefined>
 ): string {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }

@@ -6,16 +6,20 @@ export function MemberAvatar({
   avatar,
   userId,
   onClick,
+  stopPropagation = true,
 }: {
   name: string;
   avatar?: string;
   userId?: string;
   onClick?: () => void;
+  stopPropagation?: boolean;
 }) {
   const setSelectedUserId = useBoardStore((s) => s.setSelectedUserId);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
+    if (stopPropagation) {
+      e.stopPropagation();
+    }
     if (onClick) {
       onClick();
     } else if (userId) {
@@ -29,12 +33,29 @@ export function MemberAvatar({
     return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
   }, [avatar]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (stopPropagation) {
+        e.stopPropagation();
+      }
+      if (onClick) {
+        onClick();
+      } else if (userId) {
+        setSelectedUserId(userId);
+      }
+    }
+  };
+
   return (
     <div
-      className="h-8 w-8 rounded-full text-fg-on-brand flex items-center justify-center ring ring-bg-card cursor-pointer hover:ring-2 hover:ring-brand-500 transition-all"
+      role="button"
+      tabIndex={0}
+      className="size-8 rounded-full text-primary-fg flex items-center justify-center ring-2 ring-neutral-light cursor-pointer hover:ring-2 hover:ring-primary transition-all"
       style={{ backgroundColor: color }}
       title={name}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
       {avatar ? (
         <img
@@ -43,7 +64,7 @@ export function MemberAvatar({
           className="h-full w-full rounded-full object-cover"
         />
       ) : (
-        name[0]?.toUpperCase()
+        <span className="text-xs font-semibold">{name[0]?.toUpperCase()}</span>
       )}
     </div>
   );

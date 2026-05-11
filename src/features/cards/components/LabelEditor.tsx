@@ -37,16 +37,16 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
 
   return (
     <div>
-      <p className="mb-2 flex items-center gap-2 text-card-meta font-medium text-fg-muted">
+        <p className="mb-3 flex items-center gap-2 text-xs font-medium text-neutral-dark/70">
         <TagIcon size={16} weight="duotone" /> Etiquetas
       </p>
 
       {labels.length > 0 && (
-        <ul className="mb-2 flex flex-col gap-1">
+        <ul className="mb-3 flex flex-col gap-1.5">
           {labels.map((l) => (
             <li
               key={l.id}
-              className="group flex items-center gap-2 rounded-badge px-2 py-1 text-card-meta text-white shadow-card"
+              className="group flex items-center gap-2 rounded-full px-2.5 py-1 text-xs text-white shadow-sm"
               style={{ backgroundColor: l.color }}
             >
               <span className="flex-1 truncate font-medium">{l.name}</span>
@@ -65,14 +65,14 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
       {!adding ? (
         <button
           onClick={() => setAdding(true)}
-          className="flex w-full cursor-pointer items-center gap-2 rounded-button border border-dashed border-border-default px-2 py-1.5 text-card-meta text-fg-muted transition-colors hover:border-border-focus hover:bg-bg-muted hover:text-fg-default"
+          className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-dashed border-neutral-light bg-neutral-light/30 px-2 py-1.5 text-xs text-neutral-dark/70 transition-all hover:border-primary hover:bg-neutral-light-hover hover:text-neutral-dark"
         >
           <PlusIcon size={16} weight="duotone" /> Añadir etiqueta
         </button>
       ) : (
-        <div className="flex flex-col gap-2 rounded-card border border-border-default bg-bg-card p-2">
+          <div className="flex flex-col gap-2 rounded-xl border border-neutral-light bg-surface p-4 shadow-sm hover:shadow-md transition-all">
           <input
-            autoFocus
+            autoFocus /* Intentional: auto-focus for quick label creation flow */
             type="text"
             placeholder="Título de la etiqueta"
             value={name}
@@ -81,7 +81,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
               if (e.key === "Enter") submit();
               if (e.key === "Escape") reset();
             }}
-            className="w-full rounded-input border border-border-default bg-bg-card px-2 py-1 text-card-meta text-fg-default placeholder:text-fg-subtle focus:border-border-focus focus:outline-none"
+              className="w-full rounded-lg border border-neutral-light bg-neutral-light/50 px-2 py-1 text-xs text-neutral-dark placeholder:text-neutral-dark/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
 
           <div className="flex flex-wrap gap-1">
@@ -95,24 +95,24 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
                     setUseCustom(false);
                   }}
                   title={c.name}
-                  className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-badge transition-transform ${
-                    active
-                      ? "scale-110 ring-2 ring-border-focus ring-offset-1 ring-offset-bg-card"
-                      : ""
-                  }`}
+                  className={`flex size-6 cursor-pointer items-center justify-center rounded-full transition-transform hover:scale-105 ${
+                active
+                  ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-neutral-light"
+                  : ""
+              }`}
                   style={{ backgroundColor: c.value }}
                 >
                   {active && (
-                     <CheckIcon size={12} weight="bold" className="text-fg-on-brand" />
+                     <CheckIcon size={12} weight="bold" className="text-primary-fg" />
                   )}
                 </button>
               );
             })}
             <label
               title="Color personalizado"
-              className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-badge transition-transform ${
+              className={`flex size-6 cursor-pointer items-center justify-center rounded-full transition-transform hover:scale-105 ${
                 useCustom
-                  ? "scale-110 ring-2 ring-border-focus ring-offset-1 ring-offset-bg-card"
+                  ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-neutral-light"
                   : ""
               }`}
               style={{
@@ -127,15 +127,15 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
                   setCustomColor(e.target.value);
                   setUseCustom(true);
                 }}
-                className="absolute h-0 w-0 opacity-0"
+                className="absolute size-0 opacity-0"
               />
             </label>
           </div>
 
           {useCustom && (
-            <div className="flex items-center gap-2 text-card-meta text-fg-muted">
+            <div className="flex items-center gap-2 text-xs text-neutral-dark/70">
               <span
-                className="h-4 w-4 rounded-badge"
+                className="size-4 rounded-full"
                 style={{ backgroundColor: customColor }}
               />
               <code className="font-mono">{customColor}</code>
@@ -146,13 +146,13 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
             <button
               onClick={submit}
               disabled={!name.trim()}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-button bg-btn-primary-bg px-2 py-1 text-card-meta font-medium text-btn-primary-fg hover:bg-btn-primary-bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-lg bg-primary px-2 py-1 text-xs font-medium text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
             >
               <CheckIcon size={14} weight="bold" /> Crear
             </button>
             <button
               onClick={reset}
-              className="cursor-pointer rounded-button bg-btn-secondary-bg px-2 py-1 text-card-meta font-medium text-btn-secondary-fg hover:bg-btn-secondary-bg-hover"
+              className="cursor-pointer rounded-lg bg-neutral-light/70 px-2 py-1 text-xs font-medium text-neutral-dark/70 hover:bg-neutral-light-hover transition-colors"
             >
               Cancelar
             </button>

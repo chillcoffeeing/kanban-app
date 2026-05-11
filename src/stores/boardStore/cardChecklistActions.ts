@@ -1,49 +1,40 @@
 import { cardsApi } from "@/services/cards";
-import type { Board, Card, ChecklistItem } from "@/shared/types";
-import { updateCardInState } from "./cardHelpers";
+import type { ChecklistItem } from "@/shared/types";
+import type { BoardState } from "./types";
+import { forCard } from "./helpers/boardHelpers";
 
 export function createCardChecklistActions(set: any, get: any) {
   return {
-    /* ------------------------ Card Checklists ------------------------ */
-
     addChecklistItem: async (
       boardId: string,
       stageId: string,
       cardId: string,
       text: string,
     ) => {
-      // Optimistic update
       const currentState = get();
       const newItem: ChecklistItem = {
-        id: `temp-${Date.now()}`, // Temporary ID
+        id: `temp-${Date.now()}`,
+        cardId,
         text,
         done: false,
-        position: 0, // Will be updated by backend
+        position: 0,
       };
+
+      set((state: BoardState) => {
+        forCard(state, boardId, stageId, cardId, (card) => {
+          card.checklist.push(newItem);
+        });
+      });
 
       try {
         const res = await cardsApi.createChecklistItem(cardId, { text });
-        // Update with real data from backend
-
-        set((state: any) => {
-          const { boards, currentBoard } = updateCardInState(
-            state.boards,
-            state.currentBoard,
-            boardId,
-            stageId,
-            cardId,
-            (card) => ({
-              ...card,
-              checklist: [
-                ...(card.checklist || []),
-                { ...newItem, id: res.id } as ChecklistItem,
-              ],
-            }),
-          );
-          return { boards, currentBoard };
+        set((state: BoardState) => {
+          forCard(state, boardId, stageId, cardId, (card) => {
+            const item = card.checklist.find((i) => i.id === newItem.id);
+            if (item) item.id = res.id;
+          });
         });
       } catch (error) {
-        // Rollback on error
         set(currentState);
         throw error;
       }
@@ -56,30 +47,18 @@ export function createCardChecklistActions(set: any, get: any) {
       itemId: string,
       updates: { text?: string; done?: boolean },
     ) => {
-      // Optimistic update
       const currentState = get();
 
-      set((state: any) => {
-        const { boards, currentBoard } = updateCardInState(
-          state.boards,
-          state.currentBoard,
-          boardId,
-          stageId,
-          cardId,
-          (card) => ({
-            ...card,
-            checklist: (card.checklist || []).map((item) =>
-              item.id === itemId ? { ...item, ...updates } : item,
-            ),
-          }),
-        );
-        return { boards, currentBoard };
+      set((state: BoardState) => {
+        forCard(state, boardId, stageId, cardId, (card) => {
+          const item = card.checklist.find((i) => i.id === itemId);
+          if (item) Object.assign(item, updates);
+        });
       });
 
       try {
         await cardsApi.updateChecklistItem(cardId, itemId, updates);
       } catch (error) {
-        // Rollback on error
         set(currentState);
         throw error;
       }
@@ -91,30 +70,17 @@ export function createCardChecklistActions(set: any, get: any) {
       cardId: string,
       itemId: string,
     ) => {
-      // Optimistic update
       const currentState = get();
 
-      set((state: any) => {
-        const { boards, currentBoard } = updateCardInState(
-          state.boards,
-          state.currentBoard,
-          boardId,
-          stageId,
-          cardId,
-          (card) => ({
-            ...card,
-            checklist: (card.checklist || []).filter(
-              (item) => item.id !== itemId,
-            ),
-          }),
-        );
-        return { boards, currentBoard };
+      set((state: BoardState) => {
+        forCard(state, boardId, stageId, cardId, (card) => {
+          card.checklist = card.checklist.filter((i) => i.id !== itemId);
+        });
       });
 
       try {
         await cardsApi.deleteChecklistItem(cardId, itemId);
       } catch (error) {
-        // Rollback on error
         set(currentState);
         throw error;
       }

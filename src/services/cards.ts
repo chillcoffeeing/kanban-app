@@ -1,9 +1,9 @@
 import { api } from "./api";
 import type {
-  BackendCard,
-  BackendCardMember,
-  BackendChecklistItem,
-  BackendLabel,
+  CardResponse,
+  CardMember,
+  ChecklistItem,
+  Label,
 } from "@/shared/types";
 
 export const cardsApi = {
@@ -16,9 +16,9 @@ export const cardsApi = {
       startDate?: string;
       dueDate?: string;
     },
-  ) => api<BackendCard>(`/stages/${stageId}/cards`, { method: "POST", body }),
+  ) => api<CardResponse>(`/stages/${stageId}/cards`, { method: "POST", body }),
 
-  get: (id: string) => api<BackendCard>(`/cards/${id}`),
+  get: (id: string) => api<CardResponse>(`/cards/${id}`),
 
   update: (
     id: string,
@@ -28,10 +28,10 @@ export const cardsApi = {
       startDate?: string | null;
       dueDate?: string | null;
     },
-  ) => api<BackendCard>(`/cards/${id}`, { method: "PATCH", body }),
+  ) => api<CardResponse>(`/cards/${id}`, { method: "PATCH", body }),
 
   move: (id: string, stageId: string, index: number) =>
-    api<BackendCard>(`/cards/${id}/move`, {
+    api<CardResponse>(`/cards/${id}/move`, {
       method: "PATCH",
       body: { stageId, index },
     }),
@@ -39,25 +39,23 @@ export const cardsApi = {
   remove: (id: string) => api<void>(`/cards/${id}`, { method: "DELETE" }),
 
   search: (boardId: string, q: string) =>
-    api<BackendCard[]>(
+    api<CardResponse[]>(
       `/boards/${boardId}/cards/search?q=${encodeURIComponent(q)}`,
     ),
 
-  // Operaciones de miembros de cards
   addMember: (cardId: string, body: { boardMembershipId: string }) =>
-    api<BackendCard>(`/cards/${cardId}/members`, { method: "POST", body }),
+    api<CardResponse>(`/cards/${cardId}/members`, { method: "POST", body }),
 
   removeMember: (cardId: string, boardMembershipId: string) =>
     api(`/cards/${cardId}/members/${boardMembershipId}`, {
       method: "DELETE",
     }),
 
-  // Operaciones de checklists
   getChecklist: (cardId: string) =>
-    api<BackendChecklistItem[]>(`/cards/${cardId}/checklist`),
+    api<ChecklistItem[]>(`/cards/${cardId}/checklist`),
 
   createChecklistItem: (cardId: string, body: { text: string }) =>
-    api<BackendChecklistItem>(`/cards/${cardId}/checklist`, {
+    api<ChecklistItem>(`/cards/${cardId}/checklist`, {
       method: "POST",
       body,
     }),
@@ -67,7 +65,7 @@ export const cardsApi = {
     itemId: string,
     body: { text?: string; done?: boolean },
   ) =>
-    api<BackendChecklistItem>(`/cards/${cardId}/checklist/${itemId}`, {
+    api<ChecklistItem>(`/cards/${cardId}/checklist/${itemId}`, {
       method: "PATCH",
       body,
     }),
@@ -75,18 +73,17 @@ export const cardsApi = {
   deleteChecklistItem: (cardId: string, itemId: string) =>
     api<void>(`/cards/${cardId}/checklist/${itemId}`, { method: "DELETE" }),
 
-  // Operaciones de labels
   getLabels: (boardId: string) =>
-    api<BackendLabel[]>(`/boards/${boardId}/labels`),
+    api<Label[]>(`/boards/${boardId}/labels`),
 
   createLabel: (boardId: string, body: { name: string; color: string }) =>
-    api<BackendLabel>(`/boards/${boardId}/labels`, { method: "POST", body }),
+    api<Label>(`/boards/${boardId}/labels`, { method: "POST", body }),
 
   deleteLabel: (labelId: string) =>
     api<void>(`/labels/${labelId}`, { method: "DELETE" }),
 
   getCardLabels: (cardId: string) =>
-    api<BackendLabel[]>(`/cards/${cardId}/labels`),
+    api<Label[]>(`/cards/${cardId}/labels`),
 
   attachLabel: (cardId: string, labelId: string) =>
     api<{ success: true }>(`/cards/${cardId}/labels/${labelId}`, {
