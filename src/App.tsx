@@ -67,7 +67,9 @@ function App() {
               <Route path="/" element={<Navigate to="/boards" replace />} />
               <Route path="*" element={<Navigate to="/boards" replace />} />
             </>
-          ) : null}
+          ) : (
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          )}
         </Routes>
       </main>
       {isAuthenticated && location.pathname === "/boards" && <Footer />}
