@@ -8,7 +8,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
 }
 
 export function Modal({
@@ -40,11 +40,12 @@ export function Modal({
 
   if (!isOpen) return null;
 
-  const sizes: Record<"sm" | "md" | "lg" | "xl", string> = {
+  const sizes: Record<string, string> = {
     sm: "max-w-sm",
     md: "max-w-lg",
     lg: "max-w-2xl",
     xl: "max-w-4xl",
+    "2xl": "max-w-7xl",
   };
 
   const modalContent = (

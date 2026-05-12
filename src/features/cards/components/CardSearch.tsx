@@ -16,7 +16,7 @@ interface Match {
 export function CardSearch({ onSelectCard }: CardSearchProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const board = useBoardStore((s) => s.currentBoard);
+  const board = useBoardStore((boardState) => boardState.currentBoard);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -41,14 +41,14 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
       for (const card of stage.cards) {
         const matchTitle = card.title.toLowerCase().includes(q);
         const matchDesc = card.description?.toLowerCase().includes(q);
-        const matchLabel = card.labels?.some((l) =>
-          l.name.toLowerCase().includes(q),
+        const matchLabel = card.labels?.some((label) =>
+          label.name.toLowerCase().includes(q),
         );
         const matchMember = card.members?.some((member) =>
           member.boardMembership?.user?.name?.toLowerCase().includes(q) || false,
         );
-        const matchChecklist = card.checklist?.some((c) =>
-          c.text.toLowerCase().includes(q),
+        const matchChecklist = card.checklist?.some((checkItem) =>
+          checkItem.text.toLowerCase().includes(q),
         );
 
         if (
@@ -120,11 +120,11 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
                   <div className="flex items-center gap-2">
                     {card.labels?.length > 0 && (
                       <div className="flex gap-0.5">
-                        {card.labels.slice(0, 3).map((l) => (
+                        {card.labels.slice(0, 3).map((label) => (
                           <span
-                            key={l.color}
+                            key={label.color}
                             className="h-1.5 w-4 rounded-full"
-                            style={{ backgroundColor: l.color }}
+                            style={{ backgroundColor: label.color }}
                           />
                         ))}
                       </div>

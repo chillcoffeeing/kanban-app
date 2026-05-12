@@ -41,13 +41,13 @@ export function createStageActions(set: any, get: any) {
         const board =
           get().currentBoard ??
           get().boards.find((b: Board) => b.id === boardId);
-        const oldStage = board?.stages.find((s: Stage) => s.id === stageId);
+        const oldStage = board?.stages.find((stage: Stage) => stage.id === stageId);
         const oldName = oldStage?.name ?? stageId;
 
         const res = await stagesApi.update(stageId, { name: updates.name });
         set((state: BoardState) => {
           forBoard(state, boardId, (b) => {
-            const s = b.stages.find((st) => st.id === stageId);
+            const s = b.stages.find((stage) => stage.id === stageId);
             if (s) s.name = res.name;
           });
         });
@@ -72,13 +72,13 @@ export function createStageActions(set: any, get: any) {
         const board =
           get().currentBoard ??
           get().boards.find((b: Board) => b.id === boardId);
-        const stage = board?.stages.find((s: Stage) => s.id === stageId);
+        const stage = board?.stages.find((stage: Stage) => stage.id === stageId);
         const stageName = stage?.name ?? stageId;
 
         await stagesApi.remove(stageId);
         set((state: BoardState) => {
           forBoard(state, boardId, (b) => {
-            b.stages = b.stages.filter((s) => s.id !== stageId);
+            b.stages = b.stages.filter((stage) => stage.id !== stageId);
           });
         });
 

@@ -71,8 +71,8 @@ export function createMemberActions(set: any, get: any) {
 
       set((state: BoardState) => {
         forBoard(state, boardId, (b) => {
-          const m = b.members.find((mem) => mem.id === membershipId);
-          if (m) m.permissions = permissions;
+          const member = b.members.find((mem) => mem.id === membershipId);
+          if (member) member.permissions = permissions;
         });
       });
     },
@@ -92,13 +92,13 @@ export function createMemberActions(set: any, get: any) {
       const board =
         get().currentBoard ?? get().boards.find((b: any) => b.id === boardId);
       const member = board?.members.find(
-        (m: BoardMember) => m.id === membershipId,
+        (member: BoardMember) => member.id === membershipId,
       );
       const memberEmail = member?.email ?? membershipId;
 
       set((state: BoardState) => {
         forBoard(state, boardId, (b) => {
-          b.members = b.members.filter((m) => m.id !== membershipId);
+          b.members = b.members.filter((member) => member.id !== membershipId);
         });
       });
 

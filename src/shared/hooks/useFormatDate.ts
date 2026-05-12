@@ -5,11 +5,11 @@ import { formatDate } from "@/shared/utils/helpers";
 
 export function useFormatDate() {
   const { dateFormat, timeFormat, timezone, language } = useSettingsStore(
-    useShallow((s) => ({
-      dateFormat: s.dateFormat,
-      timeFormat: s.timeFormat,
-      timezone: s.timezone,
-      language: s.language,
+    useShallow((settings) => ({
+      dateFormat: settings.dateFormat,
+      timeFormat: settings.timeFormat,
+      timezone: settings.timezone,
+      language: settings.language,
     })),
   );
 

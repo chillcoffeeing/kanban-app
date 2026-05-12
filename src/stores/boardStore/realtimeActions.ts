@@ -37,7 +37,7 @@ export function createRealtimeActions(set: any, get: any) {
   return {
     realtimeUpdateBoard: (boardId: string, updates: Partial<Board>) => {
       set((state: BoardState) => {
-        const b = state.boards.find((x) => x.id === boardId);
+        const b = state.boards.find((board) => board.id === boardId);
         if (b) Object.assign(b, updates);
         if (state.currentBoard?.id === boardId && state.currentBoard !== b)
           Object.assign(state.currentBoard, updates);
@@ -46,7 +46,7 @@ export function createRealtimeActions(set: any, get: any) {
 
     realtimeDeleteBoard: (boardId: string) => {
       set((state: BoardState) => {
-        state.boards = state.boards.filter((b) => b.id !== boardId);
+        state.boards = state.boards.filter((board) => board.id !== boardId);
         if (state.currentBoard?.id === boardId) state.currentBoard = null;
       });
     },
@@ -62,7 +62,7 @@ export function createRealtimeActions(set: any, get: any) {
 
           for (const board of state.boards) {
             for (const stage of board.stages) {
-              if (stage.cards.some((c) => c.id === cardId)) {
+              if (stage.cards.some((card) => card.id === cardId)) {
                 currentStageId = stage.id;
                 currentBoardId = board.id;
                 break;
@@ -77,16 +77,16 @@ export function createRealtimeActions(set: any, get: any) {
             currentStageId !== updates.stageId
           ) {
             const card = removeCardFromBoard(
-              state.boards.find((b) => b.id === currentBoardId)!,
+              state.boards.find((board) => board.id === currentBoardId)!,
               cardId,
             );
             if (card) {
               const merged = { ...card, ...updates };
-              const targetBoard = state.boards.find((b) =>
-                b.stages.some((s) => s.id === updates.stageId),
+            const targetBoard = state.boards.find((board) =>
+              board.stages.some((stage) => stage.id === updates.stageId),
               );
               const targetStage = targetBoard?.stages.find(
-                (s) => s.id === updates.stageId,
+                (stage) => stage.id === updates.stageId,
               );
               if (targetStage) {
                 targetStage.cards.push(merged);
@@ -99,7 +99,7 @@ export function createRealtimeActions(set: any, get: any) {
               if (curCard) {
                 const merged = { ...curCard, ...updates };
                 const curStage = state.currentBoard.stages.find(
-                  (s) => s.id === updates.stageId,
+                  (stage) => stage.id === updates.stageId,
                 );
                 if (curStage) {
                   curStage.cards.push(merged);
@@ -123,12 +123,12 @@ export function createRealtimeActions(set: any, get: any) {
     realtimeAddCard: (card: Card & { stageId: string }) => {
       set((state: BoardState) => {
         for (const board of state.boards) {
-          const stage = board.stages.find((s) => s.id === card.stageId);
+          const stage = board.stages.find((stage) => stage.id === card.stageId);
           if (stage) stage.cards.push(card);
         }
         if (state.currentBoard) {
           const stage = state.currentBoard.stages.find(
-            (s) => s.id === card.stageId,
+            (stage) => stage.id === card.stageId,
           );
           if (stage) stage.cards.push(card);
         }
@@ -139,7 +139,7 @@ export function createRealtimeActions(set: any, get: any) {
       set((state: BoardState) => {
         const remove = (board: Board) => {
           for (const stage of board.stages) {
-            stage.cards = stage.cards.filter((c) => c.id !== cardId);
+            stage.cards = stage.cards.filter((card) => card.id !== cardId);
           }
         };
         state.boards.forEach(remove);
@@ -150,12 +150,12 @@ export function createRealtimeActions(set: any, get: any) {
     realtimeUpdateStage: (stageId: string, updates: Partial<Stage>) => {
       set((state: BoardState) => {
         for (const board of state.boards) {
-          const stage = board.stages.find((s) => s.id === stageId);
+          const stage = board.stages.find((stage) => stage.id === stageId);
           if (stage) Object.assign(stage, updates);
         }
         if (state.currentBoard) {
           const stage = state.currentBoard.stages.find(
-            (s) => s.id === stageId,
+            (stage) => stage.id === stageId,
           );
           if (stage) Object.assign(stage, updates);
         }
@@ -174,11 +174,11 @@ export function createRealtimeActions(set: any, get: any) {
     realtimeDeleteStage: (stageId: string) => {
       set((state: BoardState) => {
         for (const board of state.boards) {
-          board.stages = board.stages.filter((s) => s.id !== stageId);
+          board.stages = board.stages.filter((stage) => stage.id !== stageId);
         }
         if (state.currentBoard) {
           state.currentBoard.stages = state.currentBoard.stages.filter(
-            (s) => s.id !== stageId,
+            (stage) => stage.id !== stageId,
           );
         }
       });

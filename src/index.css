@@ -46,6 +46,20 @@
   /* ── Surface (raised cards, modals, dropdowns) ──── */
   --color-surface: var(--c-surface);
   --color-surface-hover: var(--c-surface-hover);
+
+  /* ── Animations ───────────────────── */
+  --animate-scaleIn: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ─────────────────────────────────────────
@@ -237,6 +251,13 @@
 }
 
 /* ─── Backgrounds ───────────────────── */
+body[data-bg="lines"],
+body[data-bg="particles"],
+body[data-bg="waves"] {
+  background-color: var(--color-neutral-light);
+  background-image: none;
+}
+
 body[data-bg="plain"] {
   background-color: var(--color-neutral-light);
   background-image: none;
@@ -253,34 +274,6 @@ body[data-bg="grid"] {
   background-image:
     linear-gradient(to right, var(--c-texture) 1px, transparent 1px),
     linear-gradient(to bottom, var(--c-texture) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
-body[data-bg="crosshatch"] {
-  background-color: var(--color-neutral-light);
-  background-image:
-    linear-gradient(45deg, var(--c-texture) 1px, transparent 1px),
-    linear-gradient(-45deg, var(--c-texture) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-body[data-bg="diagonal"] {
-  background-color: var(--color-neutral-light);
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    var(--c-texture) 10px,
-    var(--c-texture) 11px
-  );
-}
-
-body[data-bg="plus"] {
-  background-color: var(--color-neutral-light);
-  background-image:
-    radial-gradient(circle, var(--c-texture) 2px, transparent 2px),
-    linear-gradient(to right, transparent 13px, var(--c-texture) 13px, var(--c-texture) 14px, transparent 14px),
-    linear-gradient(to bottom, transparent 13px, var(--c-texture) 13px, var(--c-texture) 14px, transparent 14px);
   background-size: 28px 28px;
 }
 

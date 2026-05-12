@@ -14,7 +14,7 @@ export function MemberAvatar({
   onClick?: () => void;
   stopPropagation?: boolean;
 }) {
-  const setSelectedUserId = useBoardStore((s) => s.setSelectedUserId);
+  const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (stopPropagation) {

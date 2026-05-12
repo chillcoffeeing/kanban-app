@@ -26,7 +26,7 @@ export function canManageMembers(
 ): boolean {
   if (!board || !userId) return false
   const prefs = getBoardPreferences(board)
-  const member = board.members.find((m) => m.user?.id === userId)
+  const member = board.members.find((member) => member.user?.id === userId)
   if (!member) return false
   if (member.role === 'owner') return true
   if (prefs.memberPermission === 'admins') {
@@ -43,5 +43,5 @@ function canComment(
   const prefs = getBoardPreferences(board)
   if (prefs.commentPermission === 'disabled') return false
   if (prefs.commentPermission === 'workspace') return true
-  return !!board.members.find((m) => m.user?.id === userId)
+  return !!board.members.find((member) => member.user?.id === userId)
 }

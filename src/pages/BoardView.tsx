@@ -19,6 +19,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore, ACTIVITY_TYPES } from "@/stores/activityStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { useSocket } from "@/shared/hooks/useSocket";
+import { useDragScroll } from "@/shared/hooks/useDragScroll";
 import { StageColumn } from "@/features/stages/components/StageColumn";
 import { CardItem } from "@/features/cards/components/CardItem";
 import { CardPreview } from "@/features/cards/components/CardPreview";
@@ -53,13 +54,13 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     addMember,
   } = useBoardStore();
 
-  const currentUser = useAuthStore((s) => s.user);
+  const currentUser = useAuthStore((state) => state.user);
 
   const isOwner = currentBoard?.members?.some(
-    (m) => m.user?.id === currentUser?.id && m.role === "owner",
+    (member) => member.user?.id === currentUser?.id && member.role === "owner",
   );
 
-  const loadActivities = useActivityStore((s) => s.loadActivities);
+  const loadActivities = useActivityStore((activityState) => activityState.loadActivities);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -79,8 +80,8 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     Boolean(queryCardId),
   );
 
-  const selectedUserId = useBoardStore((s) => s.selectedUserId);
-  const setSelectedUserId = useBoardStore((s) => s.setSelectedUserId);
+  const selectedUserId = useBoardStore((boardState) => boardState.selectedUserId);
+  const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
 
   const [showActivity, setShowActivity] = useState(false);
 
@@ -102,12 +103,14 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
   const sensors = useSensors(pointerSensor);
 
+  const scrollContainerRef = useDragScroll();
+
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const id = event.active.id;
     setActiveId(id);
-    const data = event.active.data.current as DragData | undefined;
-    if (data?.type === "card" && data.card) {
-      setActiveCard(data.card);
+    const dragData = event.active.data.current as DragData | undefined;
+    if (dragData?.type === "card" && dragData.card) {
+      setActiveCard(dragData.card);
     }
   }, []);
 
@@ -128,11 +131,11 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
         if (overData?.type === "stage") {
           toStageId = overData.stageId;
-          const toStage = currentBoard?.stages.find((s) => s.id === toStageId);
+          const toStage = currentBoard?.stages.find((stage) => stage.id === toStageId);
           newIndex = toStage?.cards.length || 0;
         } else if (overData?.type === "card") {
           toStageId = overData.stageId;
-          const toStage = currentBoard?.stages.find((s) => s.id === toStageId);
+          const toStage = currentBoard?.stages.find((stage) => stage.id === toStageId);
           newIndex = toStage?.cards.findIndex((c) => c.id === over.id) ?? 0;
         }
 
@@ -147,10 +150,10 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
           if (fromStageId !== toStageId) {
             const fromName = currentBoard?.stages.find(
-              (s) => s.id === fromStageId,
+              (stage) => stage.id === fromStageId,
             )?.name;
             const toName = currentBoard?.stages.find(
-              (s) => s.id === toStageId,
+              (stage) => stage.id === toStageId,
             )?.name;
             const cardTitle = activeData.card?.title || "Tarjeta";
             log(
@@ -293,7 +296,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex flex-1 gap-[var(--density-gap,1rem)] overflow-x-auto p-[var(--density-padding,1rem)] bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
+        <div ref={scrollContainerRef} className="flex flex-1 gap-[var(--density-gap,1rem)] overflow-x-auto p-[var(--density-padding,1rem)] cursor-grab bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
           {currentBoard.stages.map((stage) => (
             <StageColumn
               key={stage.id}

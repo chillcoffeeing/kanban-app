@@ -10,12 +10,12 @@ import { PlusIcon } from "@phosphor-icons/react";
 export function BoardsPage() {
   const navigate = useNavigate();
   const [showCreate, setShowCreate] = useState(false);
-  const boards = useBoardStore((s) => s.boards);
-  const loading = useBoardStore((s) => s.loading);
-  const error = useBoardStore((s) => s.error);
-  const hydrateBoards = useBoardStore((s) => s.hydrateBoards);
-  const createBoard = useBoardStore((s) => s.createBoard);
-  const user = useAuthStore((s) => s.user);
+  const boards = useBoardStore((boardState) => boardState.boards);
+  const loading = useBoardStore((boardState) => boardState.loading);
+  const error = useBoardStore((boardState) => boardState.error);
+  const hydrateBoards = useBoardStore((boardState) => boardState.hydrateBoards);
+  const createBoard = useBoardStore((boardState) => boardState.createBoard);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     void hydrateBoards();

@@ -1,4 +1,4 @@
-import { LoginForm } from "@/features/auth/components/LoginForm";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import {
   KanbanIcon,
   ShieldCheckIcon,
@@ -25,10 +25,9 @@ const features = [
   },
 ];
 
-export function AuthPage() {
+export function RegisterPage() {
   return (
     <div className="min-h-screen bg-neutral-light pt-16 lg:grid lg:grid-cols-2">
-      {/* Brand panel */}
       <aside className="relative hidden overflow-hidden bg-linear-to-br from-primary via-secondary to-tertiary lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
         <div
           aria-hidden
@@ -92,10 +91,8 @@ export function AuthPage() {
         </div>
       </aside>
 
-      {/* Form panel */}
       <main className="flex items-center justify-center px-4 py-10 sm:px-8 lg:min-h-0">
         <div className="w-full max-w-md">
-          {/* Mobile brand */}
           <div className="mb-8 flex items-center justify-center gap-2 lg:hidden">
             <div className="flex size-12 items-center justify-center rounded-xl bg-primary">
               <KanbanIcon size={30} weight="duotone" className="text-white" />
@@ -106,7 +103,7 @@ export function AuthPage() {
           </div>
 
           <div className="rounded-2xl border border-neutral-light bg-surface p-8 shadow-lg sm:p-10 animate-scaleIn">
-            <LoginForm />
+            <RegisterForm />
           </div>
 
           <p className="mt-6 text-center text-xs text-neutral-dark/60">

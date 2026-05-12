@@ -34,8 +34,8 @@ interface MemberProfile {
 }
 
 export function MemberProfileModal() {
-  const userId = useBoardStore((s) => s.selectedUserId);
-  const setSelectedUserId = useBoardStore((s) => s.setSelectedUserId);
+  const userId = useBoardStore((boardState) => boardState.selectedUserId);
+  const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
   const [user, setUser] = useState<MemberProfile | null>(null);
   const [loading, setLoading] = useState(false);
 

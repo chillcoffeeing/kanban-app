@@ -166,6 +166,20 @@ export function UserAppearancePage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="primary" onClick={handleSave} disabled={saving || !hasChanges}>
+          <FloppyDiskIcon size={20} weight="duotone" />
+          {saving ? "Guardando…" : "Guardar cambios"}
+        </Button>
+        {hasChanges && (
+          <Button variant="ghost" onClick={handleReset} disabled={saving}>
+            <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Descartar
+          </Button>
+        )}
+        {saved && (
+          <span className="text-content text-success">Apariencia guardada correctamente</span>
+        )}
+      </div>
       <Section title="Tema" description="Paleta de colores de la interfaz." icon={SunIcon}>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {THEME_OPTIONS.map(({ id, label, Icon }) => {
@@ -332,21 +346,6 @@ export function UserAppearancePage() {
           </Row>
         </div>
       </Section>
-
-      <div className="flex items-center gap-3 pt-4 border-t border-neutral-light">
-        <Button variant="primary" onClick={handleSave} disabled={saving || !hasChanges}>
-          <FloppyDiskIcon size={20} weight="duotone" />
-          {saving ? "Guardando…" : "Guardar cambios"}
-        </Button>
-        {hasChanges && (
-          <Button variant="ghost" onClick={handleReset} disabled={saving}>
-            <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Descartar
-          </Button>
-        )}
-        {saved && (
-          <span className="text-content text-success">Apariencia guardada correctamente</span>
-        )}
-      </div>
     </div>
   );
 }

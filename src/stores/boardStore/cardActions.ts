@@ -110,8 +110,8 @@ export function createCardActions(set: any, get: any) {
 
       set((state: BoardState) => {
         forBoard(state, boardId, (b) => {
-          const s = b.stages.find((st) => st.id === stageId);
-          if (s) s.cards = s.cards.filter((c) => c.id !== cardId);
+          const s = b.stages.find((stage) => stage.id === stageId);
+          if (s) s.cards = s.cards.filter((card) => card.id !== cardId);
         });
       });
 

@@ -37,8 +37,8 @@ function PrefRow({ icon: Icon, title, description, children }: PrefRowProps) {
 
 export function BoardPreferencesPage() {
   const { boardId } = useParams<{ boardId: string }>();
-  const currentBoard = useBoardStore((s) => s.currentBoard);
-  const updateBoard = useBoardStore((s) => s.updateBoard);
+  const currentBoard = useBoardStore((boardState) => boardState.currentBoard);
+  const updateBoard = useBoardStore((boardState) => boardState.updateBoard);
 
   if (!currentBoard || !boardId) return null;
 

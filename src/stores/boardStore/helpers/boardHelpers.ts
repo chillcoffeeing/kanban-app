@@ -6,7 +6,7 @@ export function forBoard(
   boardId: string,
   fn: (board: Board) => void,
 ) {
-  const listBoard = draft.boards.find((b) => b.id === boardId);
+  const listBoard = draft.boards.find((board) => board.id === boardId);
   if (listBoard) fn(listBoard);
   if (
     draft.currentBoard?.id === boardId &&
@@ -25,7 +25,7 @@ export function forCard(
 ) {
   forBoard(draft, boardId, (board) => {
     const stage = board.stages.find((s) => s.id === stageId);
-    const card = stage?.cards.find((c) => c.id === cardId);
+    const card = stage?.cards.find((card) => card.id === cardId);
     if (card) fn(card);
   });
 }

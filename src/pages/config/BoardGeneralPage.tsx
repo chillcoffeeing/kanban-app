@@ -11,7 +11,7 @@ export function BoardGeneralPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const navigate = useNavigate();
   const { updateBoard, deleteBoard } = useBoardStore();
-  const currentBoard = useBoardStore((s) => s.currentBoard);
+  const currentBoard = useBoardStore((boardState) => boardState.currentBoard);
   const log = useActivity(boardId);
 
   const [boardName, setBoardName] = useState(currentBoard?.name || "");

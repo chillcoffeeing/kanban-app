@@ -115,7 +115,7 @@ function buildEventHandlers(): Record<string, RealtimeEventHandler> {
 }
 
 const useSocketImpl = () => {
-  const user = useAuthStore((s) => s.user);
+  const user = useAuthStore((state) => state.user);
   const listenersRef = useRef(false);
   const connectedRef = useRef(false);
   const socketRef = useRef<ReturnType<typeof socketService.connect> | null>(

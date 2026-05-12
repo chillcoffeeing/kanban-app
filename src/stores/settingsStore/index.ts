@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useAuthStore } from "@/stores/authStore";
 import type { UserPreferenceJson } from "@/shared/types/api";
-import { BACKGROUNDS } from "./constants";
+import { BACKGROUNDS, STATIC_BACKGROUNDS, ANIMATED_BACKGROUNDS } from "./constants";
 
 const defaults: UserPreferenceJson = {
   theme: "light",
@@ -88,7 +88,19 @@ export const useSettingsStore = create<SettingsState>()(
       const sync = () => {
         const user = useAuthStore.getState().user;
         const settings = user?.preference?.settings;
-        set(settings ? { ...defaults, ...settings } : { ...defaults });
+        if (settings) {
+          set({ ...defaults, ...settings });
+        } else {
+          try {
+            const raw = localStorage.getItem('kanban-appearance');
+            if (raw) {
+              const saved = JSON.parse(raw);
+              set({ ...defaults, ...saved });
+              return;
+            }
+          } catch { /* ignore */ }
+          set({ ...defaults });
+        }
       };
 
       useAuthStore.subscribe(
@@ -100,6 +112,10 @@ export const useSettingsStore = create<SettingsState>()(
 
       const apply = async (patch: Partial<UserPreferenceJson>) => {
         set({ ...patch } as Partial<SettingsState>);
+        if ('theme' in patch) {
+          localStorage.setItem('kanban-public-theme', patch.theme!);
+          window.dispatchEvent(new Event('public-theme-change'));
+        }
         const user = useAuthStore.getState().user;
         if (user) {
           await useAuthStore.getState().updatePreferences(patch);
@@ -140,4 +156,4 @@ export const useSettingsStore = create<SettingsState>()(
   ),
 );
 
-export { BACKGROUNDS };
+export { BACKGROUNDS, STATIC_BACKGROUNDS, ANIMATED_BACKGROUNDS };

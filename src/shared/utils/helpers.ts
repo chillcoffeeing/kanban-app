@@ -5,7 +5,7 @@ export function generateId(): string {
 export function getInitials(name: string): string {
   return name
     .split(" ")
-    .map((n) => n[0])
+    .map((part) => part[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
@@ -51,8 +51,8 @@ interface FormatOptions {
 
 export function formatDate(date: DateLike, opts: FormatOptions = {}): string {
   if (!date) return "";
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return "";
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "";
 
   const {
     dateFormat = "DMY",
@@ -69,14 +69,14 @@ export function formatDate(date: DateLike, opts: FormatOptions = {}): string {
       day: "2-digit",
       timeZone: timezone,
     });
-    const datePart = fmt.format(d);
+    const datePart = fmt.format(parsedDate);
     if (!withTime) return datePart;
     const time = getFormatter("sv-SE", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: timeFormat === "12h",
       timeZone: timezone,
-    }).format(d);
+    }).format(parsedDate);
     return `${datePart} ${time}`;
   }
 
@@ -86,7 +86,7 @@ export function formatDate(date: DateLike, opts: FormatOptions = {}): string {
     month: "short",
     year: "numeric",
     timeZone: timezone,
-  }).format(d);
+  }).format(parsedDate);
 
   if (!withTime) return datePart;
 
@@ -95,7 +95,7 @@ export function formatDate(date: DateLike, opts: FormatOptions = {}): string {
     minute: "2-digit",
     hour12: timeFormat === "12h",
     timeZone: timezone,
-  }).format(d);
+  }).format(parsedDate);
   return `${datePart} · ${timePart}`;
 }
 

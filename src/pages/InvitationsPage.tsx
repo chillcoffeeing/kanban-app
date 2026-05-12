@@ -18,8 +18,8 @@ interface PendingInvitation {
 
 export function InvitationsPage() {
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export function InvitationsPage() {
       await api(`/invitations/${invitation.id}`, {
         method: "DELETE",
       });
-      setInvitations(invitations.filter((i) => i.id !== invitation.id));
+      setInvitations(invitations.filter((invitationItem) => invitationItem.id !== invitation.id));
     } catch (e: unknown) {
       if ((e as any)?.name !== "AbortError") {
         // Error handled silently

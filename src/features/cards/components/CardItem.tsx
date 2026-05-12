@@ -22,8 +22,8 @@ interface CardItemProps {
 
 export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
   const board = useBoardStore(
-    useShallow((s) => {
-      const found = s.boards.find((b) => b.id === boardId);
+    useShallow((boardState) => {
+      const found = boardState.boards.find((b) => b.id === boardId);
       return found;
     }),
   );
@@ -47,7 +47,7 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
     transition: isDragging ? "none" : transition,
   };
 
-  const completedChecks = card.checklist?.filter((c) => c.done).length || 0;
+  const completedChecks = card.checklist?.filter((checkItem) => checkItem.done).length || 0;
   const totalChecks = card.checklist?.length || 0;
   const isComplete = totalChecks > 0 && completedChecks === totalChecks;
 

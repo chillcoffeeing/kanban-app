@@ -91,6 +91,20 @@ export function UserNotificationsPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="primary" onClick={handleSave} disabled={saving || !hasChanges}>
+          <FloppyDiskIcon size={20} weight="duotone" />
+          {saving ? "Guardando…" : "Guardar cambios"}
+        </Button>
+        {hasChanges && (
+          <Button variant="ghost" onClick={handleReset} disabled={saving}>
+            <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Descartar
+          </Button>
+        )}
+        {saved && (
+          <span className="text-content text-success">Notificaciones guardadas correctamente</span>
+        )}
+      </div>
       <section className="rounded-xl border border-neutral-light bg-surface p-6 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-neutral-dark flex items-center gap-2">
           <BellIcon size={20} weight="duotone" className="text-primary/70" />
@@ -122,21 +136,6 @@ export function UserNotificationsPage() {
           ))}
         </div>
       </section>
-
-      <div className="flex items-center gap-3 pt-4 border-t border-neutral-light">
-        <Button variant="primary" onClick={handleSave} disabled={saving || !hasChanges}>
-          <FloppyDiskIcon size={20} weight="duotone" />
-          {saving ? "Guardando…" : "Guardar cambios"}
-        </Button>
-        {hasChanges && (
-          <Button variant="ghost" onClick={handleReset} disabled={saving}>
-            <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Descartar
-          </Button>
-        )}
-        {saved && (
-          <span className="text-content text-success">Notificaciones guardadas correctamente</span>
-        )}
-      </div>
     </div>
   );
 }

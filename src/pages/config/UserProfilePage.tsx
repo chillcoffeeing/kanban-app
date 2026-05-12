@@ -79,8 +79,8 @@ function formHasChanges(form: ProfileForm, user: NonNullable<ReturnType<typeof u
 }
 
 export function UserProfilePage() {
-  const user = useAuthStore((s) => s.user);
-  const updateProfile = useAuthStore((s) => s.updateProfile);
+  const user = useAuthStore((state) => state.user);
+  const updateProfile = useAuthStore((state) => state.updateProfile);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState<ProfileForm | null>(null);
@@ -139,6 +139,20 @@ export function UserProfilePage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="primary" onClick={handleSave} disabled={saving || !hasChanges}>
+          <FloppyDiskIcon size={20} weight="duotone" />
+          {saving ? "Guardando…" : "Guardar cambios"}
+        </Button>
+        {hasChanges && (
+          <Button variant="ghost" onClick={handleReset} disabled={saving}>
+            <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Descartar
+          </Button>
+        )}
+        {saved && (
+          <span className="text-content text-success">Perfil guardado correctamente</span>
+        )}
+      </div>
       <section className="rounded-xl border border-neutral-light bg-surface p-6 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-neutral-dark flex items-center gap-2">
           <UserCircleIcon size={20} weight="duotone" className="text-primary/70" />
@@ -229,21 +243,6 @@ export function UserProfilePage() {
           ))}
         </div>
       </section>
-
-      <div className="flex items-center gap-3 pt-4 border-t border-neutral-light">
-        <Button variant="primary" onClick={handleSave} disabled={saving || !hasChanges}>
-          <FloppyDiskIcon size={20} weight="duotone" />
-          {saving ? "Guardando…" : "Guardar cambios"}
-        </Button>
-        {hasChanges && (
-          <Button variant="ghost" onClick={handleReset} disabled={saving}>
-            <ArrowCounterClockwiseIcon size={20} weight="duotone" /> Descartar
-          </Button>
-        )}
-        {saved && (
-          <span className="text-content text-success">Perfil guardado correctamente</span>
-        )}
-      </div>
     </div>
   );
 }

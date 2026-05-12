@@ -140,7 +140,7 @@ export function BoardSettingsModal({
   } = useBoardStore();
   const [boardName, setBoardName] = useState(board?.name || "");
   const log = useActivity(board?.id);
-  const currentUser = useAuthStore((s) => s.user);
+  const currentUser = useAuthStore((state) => state.user);
 
   useEffect(() => {
     if (!board?.id) return;
@@ -209,11 +209,11 @@ export function BoardSettingsModal({
   const formatDate = (d: string) => new Date(d).toLocaleDateString();
 
   const togglePermission = (membershipId: string, permission: Permission) => {
-    const member = board.members.find((m) => m.id === membershipId);
+    const member = board.members.find((member) => member.id === membershipId);
     if (!member) return;
     const has = member.permissions.includes(permission);
     const perms = has
-      ? member.permissions.filter((p) => p !== permission)
+      ? member.permissions.filter((perm) => perm !== permission)
       : [...member.permissions, permission];
     updateMemberPermissions(board.id, membershipId, perms);
   };

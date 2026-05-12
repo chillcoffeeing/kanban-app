@@ -158,5 +158,4 @@ export interface AuthResponse {
   refreshToken: string;
   accessTokenExpiresIn: string;
   refreshTokenExpiresIn: string;
-  user: UserResponse;
 }

@@ -30,7 +30,7 @@ export function createCardChecklistActions(set: any, get: any) {
         const res = await cardsApi.createChecklistItem(cardId, { text });
         set((state: BoardState) => {
           forCard(state, boardId, stageId, cardId, (card) => {
-            const item = card.checklist.find((i) => i.id === newItem.id);
+            const item = card.checklist.find((item) => item.id === newItem.id);
             if (item) item.id = res.id;
           });
         });
@@ -51,7 +51,7 @@ export function createCardChecklistActions(set: any, get: any) {
 
       set((state: BoardState) => {
         forCard(state, boardId, stageId, cardId, (card) => {
-          const item = card.checklist.find((i) => i.id === itemId);
+          const item = card.checklist.find((item) => item.id === itemId);
           if (item) Object.assign(item, updates);
         });
       });
@@ -74,7 +74,7 @@ export function createCardChecklistActions(set: any, get: any) {
 
       set((state: BoardState) => {
         forCard(state, boardId, stageId, cardId, (card) => {
-          card.checklist = card.checklist.filter((i) => i.id !== itemId);
+          card.checklist = card.checklist.filter((item) => item.id !== itemId);
         });
       });
 

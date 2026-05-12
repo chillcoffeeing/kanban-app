@@ -34,14 +34,14 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
   const { addCard, updateStage, deleteStage } = useBoardStore();
   const log = useActivity(boardId);
 
-  const showCompletedCards = useSettingsStore((s) => s.showCompletedCards);
+  const showCompletedCards = useSettingsStore((settings) => settings.showCompletedCards);
 
   const visibleCards = useMemo(() => {
     return stage.cards.filter((card) => {
       if (showCompletedCards) return true;
       const total = card.checklist?.length || 0;
       if (total === 0) return true;
-      const done = card.checklist.filter((c) => c.done).length;
+      const done = card.checklist.filter((checkItem) => checkItem.done).length;
       return done < total;
     });
   }, [stage.cards, showCompletedCards]);
@@ -145,7 +145,7 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
         }`}
       >
         <SortableContext
-          items={visibleCards.map((c) => c.id)}
+          items={visibleCards.map((card) => card.id)}
           strategy={verticalListSortingStrategy}
         >
           {visibleCards.map((card) => (

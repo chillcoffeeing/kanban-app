@@ -11,9 +11,9 @@ import { BoardPreferencesPage } from "./config/BoardPreferencesPage";
 export function BoardConfigPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const navigate = useNavigate();
-  const setCurrentBoard = useBoardStore((s) => s.setCurrentBoard);
-  const currentBoard = useBoardStore((s) => s.currentBoard);
-  const currentUser = useAuthStore((s) => s.user);
+  const setCurrentBoard = useBoardStore((boardState) => boardState.setCurrentBoard);
+  const currentBoard = useBoardStore((boardState) => boardState.currentBoard);
+  const currentUser = useAuthStore((state) => state.user);
 
   useEffect(() => {
     if (!boardId) return;

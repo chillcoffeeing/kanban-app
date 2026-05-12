@@ -3,8 +3,8 @@ import { useAuthStore } from '@/stores/authStore'
 import type { ActivityType } from '@/shared/types/domain'
 
 export function useActivity(boardId: string | undefined) {
-  const logActivity = useActivityStore((s) => s.log)
-  const user = useAuthStore((s) => s.user)
+  const logActivity = useActivityStore((activityState) => activityState.log)
+  const user = useAuthStore((state) => state.user)
 
   return (
     type: ActivityType,

@@ -1,22 +1,25 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
-import { WarningCircleIcon } from '@phosphor-icons/react'
+import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
 
-interface RegisterFormProps {
-  onToggle: () => void
-}
-
-export function RegisterForm({ onToggle }: RegisterFormProps) {
+export function RegisterForm() {
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [jobTitle, setJobTitle] = useState('')
+  const [company, setCompany] = useState('')
+  const [showExtra, setShowExtra] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const register = useAuthStore((s) => s.register)
+  const register = useAuthStore((state) => state.register)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -33,7 +36,12 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
 
     setLoading(true)
     try {
-      await register(email, name, password)
+      await register(email, name, password, {
+        username: username.trim() || undefined,
+        displayName: displayName.trim() || undefined,
+        jobTitle: jobTitle.trim() || undefined,
+        company: company.trim() || undefined,
+      })
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setError('Ya existe una cuenta con ese email')
@@ -79,7 +87,7 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
         required
       />
       <Input
-        label="Email corporativo"
+        label="Email"
         type="email"
         placeholder="nombre@empresa.com"
         value={email}
@@ -97,6 +105,53 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
         required
       />
 
+      <button
+        type="button"
+        onClick={() => setShowExtra((p) => !p)}
+        className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
+      >
+        <CaretDown
+          size={14}
+          weight="bold"
+          className={`transition-transform duration-200 ${showExtra ? 'rotate-0' : '-rotate-90'}`}
+        />
+        Más información (opcional)
+      </button>
+
+      {showExtra && (
+        <div className="flex flex-col gap-4 rounded-xl border border-neutral-light bg-neutral-light/50 p-4">
+          <Input
+            label="Nombre de usuario"
+            type="text"
+            placeholder="anagarcia"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+          />
+          <Input
+            label="Nombre público"
+            type="text"
+            placeholder="Ana García"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+          />
+          <Input
+            label="Cargo"
+            type="text"
+            placeholder="Product Designer"
+            value={jobTitle}
+            onChange={(e) => setJobTitle(e.target.value)}
+          />
+          <Input
+            label="Empresa"
+            type="text"
+            placeholder="Acme Inc."
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
+        </div>
+      )}
+
       <Button type="submit" className="mt-1 w-full" size="lg" disabled={loading}>
         {loading ? 'Creando…' : 'Crear cuenta'}
       </Button>
@@ -105,7 +160,7 @@ export function RegisterForm({ onToggle }: RegisterFormProps) {
         ¿Ya tienes cuenta?{' '}
         <button
           type="button"
-          onClick={onToggle}
+          onClick={() => navigate('/login')}
           className="cursor-pointer font-semibold text-primary hover:underline"
         >
           Inicia sesión

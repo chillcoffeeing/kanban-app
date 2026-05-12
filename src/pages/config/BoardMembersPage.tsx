@@ -30,7 +30,7 @@ export function BoardMembersPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [pendingInvites, setPendingInvites] = useState<PendingInvitation[]>([]);
   const { addMember, removeMember, updateMemberPermissions } = useBoardStore();
-  const currentBoard = useBoardStore((s) => s.currentBoard);
+  const currentBoard = useBoardStore((boardState) => boardState.currentBoard);
   const log = useActivity(boardId);
 
   useEffect(() => {
@@ -87,11 +87,11 @@ export function BoardMembersPage() {
   };
 
   const togglePermission = (membershipId: string, permission: Permission) => {
-    const member = currentBoard.members.find((m) => m.id === membershipId);
+    const member = currentBoard.members.find((member) => member.id === membershipId);
     if (!member) return;
     const has = member.permissions.includes(permission);
     const perms = has
-      ? member.permissions.filter((p) => p !== permission)
+      ? member.permissions.filter((perm) => perm !== permission)
       : [...member.permissions, permission];
     updateMemberPermissions(boardId, membershipId, perms);
   };

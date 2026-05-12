@@ -69,7 +69,7 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
-  const activities = useActivityStore((s) => s.activities)
+  const activities = useActivityStore((activityState) => activityState.activities)
 
   const getRelativeTime = useMemo(() => {
     return (timestamp: string): string => {

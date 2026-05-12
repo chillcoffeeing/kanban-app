@@ -11,13 +11,13 @@ export function createAuthActions(set: any, get: any) {
     login: async (email: string, password: string) => {
       const res = await authApi.login(email, password);
       setTokens(res.accessToken, res.refreshToken);
-      set({ user: res.user, token: res.accessToken, isAuthenticated: true });
+      window.location.href = "/boards";
     },
 
-    register: async (email: string, name: string, password: string) => {
-      const res = await authApi.register(email, name, password);
+    register: async (email: string, name: string, password: string, extra?: { username?: string; displayName?: string; jobTitle?: string; company?: string }) => {
+      const res = await authApi.register({ email, name, password, ...extra });
       setTokens(res.accessToken, res.refreshToken);
-      set({ user: res.user, token: res.accessToken, isAuthenticated: true });
+      window.location.href = "/boards";
     },
 
     hydrate: async () => {
@@ -47,6 +47,7 @@ export function createAuthActions(set: any, get: any) {
       }
       clearTokens();
       set({ user: null, token: null, isAuthenticated: false });
+      window.location.href = "/";
     },
   };
 }

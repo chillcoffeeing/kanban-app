@@ -49,7 +49,7 @@ export function CardDetailModal({
     updateChecklistItem,
     deleteChecklistItem,
   } = useBoardStore();
-  const user = useAuthStore((s) => s.user);
+  const user = useAuthStore((state) => state.user);
   const log = useActivity(boardId);
 
   const [title, setTitle] = useState("");
@@ -115,7 +115,7 @@ export function CardDetailModal({
   };
 
   const toggleLabel = async (label: Label) => {
-    const has = labels.some((l) => l.id === label.id);
+    const has = labels.some((existingLabel) => existingLabel.id === label.id);
     try {
       if (has) {
         await detachLabel(boardId, activeStageId, activeCard.id, label.id);
@@ -152,7 +152,7 @@ export function CardDetailModal({
   };
 
   const toggleCheckItem = async (itemId: string) => {
-    const item = checklist.find((i) => i.id === itemId);
+    const item = checklist.find((item) => item.id === itemId);
     if (!item) return;
     try {
       await updateChecklistItem(boardId, activeStageId, activeCard.id, itemId, {
@@ -253,7 +253,7 @@ export function CardDetailModal({
     onClose();
   };
 
-  const completedCount = checklist.filter((c) => c.done).length;
+  const completedCount = checklist.filter((checkItem) => checkItem.done).length;
   const progress =
     checklist.length > 0 ? (completedCount / checklist.length) * 100 : 0;
 
@@ -273,13 +273,13 @@ export function CardDetailModal({
           {/* Labels */}
           {labels.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {labels.map((l) => (
+              {labels.map((label) => (
                 <span
-                  key={l.id}
+                  key={label.id}
                   className="rounded-full px-3 py-1 text-xs font-medium shadow-sm"
-                  style={{ backgroundColor: l.color, color: "#fff" }}
+                  style={{ backgroundColor: label.color, color: "#fff" }}
                 >
-                  {l.name}
+                  {label.name}
                 </span>
               ))}
             </div>
@@ -417,7 +417,7 @@ export function CardDetailModal({
               Acciones
             </p>
             <div className="space-y-2">
-              {members.find((m) => m.boardMembership.user.id === user?.id) ? (
+              {members.find((member) => member.boardMembership.user.id === user?.id) ? (
                 <Button
                   variant="secondary"
                   size="sm"
@@ -450,10 +450,10 @@ export function CardDetailModal({
               {showMemberDropdown && (
                 <div className="mt-2 rounded-xl border border-neutral-light bg-surface py-1 shadow-lg">
                   {currentBoard?.members
-                    .filter((m) => m.user?.id !== user?.id)
+                    .filter((member) => member.user?.id !== user?.id)
                     .map((member) => {
                       const isMember = members.some(
-                        (m) => m.boardMembershipId === member.id,
+                        (cardMember) => cardMember.boardMembershipId === member.id,
                       );
                       return (
                         <button

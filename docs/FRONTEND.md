@@ -1,173 +1,208 @@
-# Documentación del Frontend — Kanban Platform
+# Frontend Architecture — Kanban Platform
 
-> Alcance actual de la aplicación. Todos los datos están **mockeados** en el cliente mediante Zustand + `localStorage`. No existe aún integración con backend real.
-
----
-
-## 1. Stack tecnológico
+## Stack Tecnológico
 
 | Área | Tecnología |
 |------|------------|
-| Framework | React 19.2 + TypeScript |
+| Framework | React 19 + TypeScript 6 |
 | Bundler | Vite 8 |
-| Estilos | TailwindCSS 4 |
-| Estado global | Zustand 5 |
-| Drag & Drop | dnd-kit (`core`, `sortable`, `utilities`) |
-| Iconos | Phosphor Icons |
-| Routing | Navegación SPA interna (sin router externo) |
-| Persistencia | `localStorage` |
+| Routing | React Router v7 |
+| Estado global | Zustand 5 + Immer |
+| Drag & Drop | dnd-kit (core, sortable, utilities) |
+| Estilos | Tailwind CSS 4 |
+| Iconos | Phosphor Icons React |
+| Tiempo real | Socket.IO Client |
+| Linting | ESLint 9 flat config |
 
----
-
-## 2. Estructura del proyecto
+## Estructura del Proyecto
 
 ```
 src/
-├── stores/        # Zustand: auth, board, activity, settings
-├── pages/         # AuthPage, BoardsPage, BoardView
-├── features/
-│   ├── auth/      # Login / Register mock
-│   ├── boards/    # Tableros, miembros, preferencias
-│   ├── cards/     # Detalle de tarjeta, búsqueda, adjuntos, etiquetas
-│   ├── stages/    # Columnas (etapas)
-│   └── members/   # Gestión de miembros
+├── main.tsx                          # Entry point: BrowserRouter + StrictMode
+├── App.tsx                           # Root: auth guard, routing, socket, settings
+├── index.css                         # Tailwind imports + global styles
+├── pages/                            # Route-level components
+│   ├── AuthPage.tsx                  # /login
+│   ├── BoardsPage.tsx                # /boards
+│   ├── BoardRoute.tsx                # /boards/:boardId param extraction
+│   ├── BoardView.tsx                 # Tablero kanban (stages, cards, DnD, modals)
+│   ├── BoardConfigPage.tsx           # /boards/:boardId/config/*
+│   ├── UserConfigPage.tsx            # /config/*
+│   ├── InvitationsPage.tsx           # /invitations
+│   └── config/                       # Config layouts & tabs
+│       ├── BoardConfigLayout.tsx
+│       ├── BoardGeneralPage.tsx
+│       ├── BoardMembersPage.tsx
+│       ├── BoardPreferencesPage.tsx
+│       ├── UserConfigLayout.tsx
+│       ├── UserProfilePage.tsx
+│       ├── UserAppearancePage.tsx
+│       ├── UserNotificationsPage.tsx
+│       └── UserPrivacyPage.tsx
+├── features/                         # Feature-scoped modules
+│   ├── auth/components/
+│   │   ├── LoginForm.tsx
+│   │   └── RegisterForm.tsx
+│   ├── boards/components/
+│   │   ├── BoardHeader.tsx
+│   │   ├── BoardCard.tsx
+│   │   ├── CreateBoardModal.tsx
+│   │   ├── BoardSettingsModal.tsx
+│   │   └── ActivityFeed.tsx
+│   ├── boards/utils/
+│   │   └── boardPreferences.ts
+│   ├── cards/components/
+│   │   ├── CardItem.tsx              # Sortable card
+│   │   ├── CardPreview.tsx           # Drag overlay
+│   │   ├── CardDetailModal.tsx       # Editor completo
+│   │   ├── CardSearch.tsx            # Búsqueda global
+│   │   └── LabelEditor.tsx
+│   └── stages/components/
+│       └── StageColumn.tsx           # Droppable column
 ├── shared/
-│   ├── components/  # UI reusable (modales, botones, inputs)
-│   ├── hooks/       # useActivity, useApplySettings, useFormatDate
-│   ├── types/       # domain.ts, user.ts
-│   └── utils/       # helpers, constants
+│   ├── components/                   # UI reutilizable
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Toggle.tsx
+│   │   ├── DropdownMenu.tsx
+│   │   ├── MemberAvatar.tsx
+│   │   └── MemberProfileModal.tsx
+│   ├── hooks/
+│   │   ├── useSocket.ts              # WebSocket events
+│   │   ├── useActivity.ts            # Activity logging
+│   │   ├── useFormatDate.ts
+│   │   ├── useApplySettings.ts       # Theme/density al DOM
+│   │   └── usePersistSettings.ts     # localStorage persistence
+│   ├── types/
+│   │   ├── index.ts                  # Re-exports
+│   │   ├── api.ts                    # Backend DTOs
+│   │   └── domain.ts                 # Domain models
+│   └── utils/
+│       ├── constants.ts              # Backgrounds, colors, permissions
+│       └── helpers.ts                # Date, classNames, generateId
+├── services/                         # API client layer
+│   ├── api.ts                        # Fetch wrapper (token, error handling)
+│   ├── auth.ts                       # Auth endpoints
+│   ├── boards.ts                     # Boards, stages, members
+│   ├── cards.ts                      # Cards, checklist, labels
+│   ├── users.ts                      # Profile & preferences
+│   └── socket.ts                     # Socket.IO singleton
+├── stores/                           # Zustand stores
+│   ├── index.ts                      # Barrel exports
+│   ├── authStore/
+│   │   ├── index.ts                  # Store (devtools + subscribeWithSelector)
+│   │   ├── types.d.ts
+│   │   ├── authActions.ts            # login, register, hydrate, logout
+│   │   └── userActions.ts            # updateProfile, updatePreferences
+│   ├── boardStore/
+│   │   ├── index.ts                  # Store (devtools + immer)
+│   │   ├── types.d.ts
+│   │   ├── boardActions.ts
+│   │   ├── stageActions.ts
+│   │   ├── cardActions.ts
+│   │   ├── cardMemberActions.ts
+│   │   ├── cardChecklistActions.ts
+│   │   ├── cardLabelActions.ts
+│   │   ├── memberActions.ts
+│   │   ├── realtimeActions.ts
+│   │   └── helpers/
+│   │       ├── normalizers.ts        # Backend -> frontend transform
+│   │       └── boardHelpers.ts       # Inmutabilidad optimista
+│   ├── settingsStore/
+│   │   ├── index.ts
+│   │   └── constants.ts
+│   └── activityStore/
+│       ├── index.ts                  # Store (local-only, localStorage)
+│       ├── types.d.ts
+│       ├── constants.ts
+│       ├── activityActions.ts
+│       └── utils.ts
+└── components/
+    └── membersPage/
+        └── MembersList.tsx
 ```
 
----
+## Routing
 
-## 3. Modelo de dominio (tipos TypeScript)
+| Path | Component | Auth | Descripción |
+|------|-----------|------|-------------|
+| `/login` | `AuthPage` | No | Login/registro |
+| `/boards` | `BoardsPage` | Sí | Lista de tableros |
+| `/boards/:boardId` | `BoardRoute` -> `BoardView` | Sí | Vista kanban |
+| `/boards/:boardId/config/*` | `BoardConfigPage` | Sí (owner) | Config del tablero |
+| `/config/*` | `UserConfigPage` | Sí | Config del usuario |
+| `/invitations` | `InvitationsPage` | Sí | Invitaciones pendientes |
+| `/` | Redirect -> `/boards` | — | — |
 
-### Board
-```ts
-{
-  id, name, background, ownerId,
-  members: BoardMember[],
-  stages: Stage[],
-  preferences: BoardPreferences,
-  createdAt
-}
+## State Management (Zustand)
+
+4 stores independientes:
+
+| Store | Middleware | Persistencia | Propósito |
+|-------|-----------|-------------|-----------|
+| `authStore` | devtools + subscribeWithSelector | localStorage (token, user) | Autenticación |
+| `boardStore` | devtools + immer | No persiste (API fetch) | CRUD boards, stages, cards, labels, members |
+| `settingsStore` | devtools | localStorage (apariencia) | Tema, densidad, idioma |
+| `activityStore` | devtools | localStorage por boardId | Feed de actividad local |
+
+### Patrones de mutación (boardStore)
+
+| Patrón | Descripción | Uso |
+|--------|------------|-----|
+| **API -> Store + log** | Call API -> update store + log activity | Create/delete board, stage, card, label |
+| **Store -> API (error silencioso)** | Update inmediato, try API silently | Update board, stage, member permissions |
+| **Optimistic -> API -> Rollback** | Snapshot, update UI, call API, rollback on fail | Move card, members, checklist, labels |
+| **API -> Store (profile/prefs)** | Call API -> on success update store | Profile, preferences |
+
+## Data Flow
+
+```
+User Action (click, drag, type)
+  -> Component (BoardView, StageColumn, CardDetailModal)
+    -> Store Action (boardStore.addCard)
+      -> API call (services/boards.ts)
+        -> fetch() via services/api.ts (Bearer token)
+          -> NestJS Backend
+            -> Controller -> Service -> Repository -> PostgreSQL
+            -> WebSocket emission (RealtimeService)
+      <- Response
+      -> Zustand state update (immer)
+      -> Activity log (activityStore)
+  -> React re-render
 ```
 
-### Stage (columna)
-```ts
-{ id, name, cards: Card[], createdAt }
+### Tiempo real (Socket.IO)
+
+```
+Backend mutación -> RealtimeService.emitToBoard(boardId, event, payload)
+  -> Socket.IO room "board:{boardId}"
+    -> Frontend socket.on(event, handler) [useSocket.ts]
+      -> boardStore.realtime* actions (realtimeUpdateCard, realtimeAddStage)
+        -> Zustand state update -> React re-render
 ```
 
-### Card
-```ts
-{
-  id, title, description,
-  labels: Label[],            // {name, value(hex)}
-  checklist: ChecklistItem[], // {id, text, done}
-  members: string[],          // userIds
-  startDate, dueDate,
-  createdAt
-}
-```
+## Flujo de autenticación
 
-### User
-```ts
-{
-  id, email, name,
-  primaryProvider, linkedProviders[],
-  roles[], profile, preferences,
-  createdAt, lastLoginAt
-}
-```
+1. `authStore.hydrate()` en `App.tsx` -> lee token de `localStorage`
+2. `services/api.ts` adjunta `Authorization: Bearer <token>` en cada request
+3. Si 401, se intenta refresh automático vía `POST /auth/refresh`
+4. Si refresh falla, `clearTokens()` -> redirección a `/login`
+5. Socket.IO conecta con token en `auth.token` del handshake
 
-### BoardMember
-```ts
-{
-  userId, email,
-  role: 'owner' | 'admin' | 'member',
-  permissions: Permission[]
-}
-```
+## Estilos y tema
 
-Permisos disponibles: `create_stage`, `create_card`, `modify_card`, `delete_card`, `invite_member`, `modify_board`.
+- Tailwind CSS 4 con configuración vía Vite plugin
+- Temas aplicados como `data-*` attributes en `<html>` (ej. `data-theme="dark"`)
+- `useApplySettings` hook sincroniza el store de settings con el DOM
+- `usePersistSettings` persiste en `localStorage` bajo `kanban-appearance`
+- Soporte multi-idioma: español (default) e inglés
+- Densidad compacta/normal y modo de movimiento reducido
 
-### BoardPreferences
-`visibility`, `commentPermission`, `memberPermission`, `workspaceEdit`, `showCompletedOnCard`, `coversEnabled`.
+## Tipos compartidos
 
-### ActivityEntry
-```ts
-{ id, type, user, detail, meta, timestamp }
-```
-16 tipos: `board_created`, `stage_created/renamed/deleted`, `card_created/moved/updated/deleted`, `member_invited/removed`, `label_added`, `checklist_*`, etc.
-
----
-
-## 4. Funcionalidades implementadas
-
-### Autenticación (mock)
-- Registro e inicio de sesión contra `localStorage`.
-- Token simulado (`token_<userId>`).
-- Preferencias de usuario: tema, idioma, notificaciones, privacidad.
-
-### Tableros
-- Crear / renombrar / eliminar.
-- Backgrounds (gradientes predefinidos).
-- Invitación de miembros por email.
-- Gestión granular de permisos por miembro.
-- Preferencias de visibilidad y colaboración.
-
-### Etapas (columnas)
-- CRUD completo.
-- Reordenamiento drag & drop.
-
-### Tarjetas
-- CRUD completo.
-- Drag & drop dentro de una etapa y entre etapas.
-- Descripción, etiquetas (8 colores), checklist con progreso.
-- Fechas de inicio y vencimiento.
-- Adjuntos subidos como `dataUrl` (base64 local).
-- Portada seleccionable desde adjuntos.
-- Asignación/desasignación de miembros (join/leave).
-
-### Búsqueda
-- Búsqueda global de tarjetas por título, descripción, etiquetas, miembros y checklist.
-- Dropdown de resultados en vivo.
-
-### Actividad
-- Feed por tablero persistido en `localStorage` (clave `canvan_activity_<boardId>`).
-- Límite de 200 entradas; timestamps relativos.
-
----
-
-## 5. Persistencia actual (localStorage)
-
-| Clave | Contenido |
-|-------|-----------|
-| `canvan_users` | Lista de usuarios registrados |
-| `canvan_user` | Usuario autenticado actual |
-| `canvan_token` | Token mock |
-| `canvan_boards` | Tableros del usuario |
-| `canvan_activity_<boardId>` | Feed de actividad por tablero |
-
----
-
-## 6. Rutas / vistas
-
-| Ruta lógica | Vista |
-|-------------|-------|
-| `/` | AuthPage (login / registro) |
-| `/boards` | BoardsPage (galería de tableros) |
-| `/board/:id` | BoardView (tablero kanban) |
-| modal | SettingsPanel |
-
----
-
-## 7. Limitaciones del mock
-
-- No hay colaboración en tiempo real.
-- Los adjuntos viven en `localStorage` como base64 (riesgo de cuota).
-- No hay validación de servidor ni control real de permisos.
-- Los datos no son portables entre dispositivos.
-- No hay recuperación de contraseña ni verificación de email.
-
-Estas limitaciones motivan la especificación del backend descrita en [BACKEND.md](./BACKEND.md).
+- `shared/types/api.ts` — DTOs de respuesta del backend (UserResponse, CardResponse, etc.)
+- `shared/types/domain.ts` — Modelos de dominio normalizados (Board, Card, Stage, Activity)
+- Existe una capa de normalización en `stores/boardStore/helpers/normalizers.ts` que transforma las respuestas planas del backend al modelo anidado del frontend

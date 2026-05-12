@@ -9,10 +9,20 @@ export function login(email: string, password: string) {
   });
 }
 
-export function register(email: string, name: string, password: string) {
+interface RegisterOptions {
+  email: string;
+  name: string;
+  password: string;
+  username?: string;
+  displayName?: string;
+  jobTitle?: string;
+  company?: string;
+}
+
+export function register(opts: RegisterOptions) {
   return api<AuthResponse>("/auth/register", {
     method: "POST",
-    body: { email, name, password },
+    body: opts,
     auth: false,
   });
 }

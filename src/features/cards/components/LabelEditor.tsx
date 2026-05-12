@@ -28,7 +28,7 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
     const finalName = name.trim();
     const finalColor = useCustom ? customColor : color;
     if (!finalName) return;
-    if (labels.find((l) => l.color === finalColor)) return;
+    if (labels.find((existingLabel) => existingLabel.color === finalColor)) return;
     onCreate(finalName, finalColor);
     reset();
   };
@@ -43,13 +43,13 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
 
       {labels.length > 0 && (
         <ul className="mb-3 flex flex-col gap-1.5">
-          {labels.map((l) => (
+          {labels.map((label) => (
             <li
-              key={l.id}
+              key={label.id}
               className="group flex items-center gap-2 rounded-full px-2.5 py-1 text-xs text-white shadow-sm"
-              style={{ backgroundColor: l.color }}
+              style={{ backgroundColor: label.color }}
             >
-              <span className="flex-1 truncate font-medium">{l.name}</span>
+              <span className="flex-1 truncate font-medium">{label.name}</span>
               <button
                 onClick={() => remove(l)}
                 className="cursor-pointer rounded-sm p-0.5 text-white/80 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/20 hover:text-white"
@@ -85,22 +85,22 @@ export function LabelEditor({ labels, onToggle, onCreate }: LabelEditorProps) {
           />
 
           <div className="flex flex-wrap gap-1">
-            {LABEL_COLORS.map((c) => {
-              const active = !useCustom && color === c.value;
+            {LABEL_COLORS.map((colorOption) => {
+              const active = !useCustom && color === colorOption.value;
               return (
                 <button
-                  key={c.value}
+                  key={colorOption.value}
                   onClick={() => {
-                    setColor(c.value);
+                    setColor(colorOption.value);
                     setUseCustom(false);
                   }}
-                  title={c.name}
+                  title={colorOption.name}
                   className={`flex size-6 cursor-pointer items-center justify-center rounded-full transition-transform hover:scale-105 ${
                 active
                   ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-neutral-light"
                   : ""
               }`}
-                  style={{ backgroundColor: c.value }}
+                  style={{ backgroundColor: colorOption.value }}
                 >
                   {active && (
                      <CheckIcon size={12} weight="bold" className="text-primary-fg" />

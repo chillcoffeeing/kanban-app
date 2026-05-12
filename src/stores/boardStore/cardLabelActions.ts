@@ -16,7 +16,7 @@ export function createCardLabelActions(set: any, get: any) {
         get().boards.find((b: Board) => b.id === boardId);
       if (!board) return;
 
-      const label = board.labels?.find((l: Label) => l.id === labelId);
+      const label = board.labels?.find((label: Label) => label.id === labelId);
       if (!label) return;
 
       const currentState = get();
@@ -45,7 +45,7 @@ export function createCardLabelActions(set: any, get: any) {
 
       set((state: BoardState) => {
         forCard(state, boardId, stageId, cardId, (card) => {
-          card.labels = card.labels.filter((l) => l.id !== labelId);
+          card.labels = card.labels.filter((label) => label.id !== labelId);
         });
       });
 
@@ -73,10 +73,10 @@ export function createCardLabelActions(set: any, get: any) {
 
       set((state: BoardState) => {
         forBoard(state, boardId, (b) => {
-          b.labels = b.labels.filter((l) => l.id !== labelId);
+          b.labels = b.labels.filter((label) => label.id !== labelId);
           b.stages.forEach((stage) => {
             stage.cards.forEach((card) => {
-              card.labels = card.labels.filter((l) => l.id !== labelId);
+              card.labels = card.labels.filter((label) => label.id !== labelId);
             });
           });
         });

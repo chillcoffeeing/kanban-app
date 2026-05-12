@@ -73,7 +73,7 @@ export function createBoardActions(set: any, get: any) {
 
     updateBoard: async (boardId: string, updates: Partial<Board>) => {
       const board =
-        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+        get().currentBoard ?? get().boards.find((board: Board) => board.id === boardId);
       const oldName = board?.name ?? boardId;
 
       const res = await boardsApi.update(boardId, {
@@ -83,12 +83,12 @@ export function createBoardActions(set: any, get: any) {
       });
 
       set((state: BoardState) => {
-        forBoard(state, boardId, (b) => {
-          b.name = res.name;
-          b.background = res.background;
-          b.preferences =
+        forBoard(state, boardId, (board) => {
+          board.name = res.name;
+          board.background = res.background;
+          board.preferences =
             (res.preferences as unknown as Board["preferences"]) ||
-            b.preferences;
+            board.preferences;
         });
       });
 
@@ -103,13 +103,13 @@ export function createBoardActions(set: any, get: any) {
 
     deleteBoard: async (boardId: string) => {
       const board =
-        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+        get().currentBoard ?? get().boards.find((board: Board) => board.id === boardId);
       const boardName = board?.name ?? boardId;
 
       await boardsApi.remove(boardId);
 
       set((state: BoardState) => {
-        state.boards = state.boards.filter((b) => b.id !== boardId);
+        state.boards = state.boards.filter((board) => board.id !== boardId);
         if (state.currentBoard?.id === boardId) state.currentBoard = null;
       });
 
