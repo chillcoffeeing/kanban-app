@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { BoardMember, Permission } from "@/shared/types";
 import { PERMISSIONS } from "@/shared/utils/constants";
 import { TrashIcon, UserIcon } from "@phosphor-icons/react";
@@ -49,12 +51,12 @@ export default function MembersList({
             {member.user?.createdAt && (
               <p className="mt-0.5 text-xs text-neutral-dark/60">
                 Miembro desde{" "}
-                {new Date(member.user!.createdAt!).toLocaleDateString()}
+                {format(new Date(member.user!.createdAt!), "P", { locale: es })}
               </p>
             )}
             {member.invitedAt && (
               <p className="mt-0.5 text-xs text-neutral-dark/60">
-                Invitado: {new Date(member.invitedAt!).toLocaleDateString()}
+                Invitado: {format(new Date(member.invitedAt!), "P", { locale: es })}
               </p>
             )}
           </div>

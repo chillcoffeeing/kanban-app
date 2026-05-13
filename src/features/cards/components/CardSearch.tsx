@@ -21,7 +21,7 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleOutsideClick = (e: MouseEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
@@ -29,8 +29,8 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
   const results = useMemo<Match[]>(() => {
@@ -39,25 +39,17 @@ export function CardSearch({ onSelectCard }: CardSearchProps) {
     const matches: Match[] = [];
     for (const stage of board.stages) {
       for (const card of stage.cards) {
-        const matchTitle = card.title.toLowerCase().includes(q);
-        const matchDesc = card.description?.toLowerCase().includes(q);
-        const matchLabel = card.labels?.some((label) =>
-          label.name.toLowerCase().includes(q),
-        );
-        const matchMember = card.members?.some((member) =>
-          member.boardMembership?.user?.name?.toLowerCase().includes(q) || false,
-        );
-        const matchChecklist = card.checklist?.some((checkItem) =>
-          checkItem.text.toLowerCase().includes(q),
-        );
-
-        if (
-          matchTitle ||
-          matchDesc ||
-          matchLabel ||
-          matchMember ||
-          matchChecklist
-        ) {
+        const searchable = [
+          card.title,
+          card.description,
+          ...(card.labels ?? []).map((l) => l.name),
+          ...(card.members ?? []).map((m) => m.boardMembership?.user?.name),
+          ...(card.checklist ?? []).map((c) => c.text),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (searchable.includes(q)) {
           matches.push({ card, stage });
         }
       }

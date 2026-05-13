@@ -19,7 +19,6 @@ import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore, ACTIVITY_TYPES } from "@/stores/activityStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { useSocket } from "@/shared/hooks/useSocket";
-import { useDragScroll } from "@/shared/hooks/useDragScroll";
 import { StageColumn } from "@/features/stages/components/StageColumn";
 import { CardItem } from "@/features/cards/components/CardItem";
 import { CardPreview } from "@/features/cards/components/CardPreview";
@@ -87,7 +86,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
   const [showInvite, setShowInvite] = useState(false);
 
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const activeId = useRef<UniqueIdentifier | null>(null);
 
   const [activeCard, setActiveCard] = useState<Card | null>(null);
 
@@ -103,11 +102,9 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
   const sensors = useSensors(pointerSensor);
 
-  const scrollContainerRef = useDragScroll();
-
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const id = event.active.id;
-    setActiveId(id);
+    activeId.current = id;
     const dragData = event.active.data.current as DragData | undefined;
     if (dragData?.type === "card" && dragData.card) {
       setActiveCard(dragData.card);
@@ -117,7 +114,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      setActiveId(null);
+      activeId.current = null;
       setActiveCard(null);
       if (!over) return;
 
@@ -272,7 +269,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
   if (!currentBoard) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-lg text-neutral-dark">Cargando tablero...</p>
+        <p className="text-lg text-neutral-dark">Cargando tablero&hellip;</p>
       </div>
     );
   }
@@ -296,7 +293,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div ref={scrollContainerRef} className="flex flex-1 gap-[var(--density-gap,1rem)] overflow-x-auto p-[var(--density-padding,1rem)] cursor-grab bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
+        <div className="flex flex-1 gap-[var(--density-gap,1rem)] overflow-x-auto p-[var(--density-padding,1rem)] bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-[length:20px_20px]">
           {currentBoard.stages.map((stage) => (
             <StageColumn
               key={stage.id}
@@ -314,7 +311,6 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
                 className="rounded-xl border border-neutral-light bg-surface p-[var(--density-padding,1rem)] shadow-sm animate-scaleIn"
               >
                 <input
-                  autoFocus /* Intentional: auto-focus for quick stage creation flow */
                   placeholder="Nombre de la etapa..."
                   value={newStageName}
                   onChange={(e) => setNewStageName(e.target.value)}

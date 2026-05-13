@@ -60,7 +60,7 @@ export function UserNotificationsPage() {
     try {
       await store.apply(form);
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setTimeout(() => setSaved(false), 2000);
     } finally {
       setSaving(false);
     }

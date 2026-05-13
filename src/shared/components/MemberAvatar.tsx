@@ -16,7 +16,7 @@ export function MemberAvatar({
 }) {
   const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleProfileClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (stopPropagation) {
       e.stopPropagation();
     }
@@ -54,7 +54,7 @@ export function MemberAvatar({
       className="size-8 rounded-full text-primary-fg flex items-center justify-center ring-2 ring-neutral-light cursor-pointer hover:ring-2 hover:ring-primary transition-all"
       style={{ backgroundColor: color }}
       title={name}
-      onClick={handleClick}
+      onClick={handleProfileClick}
       onKeyDown={handleKeyDown}
     >
       {avatar ? (

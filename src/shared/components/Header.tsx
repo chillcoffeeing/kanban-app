@@ -10,8 +10,10 @@ import {
   BellIcon,
   PaintBucketIcon,
 } from "@phosphor-icons/react";
+import { useMountFade } from "@/shared/hooks/useGsapAnimation";
 
 export function Header() {
+  const headerRef = useMountFade<HTMLDivElement>({ direction: "down", distance: -20 });
   const { user, isAuthenticated, logout } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ export function Header() {
       : "boards";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-neutral-light bg-surface">
+    <header ref={headerRef} className="sticky top-0 z-30 border-b border-neutral-light bg-surface">
       <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <button

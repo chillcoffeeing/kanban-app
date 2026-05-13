@@ -32,7 +32,6 @@ export function CreateBoardModal({ isOpen, onClose, onCreate }: CreateBoardModal
           placeholder="Ej: Proyecto Web"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          autoFocus /* Intentional: auto-focus for quick board creation flow */
           required
         />
 

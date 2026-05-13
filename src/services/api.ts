@@ -72,11 +72,6 @@ export async function api<T = unknown>(
   return data as T;
 }
 
-// Helper to create an AbortController for use in effects
-export function createAbortController() {
-  return new AbortController();
-}
-
 function safeJson(s: string): unknown {
   try {
     return JSON.parse(s);
@@ -84,5 +79,3 @@ function safeJson(s: string): unknown {
     return s;
   }
 }
-
-export const API_BASE_URL = API_BASE;

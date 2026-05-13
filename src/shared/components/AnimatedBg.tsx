@@ -13,15 +13,16 @@ function LinesCanvas() {
 
     let animId: number;
 
+    const dpr = devicePixelRatio;
+
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width || window.innerWidth;
       const h = rect.height || window.innerHeight;
-      canvas.width = w * devicePixelRatio;
-      canvas.height = h * devicePixelRatio;
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      Object.assign(canvas.style, { width: `${w}px`, height: `${h}px` });
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -30,7 +31,7 @@ function LinesCanvas() {
       amplitude: 12 + Math.random() * 28,
       frequency: 0.003 + Math.random() * 0.01,
       speed: (0.15 + Math.random() * 0.3) * (i % 2 === 0 ? 1 : -1),
-      yOffset: ((i + 1) / 6) * (canvas.height / devicePixelRatio),
+      yOffset: ((i + 1) / 6) * (canvas.height / dpr),
       thickness: 1 + Math.random() * 1.5,
       alpha: 0.04 + Math.random() * 0.06,
       hue: i % 2 === 0 ? 239 : 217,
@@ -40,8 +41,8 @@ function LinesCanvas() {
     let time = 0;
     const draw = () => {
       time += 0.01;
-      const w = canvas.width / devicePixelRatio;
-      const h = canvas.height / devicePixelRatio;
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
       ctx.clearRect(0, 0, w, h);
       ctx.lineCap = "round";
 
@@ -94,12 +95,17 @@ function ParticlesCanvas() {
       x: number; y: number; vx: number; vy: number; r: number; alpha: number;
     }> = [];
 
+    const dpr = devicePixelRatio;
+    let iw = window.innerWidth;
+    let ih = window.innerHeight;
+
     const resize = () => {
-      canvas.width = window.innerWidth * devicePixelRatio;
-      canvas.height = window.innerHeight * devicePixelRatio;
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
+      iw = window.innerWidth;
+      ih = window.innerHeight;
+      canvas.width = iw * dpr;
+      canvas.height = ih * dpr;
+      Object.assign(canvas.style, { width: `${iw}px`, height: `${ih}px` });
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -116,14 +122,14 @@ function ParticlesCanvas() {
     }
 
     const draw = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.clearRect(0, 0, iw, ih);
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
-        if (p.x < 0) p.x = window.innerWidth;
-        if (p.x > window.innerWidth) p.x = 0;
-        if (p.y < 0) p.y = window.innerHeight;
-        if (p.y > window.innerHeight) p.y = 0;
+        if (p.x < 0) p.x = iw;
+        if (p.x > iw) p.x = 0;
+        if (p.y < 0) p.y = ih;
+        if (p.y > ih) p.y = 0;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(239, 60%, 55%, ${p.alpha})`;
@@ -155,15 +161,16 @@ function WavesCanvas() {
 
     let animId: number;
 
+    const dpr = devicePixelRatio;
+
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width || window.innerWidth;
       const h = rect.height || window.innerHeight;
-      canvas.width = w * devicePixelRatio;
-      canvas.height = h * devicePixelRatio;
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      Object.assign(canvas.style, { width: `${w}px`, height: `${h}px` });
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -172,7 +179,7 @@ function WavesCanvas() {
       amplitude: 20 + i * 15,
       frequency: 0.002 + i * 0.001,
       speed: 0.3 + i * 0.1,
-      yCenter: (canvas.height / devicePixelRatio) * (0.5 + i * 0.15),
+      yCenter: (canvas.height / dpr) * (0.5 + i * 0.15),
       alpha: 0.03 + i * 0.02,
       hue: [239, 217, 280][i],
     }));
@@ -180,8 +187,8 @@ function WavesCanvas() {
     let time = 0;
     const draw = () => {
       time += 0.008;
-      const w = canvas.width / devicePixelRatio;
-      const h = canvas.height / devicePixelRatio;
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
       ctx.clearRect(0, 0, w, h);
 
       for (const wave of waves) {

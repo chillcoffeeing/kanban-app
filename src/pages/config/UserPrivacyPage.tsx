@@ -54,7 +54,7 @@ export function UserPrivacyPage() {
     try {
       await store.apply(form as unknown as Partial<UserPreferenceJson>);
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setTimeout(() => setSaved(false), 2000);
     } finally {
       setSaving(false);
     }

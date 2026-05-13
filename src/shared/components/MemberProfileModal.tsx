@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   EnvelopeIcon,
   BuildingIcon,
@@ -36,24 +38,26 @@ interface MemberProfile {
 export function MemberProfileModal() {
   const userId = useBoardStore((boardState) => boardState.selectedUserId);
   const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
-  const [user, setUser] = useState<MemberProfile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState<{
+    user: MemberProfile | null;
+    loading: boolean;
+  }>({ user: null, loading: false });
 
   useEffect(() => {
     if (!userId) {
-      setUser(null);
+      setState({ user: null, loading: false });
       return;
     }
 
+    setState((prev) => ({ ...prev, loading: true }));
+
     const fetchUser = async () => {
-      setLoading(true);
       try {
         const data = await api<MemberProfile>(`/users/${userId}`);
-        setUser(data);
+        setState({ user: data, loading: false });
       } catch (error) {
         console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
+        setState((prev) => ({ ...prev, loading: false }));
       }
     };
 
@@ -66,7 +70,7 @@ export function MemberProfileModal() {
 
   if (!userId) return null;
 
-  if (loading) {
+  if (state.loading) {
     return (
       <Modal isOpen={!!userId} onClose={handleClose} size="md">
         <div className="flex flex-col items-center gap-4 py-8">
@@ -78,6 +82,7 @@ export function MemberProfileModal() {
     );
   }
 
+  const user = state.user;
   if (!user) return null;
 
   const profile = user.profile || {};
@@ -199,10 +204,7 @@ export function MemberProfileModal() {
             <div className="border-t border-neutral-light pt-4 text-center">
               <p className="text-xs text-neutral-dark/50">
                 Miembro desde{" "}
-                {new Date(user.createdAt).toLocaleDateString("es-ES", {
-                  year: "numeric",
-                  month: "long",
-                })}
+                {format(new Date(user.createdAt), "MMMM yyyy", { locale: es })}
               </p>
             </div>
           )}

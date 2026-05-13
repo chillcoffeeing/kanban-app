@@ -46,7 +46,7 @@ export function BoardHeader({
     <div
       className={`flex items-center mx-4 mt-4 justify-between rounded-lg px-4 py-3 ${gradientClass} ${textColorClass}`}
     >
-      <h2 className="text-lg font-bold flex items-center gap-2">
+      <h2 className="text-lg font-semibold flex items-center gap-2">
         {board.name}
         <span className="text-xs font-normal opacity-60">
           {board.members.length} miembros
@@ -96,7 +96,7 @@ export function BoardHeader({
                   size="sm"
                   className="bg-white/10! text-white! hover:bg-white/20!"
                 >
-                  OK
+                  Enviar
                 </Button>
               </form>
             )}

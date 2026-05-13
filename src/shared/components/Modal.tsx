@@ -19,10 +19,12 @@ export function Modal({
   size = "md",
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
     if (isOpen) {
       document.addEventListener("keydown", handleEsc);
@@ -36,7 +38,7 @@ export function Modal({
       const root = document.getElementById("root");
       if (root) root.style.pointerEvents = "";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

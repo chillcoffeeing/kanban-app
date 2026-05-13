@@ -69,17 +69,3 @@ export function getBoardBackgroundClasses(backgroundId: string): { gradientClass
     textColorClass: found.textColorClass
   }
 }
-
-// Helper to migrate old JSON backgrounds to new ID format
-export function migrateBackgroundToId(background: string): string {
-  try {
-    const parsed = JSON.parse(background)
-    if (parsed.gradient) {
-      const match = BOARD_BACKGROUNDS.find(bg => bg.gradientClass === parsed.gradient)
-      if (match) return match.id
-    }
-  } catch {
-    // Not JSON, assume it's already an ID
-  }
-  return background
-}

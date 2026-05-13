@@ -6,6 +6,7 @@ import { BoardCard } from "@/features/boards/components/BoardCard";
 import { CreateBoardModal } from "@/features/boards/components/CreateBoardModal";
 import { Button } from "@/shared/components/Button";
 import { PlusIcon } from "@phosphor-icons/react";
+import { useStaggerFade, useMountFade } from "@/shared/hooks/useGsapAnimation";
 
 export function BoardsPage() {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ export function BoardsPage() {
   }, [hydrateBoards]);
 
   const myBoards = boards;
+  const titleRef = useMountFade<HTMLDivElement>({ direction: "up", distance: 20 });
+  const gridRef = useStaggerFade<HTMLDivElement>({ stagger: 0.06 });
 
   const handleCreate = async (name: string, background: string) => {
     if (!user) return;
@@ -34,9 +37,9 @@ export function BoardsPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
+      <div ref={titleRef} className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-dark">Mis Tableros</h1>
+          <h1 className="text-2xl font-semibold text-neutral-dark">Mis Tableros</h1>
           <p className="mt-1 text-sm text-neutral-dark/60">{myBoards.length} tablero{myBoards.length !== 1 ? 's' : ''}</p>
         </div>
         <Button onClick={() => setShowCreate(true)}>
@@ -69,7 +72,7 @@ export function BoardsPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div ref={gridRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {myBoards.map((board) => (
             <BoardCard
               key={board.id}

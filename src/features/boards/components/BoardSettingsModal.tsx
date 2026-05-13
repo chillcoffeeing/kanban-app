@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { Input } from "@/shared/components/Input";
@@ -206,7 +208,7 @@ export function BoardSettingsModal({
     }
   };
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString();
+  const formatDate = (d: string) => format(new Date(d), "P", { locale: es });
 
   const togglePermission = (membershipId: string, permission: Permission) => {
     const member = board.members.find((member) => member.id === membershipId);
@@ -415,7 +417,7 @@ export function BoardSettingsModal({
                               </div>
                               <p className="text-xs text-neutral-dark">
                                  Invitado:{" "}
-                                {new Date(inv.createdAt).toLocaleDateString()}
+                                {format(new Date(inv.createdAt), "P", { locale: es })}
                               </p>
                             </div>
                           </div>

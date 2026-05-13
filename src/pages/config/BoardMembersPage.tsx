@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import type { FormEvent } from "react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { useBoardStore } from "@/stores/boardStore";
 import { Button } from "@/shared/components/Button";
 import { Input } from "@/shared/components/Input";
@@ -164,7 +166,7 @@ export function BoardMembersPage() {
                         </span>
                       </div>
                       <p className="text-xs text-neutral-dark/60 mt-0.5">
-                        Invitado: {new Date(inv.createdAt).toLocaleDateString()}
+                        Invitado: {format(new Date(inv.createdAt), "P", { locale: es })}
                       </p>
                     </div>
                   </div>

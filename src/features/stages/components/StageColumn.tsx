@@ -87,7 +87,6 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
         {isEditing ? (
           <form onSubmit={handleRename} className="flex-1">
             <input
-              autoFocus /* Intentional: auto-focus for quick rename workflow */
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               onBlur={handleRename}
@@ -164,7 +163,6 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
         {isAdding ? (
           <form onSubmit={handleAddCard} className="flex flex-col gap-2">
             <textarea
-              autoFocus /* Intentional: auto-focus for quick card creation flow */
               placeholder="Título de la tarjeta..."
               value={newCardTitle}
               onChange={(e) => setNewCardTitle(e.target.value)}

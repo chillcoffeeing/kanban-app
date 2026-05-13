@@ -6,6 +6,7 @@ import { Input } from '@/shared/components/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
 import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
+import { useMountFade } from "@/shared/hooks/useGsapAnimation";
 
 const TEST_ACCOUNTS = [
   { email: 'alice@kanban.dev', label: 'Tech Lead (dueño Board 1)' },
@@ -21,6 +22,7 @@ const PASSWORD = 'Passw0rd!';
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const formRef = useMountFade<HTMLFormElement>({ direction: "up", distance: 20, delay: 0.15 })
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -46,12 +48,12 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">
           Bienvenido de vuelta
         </p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-neutral-dark">
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-neutral-dark">
           Inicia sesión
         </h1>
         <p className="mt-2 text-sm text-neutral-dark/70">
@@ -118,9 +120,9 @@ export function LoginForm() {
       <div>
         <div className="mb-1 flex items-center justify-between">
           <label className="text-sm font-medium text-neutral-dark">Contraseña</label>
-          <a href="#" className="text-xs font-medium text-primary hover:underline">
+          <button type="button" className="cursor-pointer text-xs font-medium text-primary hover:underline">
             ¿Olvidaste tu contraseña?
-          </a>
+          </button>
         </div>
         <Input
           type="password"

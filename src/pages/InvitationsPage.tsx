@@ -100,7 +100,7 @@ export function InvitationsPage() {
     <div className="flex min-h-[calc(100vh-80px)] items-center justify-center">
       <div className="text-center">
         <div className="inline-block size-8 animate-spin rounded-full border-4 border-neutral-light border-t-primary"></div>
-        <p className="mt-4 text-neutral-dark/50">Cargando...</p>
+        <p className="mt-4 text-neutral-dark/50">Cargando&hellip;</p>
       </div>
     </div>
     );
@@ -112,8 +112,8 @@ export function InvitationsPage() {
         <div className="mb-4 rounded-full bg-neutral-light/50 p-6 inline-block">
           <CheckCircleIcon size={48} weight="duotone" className="text-neutral-dark/30" />
         </div>
-        <h1 className="text-2xl font-bold text-neutral-dark">
-           Sin invitaciones pendientes
+        <h1 className="text-2xl font-semibold text-neutral-dark">
+            Sin invitaciones pendientes
         </h1>
         <p className="mt-2 text-neutral-dark/60">
            No tienes ninguna invitación a tableros.
@@ -128,7 +128,7 @@ export function InvitationsPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-neutral-dark">
+          <h1 className="text-2xl font-semibold text-neutral-dark">
            Invitaciones pendientes
           </h1>
           <p className="mt-1 text-sm text-neutral-dark/60">

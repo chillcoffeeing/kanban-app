@@ -52,7 +52,7 @@ export function PublicHeader() {
         }
       }
     },
-    [location.pathname, navigate],
+    [location, navigate],
   );
 
   return (

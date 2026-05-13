@@ -50,7 +50,7 @@ export function BoardConfigPage() {
           <span>Volver al tablero</span>
         </button>
       </div>
-      <h1 className="text-2xl font-bold text-neutral-dark">
+      <h1 className="text-2xl font-semibold text-neutral-dark">
         Configuración del tablero
       </h1>
       <p className="mt-1 mb-6 text-sm text-neutral-dark/60">

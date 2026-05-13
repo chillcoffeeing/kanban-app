@@ -1,7 +1,12 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
+import { getYear } from "date-fns";
 
 export function Footer() {
-  const year = useMemo(() => new Date().getFullYear(), []);
+  const [year, setYear] = useState(getYear(new Date()));
+
+  useEffect(() => {
+    setYear(getYear(new Date()));
+  }, []);
 
   return (
     <footer className="border-t border-neutral-light bg-surface py-6">

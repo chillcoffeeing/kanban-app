@@ -16,13 +16,13 @@ export function DropdownMenu({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleOutsideClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
   return (
@@ -42,10 +42,15 @@ export function DropdownMenu({
       </div>
       {isOpen && (
         <div
+          role="menu"
+          tabIndex={-1}
           className={`absolute z-50 mt-2 min-w-50 p-1 rounded-lg border border-neutral-light bg-surface py-1 shadow-lg ${
             align === "right" ? "right-0" : "left-0"
           }`}
           onClick={() => setIsOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setIsOpen(false);
+          }}
         >
           {children}
         </div>

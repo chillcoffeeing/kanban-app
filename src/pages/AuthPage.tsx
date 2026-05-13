@@ -6,6 +6,7 @@ import {
   UsersThreeIcon,
   ChartLineUpIcon,
 } from "@phosphor-icons/react";
+import { useMountFade } from "@/shared/hooks/useGsapAnimation";
 
 const features = [
   {
@@ -26,10 +27,12 @@ const features = [
 ];
 
 export function AuthPage() {
+  const brandRef = useMountFade<HTMLDivElement>({ direction: "left", distance: 30 });
+  const formRef = useMountFade<HTMLDivElement>({ direction: "right", distance: 30 });
   return (
     <div className="min-h-screen bg-neutral-light pt-16 lg:grid lg:grid-cols-2">
       {/* Brand panel */}
-      <aside className="relative hidden overflow-hidden bg-linear-to-br from-primary via-secondary to-tertiary lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
+      <aside ref={brandRef} className="relative hidden overflow-hidden bg-linear-to-br from-primary via-secondary to-tertiary lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.18]"
@@ -63,7 +66,7 @@ export function AuthPage() {
           <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 ring-1 ring-white/20 backdrop-blur">
             <ShieldCheckIcon size={18} weight="fill" /> Plataforma empresarial
           </p>
-          <h2 className="text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
+          <h2 className="text-4xl font-semibold leading-tight tracking-tight xl:text-5xl">
             La forma profesional de gestionar el trabajo de tu equipo.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-white/80">
@@ -93,7 +96,7 @@ export function AuthPage() {
       </aside>
 
       {/* Form panel */}
-      <main className="flex items-center justify-center px-4 py-10 sm:px-8 lg:min-h-0">
+      <main ref={formRef} className="flex items-center justify-center px-4 py-10 sm:px-8 lg:min-h-0">
         <div className="w-full max-w-md">
           {/* Mobile brand */}
           <div className="mb-8 flex items-center justify-center gap-2 lg:hidden">

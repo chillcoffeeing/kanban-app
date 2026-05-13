@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useReducer } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/components/Button'
@@ -6,20 +6,32 @@ import { Input } from '@/shared/components/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
 import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
+import { useMountFade } from "@/shared/hooks/useGsapAnimation";
+
+const INITIAL_FORM = {
+  name: '', email: '', password: '',
+  username: '', displayName: '', jobTitle: '', company: '',
+};
+
+type FormField = keyof typeof INITIAL_FORM;
+
+function formReducer(state: typeof INITIAL_FORM, action: { field: FormField; value: string }) {
+  return { ...state, [action.field]: action.value };
+}
 
 export function RegisterForm() {
   const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
-  const [displayName, setDisplayName] = useState('')
-  const [jobTitle, setJobTitle] = useState('')
-  const [company, setCompany] = useState('')
+  const formRef = useMountFade<HTMLFormElement>({ direction: "up", distance: 20, delay: 0.15 })
+  const [form, dispatch] = useReducer(formReducer, INITIAL_FORM)
   const [showExtra, setShowExtra] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const register = useAuthStore((state) => state.register)
+
+  const setForm = (field: FormField) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    dispatch({ field, value: e.target.value });
+
+  const { name, email, password, username, displayName, jobTitle, company } = form;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -54,12 +66,12 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">
           Comienza gratis
         </p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-neutral-dark">
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-neutral-dark">
           Crea tu cuenta
         </h1>
         <p className="mt-2 text-sm text-neutral-dark/70">
@@ -82,7 +94,7 @@ export function RegisterForm() {
         type="text"
         placeholder="Ana García"
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={setForm('name')}
         autoComplete="name"
         required
       />
@@ -91,7 +103,7 @@ export function RegisterForm() {
         type="email"
         placeholder="nombre@empresa.com"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={setForm('email')}
         autoComplete="email"
         required
       />
@@ -100,7 +112,7 @@ export function RegisterForm() {
         type="password"
         placeholder="Mínimo 8 caracteres"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={setForm('password')}
         autoComplete="new-password"
         required
       />
@@ -125,7 +137,7 @@ export function RegisterForm() {
             type="text"
             placeholder="anagarcia"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={setForm('username')}
             autoComplete="username"
           />
           <Input
@@ -133,21 +145,21 @@ export function RegisterForm() {
             type="text"
             placeholder="Ana García"
             value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            onChange={setForm('displayName')}
           />
           <Input
             label="Cargo"
             type="text"
             placeholder="Product Designer"
             value={jobTitle}
-            onChange={(e) => setJobTitle(e.target.value)}
+            onChange={setForm('jobTitle')}
           />
           <Input
             label="Empresa"
             type="text"
             placeholder="Acme Inc."
             value={company}
-            onChange={(e) => setCompany(e.target.value)}
+            onChange={setForm('company')}
           />
         </div>
       )}

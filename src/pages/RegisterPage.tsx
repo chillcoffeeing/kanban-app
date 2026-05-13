@@ -62,7 +62,7 @@ export function RegisterPage() {
           <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white/90 ring-1 ring-white/20 backdrop-blur">
             <ShieldCheckIcon size={18} weight="fill" /> Plataforma empresarial
           </p>
-          <h2 className="text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
+          <h2 className="text-4xl font-semibold leading-tight tracking-tight xl:text-5xl">
             La forma profesional de gestionar el trabajo de tu equipo.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-white/80">

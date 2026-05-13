@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useAuthStore } from "@/stores/authStore";
 import type { UserPreferenceJson } from "@/shared/types/api";
-import { BACKGROUNDS, STATIC_BACKGROUNDS, ANIMATED_BACKGROUNDS } from "./constants";
+import { BACKGROUNDS } from "./constants";
 
 const defaults: UserPreferenceJson = {
   theme: "light",
@@ -28,7 +28,7 @@ const defaults: UserPreferenceJson = {
   analyticsOptOut: false,
 };
 
-export interface SettingsState {
+interface SettingsState {
   theme: string;
   background: string;
   density: string;
@@ -156,4 +156,4 @@ export const useSettingsStore = create<SettingsState>()(
   ),
 );
 
-export { BACKGROUNDS, STATIC_BACKGROUNDS, ANIMATED_BACKGROUNDS };
+export { BACKGROUNDS };

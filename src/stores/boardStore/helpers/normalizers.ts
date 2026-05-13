@@ -36,7 +36,7 @@ export function normalizeStage(
   };
 }
 
-export function normalizeMember(member: BoardMemberResponse): BoardMember {
+function normalizeMember(member: BoardMemberResponse): BoardMember {
   return {
     id: member.id,
     email: member.email ?? "",

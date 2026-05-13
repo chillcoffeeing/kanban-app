@@ -21,10 +21,11 @@ export function usePersistSettings(): void {
     restored.current = true;
     try {
       const raw = localStorage.getItem(KEY);
-      if (!raw) return;
-      const saved = JSON.parse(raw);
-      if (saved && typeof saved.theme === "string") {
-        useSettingsStore.setState((state) => ({ ...state, ...saved }));
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved && typeof saved.theme === "string") {
+          useSettingsStore.setState((state) => ({ ...state, ...saved }));
+        }
       }
     } catch {
       /* ignore */

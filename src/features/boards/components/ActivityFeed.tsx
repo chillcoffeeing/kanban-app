@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import { useActivityStore, ACTIVITY_TYPES } from '@/stores/activityStore'
 import type { ActivityType } from '@/shared/types/domain'
 import {
@@ -50,17 +52,7 @@ const COLOR_MAP: Partial<Record<ActivityType, string>> = {
 }
 
 function formatRelative(timestamp: string): string {
-  const now = Date.now()
-  const diffMs = now - new Date(timestamp).getTime()
-  const diffMin = Math.floor(diffMs / 60000)
-  const diffHr = Math.floor(diffMs / 3600000)
-  const diffDay = Math.floor(diffMs / 86400000)
-
-  if (diffMin < 1) return 'Ahora'
-  if (diffMin < 60) return `hace ${diffMin}m`
-  if (diffHr < 24) return `hace ${diffHr}h`
-  if (diffDay < 7) return `hace ${diffDay}d`
-  return new Date(timestamp).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+  return formatDistanceToNow(new Date(timestamp), { locale: es, addSuffix: true })
 }
 
 interface ActivityFeedProps {
@@ -72,19 +64,8 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
   const activities = useActivityStore((activityState) => activityState.activities)
 
   const getRelativeTime = useMemo(() => {
-    return (timestamp: string): string => {
-      const now = Date.now()
-      const diffMs = now - new Date(timestamp).getTime()
-      const diffMin = Math.floor(diffMs / 60000)
-      const diffHr = Math.floor(diffMs / 3600000)
-      const diffDay = Math.floor(diffMs / 86400000)
-
-      if (diffMin < 1) return 'Ahora'
-      if (diffMin < 60) return `hace ${diffMin}m`
-      if (diffHr < 24) return `hace ${diffHr}h`
-      if (diffDay < 7) return `hace ${diffDay}d`
-      return new Date(timestamp).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
-    }
+    return (timestamp: string): string =>
+      formatDistanceToNow(new Date(timestamp), { locale: es, addSuffix: true })
   }, [])
 
   return (

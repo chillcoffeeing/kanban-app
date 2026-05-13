@@ -143,7 +143,7 @@ export function UserAppearancePage() {
         showCompletedCards: form.showCompletedCards,
       });
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setTimeout(() => setSaved(false), 2000);
     } finally {
       setSaving(false);
     }
