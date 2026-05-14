@@ -104,7 +104,9 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
               className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs ${
                 isComplete
                   ? "bg-success/20 text-success"
-                  : "bg-danger/20 text-danger"
+                  : isOverdue(card.dueDate)
+                    ? "bg-danger/20 text-danger"
+                    : "bg-neutral-light/70 text-neutral-dark/70"
               }`}
             >
               <CalendarBlankIcon size={16} weight="duotone" />
@@ -116,11 +118,11 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
               className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs ${
                 isComplete
                   ? "bg-success/20 text-success"
-                  : "bg-danger/20 text-danger"
+                  : "bg-neutral-light/70 text-neutral-dark/70"
               }`}
             >
-              <CalendarBlankIcon size={16} weight="duotone" />
-              {formatDate(card.dueDate)}
+              <CheckCircleIcon size={16} weight="duotone" />
+              {completedChecks}/{totalChecks}
             </span>
           )}
           {card.description && (

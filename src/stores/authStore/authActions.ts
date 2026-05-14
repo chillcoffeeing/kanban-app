@@ -5,6 +5,7 @@ import {
   getAccessToken,
   ApiError,
 } from "@/services/api";
+import { useToastStore } from "@/stores/toastStore";
 
 export function createAuthActions(set: any, get: any) {
   return {

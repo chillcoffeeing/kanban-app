@@ -1,4 +1,5 @@
 import { usersApi } from "@/services/users";
+import { useToastStore } from "@/stores/toastStore";
 import type { UserResponse, UserProfileJson, UserPreferenceJson } from "@/shared/types/api";
 
 export function createUserActions(set: any, get: any) {
@@ -33,6 +34,7 @@ export function createUserActions(set: any, get: any) {
             profile: { ...current.profile, profile: updatedProfileJson },
           },
         });
+        useToastStore.getState().addToast({ type: "error", message: "Error al actualizar perfil" });
       }
     },
 
@@ -66,6 +68,7 @@ export function createUserActions(set: any, get: any) {
             preference: { ...current.preference, settings: updatedSettings },
           },
         });
+        useToastStore.getState().addToast({ type: "error", message: "Error al actualizar preferencias" });
       }
     },
   };

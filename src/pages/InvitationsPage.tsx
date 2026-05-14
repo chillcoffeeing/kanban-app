@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { Button } from "@/shared/components/Button";
 import { api } from "@/services/api";
+import { useToastStore } from "@/stores/toastStore";
 import { CheckCircleIcon, XCircleIcon } from "@phosphor-icons/react";
 
 interface PendingInvitation {
@@ -38,7 +39,7 @@ export function InvitationsPage() {
         setInvitations(data);
       } catch (e: unknown) {
         if ((e as any)?.name !== "AbortError") {
-          // Error handled silently
+          useToastStore.getState().addToast({ type: "error", message: "Error al cargar invitaciones" });
         }
       } finally {
         setLoading(false);
@@ -59,7 +60,7 @@ export function InvitationsPage() {
       navigate(`/boards/${invitation.boardId}`);
     } catch (e: unknown) {
       if ((e as any)?.name !== "AbortError") {
-        // Error handled silently
+        useToastStore.getState().addToast({ type: "error", message: "Error al aceptar la invitación" });
       }
     } finally {
       setActionInProgress(null);
@@ -75,7 +76,7 @@ export function InvitationsPage() {
       setInvitations(invitations.filter((invitationItem) => invitationItem.id !== invitation.id));
     } catch (e: unknown) {
       if ((e as any)?.name !== "AbortError") {
-        // Error handled silently
+        useToastStore.getState().addToast({ type: "error", message: "Error al rechazar la invitación" });
       }
     } finally {
       setActionInProgress(null);

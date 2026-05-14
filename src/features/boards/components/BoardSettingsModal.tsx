@@ -30,6 +30,7 @@ import {
   canManageMembers,
 } from "../utils/boardPreferences";
 import { useAuthStore } from "@/stores/authStore";
+import { useToastStore } from "@/stores/toastStore";
 import type {
   Board,
   BoardMember,
@@ -204,7 +205,7 @@ export function BoardSettingsModal({
       );
       log(ACTIVITY_TYPES.MEMBER_REMOVED, `eliminó la invitación de "${email}"`);
     } catch (err) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al eliminar la invitación" });
     }
   };
 
@@ -297,10 +298,10 @@ export function BoardSettingsModal({
                 </form>
               ) : (
                 <p className="rounded-lg border border-neutral-light bg-neutral-light/50 p-3 text-xs text-neutral-dark/60">
-                  Solo los administradores pueden gestionar miembros en este
+                  Solo el propietario puede gestionar miembros en este
                   tablero (preferencia{" "}
                   <strong>Añadir y eliminar miembros</strong> = Solo
-                  administradores).
+                  propietario).
                 </p>
               )}
 
@@ -505,7 +506,7 @@ export function BoardSettingsModal({
                   }
                   options={[
                     { value: "members", label: "Miembros" },
-                    { value: "admins", label: "Solo administradores" },
+                    { value: "admins", label: "Solo propietario" },
                   ]}
                 />
               </PrefRow>

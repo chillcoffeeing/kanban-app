@@ -5,6 +5,7 @@ import { useBoardStore } from "@/stores/boardStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
+import { useToastStore } from "@/stores/toastStore";
 import {
   UserPlusIcon,
   TrashIcon,
@@ -61,12 +62,18 @@ export function CardDetailModal({
   const [newCheckItem, setNewCheckItem] = useState("");
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
 
+  function toDateInputValue(date: string | null | undefined): string {
+    if (!date) return "";
+    const m = date.match(/^(\d{4}-\d{2}-\d{2})/);
+    return m ? m[1] : "";
+  }
+
   useEffect(() => {
     if (!card) return;
     setTitle(card.title || "");
     setDescription(card.description || "");
-    setDueDate(card.dueDate || "");
-    setStartDate(card.startDate || "");
+    setDueDate(toDateInputValue(card.dueDate));
+    setStartDate(toDateInputValue(card.startDate));
   }, [card]);
 
   if (isLoading && !card) {
@@ -133,7 +140,7 @@ export function CardDetailModal({
         );
       }
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al cambiar etiqueta de la tarjeta" });
     }
   };
 
@@ -149,7 +156,7 @@ export function CardDetailModal({
       );
       setNewCheckItem("");
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al añadir elemento al checklist" });
     }
   };
 
@@ -165,7 +172,7 @@ export function CardDetailModal({
         `${!item.done ? "completó" : "desmarcó"} "${item.text}" en "${title}"`,
       );
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al cambiar estado del checklist" });
     }
   };
 
@@ -173,7 +180,7 @@ export function CardDetailModal({
     try {
       await deleteChecklistItem(boardId, activeStageId, activeCard.id, itemId);
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al eliminar elemento del checklist" });
     }
   };
 
@@ -189,7 +196,7 @@ export function CardDetailModal({
       await addCardMember(boardId, activeStageId, activeCard.id, membership.id);
       log(ACTIVITY_TYPES.MEMBER_JOINED_CARD, `se unió a la tarjeta "${title}"`);
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al unirse a la tarjeta" });
     }
   };
 
@@ -210,7 +217,7 @@ export function CardDetailModal({
       );
       log(ACTIVITY_TYPES.MEMBER_LEFT_CARD, `dejó la tarjeta "${title}"`);
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al dejar la tarjeta" });
     }
   };
 
@@ -245,7 +252,7 @@ export function CardDetailModal({
         `añadió la etiqueta "${label.name}" a "${title}"`,
       );
     } catch (error) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al crear etiqueta" });
     }
   };
 

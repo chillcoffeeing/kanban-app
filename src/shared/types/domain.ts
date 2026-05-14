@@ -33,7 +33,7 @@ export type Permission =
   | "delete_card"
   | "invite_member";
 
-type MemberRole = "owner" | "admin" | "member";
+type MemberRole = "owner" | "member";
 
 export interface BoardMember {
   email: string;
@@ -70,6 +70,7 @@ export interface Board {
   stagesCount?: number;
   membersCount?: number;
   cardsCount?: number;
+  role?: string;
 }
 
 /* -------------------------- Activity feed --------------------------- */

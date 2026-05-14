@@ -30,7 +30,7 @@ export function canManageMembers(
   if (!member) return false
   if (member.role === 'owner') return true
   if (prefs.memberPermission === 'admins') {
-    return member.role === 'admin'
+    return false
   }
   return true
 }

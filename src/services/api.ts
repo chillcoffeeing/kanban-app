@@ -27,6 +27,13 @@ export function clearTokens() {
   localStorage.removeItem(REFRESH_KEY);
 }
 
+export let onForbidden: ((error: ApiError) => void) | null = null;
+export const SetOnForbidden = (
+  callback: ((error: ApiError) => void) | null,
+) => {
+  onForbidden = callback;
+};
+
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
@@ -67,7 +74,11 @@ export async function api<T = unknown>(
         : null) ||
       res.statusText ||
       "Request failed";
-    throw new ApiError(msg, res.status, data);
+    const error = new ApiError(msg, res.status, data);
+    if (res.status === 403 && onForbidden) {
+      onForbidden(error);
+    }
+    throw error;
   }
   return data as T;
 }

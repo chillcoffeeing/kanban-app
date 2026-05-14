@@ -65,5 +65,6 @@ export function normalizeBoard(
     stagesCount: board.stagesCount,
     membersCount: board.membersCount,
     cardsCount: board.cardsCount,
+    role: board.role,
   };
 }

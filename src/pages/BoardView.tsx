@@ -14,11 +14,14 @@ import type {
   DragEndEvent,
   UniqueIdentifier,
 } from "@dnd-kit/core";
+import gsap from "gsap";
 import { useBoardStore } from "@/stores/boardStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore, ACTIVITY_TYPES } from "@/stores/activityStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { useSocket } from "@/shared/hooks/useSocket";
+import { setBoardContext } from "@/shared/hooks/usePermissionDenied";
+import { useToastStore } from "@/stores/toastStore";
 import { StageColumn } from "@/features/stages/components/StageColumn";
 import { CardItem } from "@/features/cards/components/CardItem";
 import { CardPreview } from "@/features/cards/components/CardPreview";
@@ -59,7 +62,9 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     (member) => member.user?.id === currentUser?.id && member.role === "owner",
   );
 
-  const loadActivities = useActivityStore((activityState) => activityState.loadActivities);
+  const loadActivities = useActivityStore(
+    (activityState) => activityState.loadActivities,
+  );
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -79,8 +84,12 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
     Boolean(queryCardId),
   );
 
-  const selectedUserId = useBoardStore((boardState) => boardState.selectedUserId);
-  const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
+  const selectedUserId = useBoardStore(
+    (boardState) => boardState.selectedUserId,
+  );
+  const setSelectedUserId = useBoardStore(
+    (boardState) => boardState.setSelectedUserId,
+  );
 
   const [showActivity, setShowActivity] = useState(false);
 
@@ -128,11 +137,15 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
         if (overData?.type === "stage") {
           toStageId = overData.stageId;
-          const toStage = currentBoard?.stages.find((stage) => stage.id === toStageId);
+          const toStage = currentBoard?.stages.find(
+            (stage) => stage.id === toStageId,
+          );
           newIndex = toStage?.cards.length || 0;
         } else if (overData?.type === "card") {
           toStageId = overData.stageId;
-          const toStage = currentBoard?.stages.find((stage) => stage.id === toStageId);
+          const toStage = currentBoard?.stages.find(
+            (stage) => stage.id === toStageId,
+          );
           newIndex = toStage?.cards.findIndex((c) => c.id === over.id) ?? 0;
         }
 
@@ -234,12 +247,13 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
 
     const init = async () => {
       try {
+        setBoardContext(boardId);
         await setCurrentBoard(boardId);
         loadActivities(boardId);
         joinBoard(boardId);
       } catch (error) {
         if (!controller.signal.aborted) {
-          // Error handled silently
+          useToastStore.getState().addToast({ type: "error", message: "Error al cargar el tablero" });
         }
       }
     };
@@ -267,16 +281,11 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
   };
 
   if (!currentBoard) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-lg text-neutral-dark">Cargando tablero&hellip;</p>
-      </div>
-    );
+    return <BoardLoading />;
   }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Board header */}
       <BoardHeader
         board={currentBoard}
         isOwner={!!isOwner}
@@ -286,7 +295,6 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
         showInvite={showInvite}
       />
 
-      {/* Stages with horizontal scroll */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -303,7 +311,6 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
             />
           ))}
 
-          {/* Add stage */}
           <div className="w-72 shrink-0">
             {isAddingStage ? (
               <form
@@ -319,7 +326,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
                   }
                   className="mb-3 w-full rounded-lg border border-neutral-light bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
-                     <div className="flex gap-[var(--density-gap,0.5rem)]">
+                <div className="flex gap-[var(--density-gap,0.5rem)]">
                   <Button size="sm" type="submit">
                     Añadir etapa
                   </Button>
@@ -383,6 +390,55 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
         isOpen={showActivity}
         onClose={() => setShowActivity(false)}
       />
+    </div>
+  );
+}
+
+function BoardLoading() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<HTMLDivElement[]>([]);
+
+  useEffect(() => {
+    const dots = dotRefs.current.filter(Boolean);
+    if (!dots.length) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        containerRef.current,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" },
+      );
+
+      gsap.to(dots, {
+        y: -12,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: "power2.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex h-60 flex-col items-center justify-center gap-6"
+    >
+      <div className="flex items-center gap-2">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            ref={(el) => {
+              if (el) dotRefs.current[i] = el;
+            }}
+            className="size-4 rounded-full bg-primary"
+          />
+        ))}
+      </div>
+      <p className="text-lg text-neutral-dark/70">Cargando tablero&hellip;</p>
     </div>
   );
 }

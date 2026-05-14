@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import type { FormEvent } from "react";
 import { format } from "date-fns";
@@ -14,10 +14,17 @@ import {
 } from "@phosphor-icons/react";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
-import { PERMISSIONS } from "@/shared/utils/constants";
+import { useToastStore } from "@/stores/toastStore";
 import type { BoardMember, Permission } from "@/shared/types/domain";
 import { api } from "@/services/api";
 import MembersList from "@/components/membersPage/MembersList";
+
+interface PendingPermissionRequest {
+  id: string;
+  requesterId: string;
+  permission: string;
+  requester?: { id: string; name: string; email: string; avatarUrl: string | null };
+}
 
 interface PendingInvitation {
   id: string;
@@ -31,9 +38,20 @@ export function BoardMembersPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const [inviteEmail, setInviteEmail] = useState("");
   const [pendingInvites, setPendingInvites] = useState<PendingInvitation[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<PendingPermissionRequest[]>([]);
   const { addMember, removeMember, updateMemberPermissions } = useBoardStore();
   const currentBoard = useBoardStore((boardState) => boardState.currentBoard);
   const log = useActivity(boardId);
+
+  const fetchPendingRequests = useCallback(async () => {
+    if (!boardId) return;
+    try {
+      const data = await api<PendingPermissionRequest[]>(`/boards/${boardId}/permission-requests`);
+      setPendingRequests(data ?? []);
+    } catch {
+      setPendingRequests([]);
+    }
+  }, [boardId]);
 
   useEffect(() => {
     if (!boardId) return;
@@ -49,10 +67,12 @@ export function BoardMembersPage() {
         }
       });
 
+    fetchPendingRequests();
+
     return () => {
       controller.abort();
     };
-  }, [boardId]);
+  }, [boardId, fetchPendingRequests]);
 
   if (!currentBoard || !boardId) return null;
 
@@ -84,11 +104,11 @@ export function BoardMembersPage() {
       );
       log(ACTIVITY_TYPES.MEMBER_REMOVED, `eliminó la invitación de "${email}"`);
     } catch (err) {
-      // Error handled silently
+      useToastStore.getState().addToast({ type: "error", message: "Error al eliminar la invitación" });
     }
   };
 
-  const togglePermission = (membershipId: string, permission: Permission) => {
+  const togglePermission = async (membershipId: string, permission: Permission) => {
     const member = currentBoard.members.find((member) => member.id === membershipId);
     if (!member) return;
     const has = member.permissions.includes(permission);
@@ -96,6 +116,23 @@ export function BoardMembersPage() {
       ? member.permissions.filter((perm) => perm !== permission)
       : [...member.permissions, permission];
     updateMemberPermissions(boardId, membershipId, perms);
+
+    if (!has) {
+      const pendingReq = pendingRequests.find(
+        (r) => r.requesterId === membershipId && r.permission === permission,
+      );
+      if (pendingReq) {
+        try {
+          await api(`/boards/${boardId}/permission-requests/${pendingReq.id}`, {
+            method: "PATCH",
+            body: { status: "approved" },
+          });
+          setPendingRequests((prev) => prev.filter((r) => r.id !== pendingReq.id));
+        } catch {
+          // Silently fail — permission was already granted locally
+        }
+      }
+    }
   };
 
   return (
@@ -130,6 +167,7 @@ export function BoardMembersPage() {
         <div className="flex flex-col gap-3">
           <MembersList
             members={currentBoard.members}
+            pendingRequests={pendingRequests}
             handleRemoveMember={handleRemoveMember}
             togglePermission={togglePermission}
           />

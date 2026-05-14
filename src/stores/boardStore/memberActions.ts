@@ -1,8 +1,8 @@
 import { generateId } from "@/shared/utils/helpers";
-import { ALL_PERMISSIONS } from "@/shared/utils/constants";
 import { membersApi } from "@/services/boards";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore } from "@/stores/activityStore";
+import { useToastStore } from "@/stores/toastStore";
 import type { ActivityType, BoardMember, Permission } from "@/shared/types";
 import type { BoardState } from "./types";
 import { forBoard } from "./helpers/boardHelpers";
@@ -26,12 +26,12 @@ export function createMemberActions(set: any, get: any) {
     addMember: async (
       boardId: string,
       email: string,
-      permissions = ALL_PERMISSIONS,
+      permissions: Permission[] = [],
     ) => {
       try {
         await membersApi.invite(boardId, email, "member");
       } catch {
-        /* ignore */
+        useToastStore.getState().addToast({ type: "error", message: "Error al invitar al miembro" });
       }
       const placeholderId = `pending_${generateId()}`;
 

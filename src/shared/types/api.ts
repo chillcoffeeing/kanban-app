@@ -118,11 +118,12 @@ export interface BoardResponse {
   stagesCount?: number;
   membersCount?: number;
   cardsCount?: number;
+  role?: string;
 }
 
 export interface BoardMemberResponse {
   id: string;
-  role: "owner" | "admin" | "member";
+  role: "owner" | "member";
   permissions: string[];
   invitedAt: string;
   email?: string;
@@ -146,7 +147,6 @@ export interface UserResponse {
   email: string;
   avatarUrl: string;
   name: string;
-  roles: string[];
   profile?: UserProfile;
   preference?: UserPreference;
   createdAt: string;

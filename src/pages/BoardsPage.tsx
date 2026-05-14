@@ -15,14 +15,19 @@ export function BoardsPage() {
   const loading = useBoardStore((boardState) => boardState.loading);
   const error = useBoardStore((boardState) => boardState.error);
   const hydrateBoards = useBoardStore((boardState) => boardState.hydrateBoards);
+  const setCurrentBoard = useBoardStore((boardState) => boardState.setCurrentBoard);
   const createBoard = useBoardStore((boardState) => boardState.createBoard);
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     void hydrateBoards();
-  }, [hydrateBoards]);
+    void setCurrentBoard(null);
+  }, [hydrateBoards, setCurrentBoard]);
 
-  const myBoards = boards;
+  const myBoards = boards.filter((b) => b.role === "owner");
+  const memberBoards = boards.filter((b) => b.role && b.role !== "owner");
+  const hasCategorized = !loading && boards.length > 0;
+
   const titleRef = useMountFade<HTMLDivElement>({ direction: "up", distance: 20 });
   const gridRef = useStaggerFade<HTMLDivElement>({ stagger: 0.06 });
 
@@ -40,7 +45,7 @@ export function BoardsPage() {
       <div ref={titleRef} className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-dark">Mis Tableros</h1>
-          <p className="mt-1 text-sm text-neutral-dark/60">{myBoards.length} tablero{myBoards.length !== 1 ? 's' : ''}</p>
+          <p className="mt-1 text-sm text-neutral-dark/60">{boards.length} tablero{boards.length !== 1 ? 's' : ''}</p>
         </div>
         <Button onClick={() => setShowCreate(true)}>
           <PlusIcon size={20} weight="duotone" /> Nuevo tablero
@@ -53,12 +58,12 @@ export function BoardsPage() {
          </div>
       )}
 
-      {loading && myBoards.length === 0 ? (
+      {loading && boards.length === 0 ? (
         <div className="py-16 text-center text-neutral-dark/50">
           <div className="inline-block size-8 animate-spin rounded-full border-4 border-neutral-light border-t-primary"></div>
           <p className="mt-4">Cargando tableros…</p>
         </div>
-      ) : myBoards.length === 0 ? (
+      ) : boards.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-light py-20">
           <div className="mb-4 rounded-full bg-primary/10 p-4">
             <PlusIcon size={32} weight="duotone" className="text-primary" />
@@ -72,15 +77,37 @@ export function BoardsPage() {
           </Button>
         </div>
       ) : (
-        <div ref={gridRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {myBoards.map((board) => (
-            <BoardCard
-              key={board.id}
-              board={board}
-              onClick={() => navigate(`/boards/${board.id}`)}
-            />
-          ))}
-        </div>
+        <>
+          {hasCategorized && myBoards.length > 0 && (
+            <div className="mb-8">
+              <h2 className="mb-3 text-lg font-semibold text-neutral-dark">Tus tableros</h2>
+              <div ref={gridRef} className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {myBoards.map((board) => (
+                  <BoardCard
+                    key={board.id}
+                    board={board}
+                    onClick={() => navigate(`/boards/${board.id}`)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {hasCategorized && memberBoards.length > 0 && (
+            <div>
+              <h2 className="mb-3 text-lg font-semibold text-neutral-dark">Donde eres miembro</h2>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {memberBoards.map((board) => (
+                  <BoardCard
+                    key={board.id}
+                    board={board}
+                    onClick={() => navigate(`/boards/${board.id}`)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <CreateBoardModal

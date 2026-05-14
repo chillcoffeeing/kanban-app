@@ -1,6 +1,7 @@
 import { cardsApi } from "@/services/cards";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivityStore } from "@/stores/activityStore";
+import { useToastStore } from "@/stores/toastStore";
 import type { ActivityType, Board, Card } from "@/shared/types";
 import type { BoardState } from "./types";
 import { normalizeCard } from "./helpers/normalizers";
@@ -154,6 +155,7 @@ export function createCardActions(set: any, get: any) {
         set((state: BoardState) => {
           processCardMove(state, boardId, toStageId, fromStageId, cardId, oldIndex);
         });
+        useToastStore.getState().addToast({ type: "error", message: "Error al mover la tarjeta" });
       }
     },
 
@@ -191,6 +193,7 @@ export function createCardActions(set: any, get: any) {
 
           return card;
         } catch {
+          useToastStore.getState().addToast({ type: "error", message: "Error al cargar la tarjeta" });
           return null;
         } finally {
           cardLoadPromises.delete(cardId);

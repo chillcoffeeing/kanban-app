@@ -12,7 +12,11 @@ import { Footer } from "@/shared/components/Footer";
 import { useApplySettings } from "@/shared/hooks/useApplySettings";
 import { usePersistSettings } from "@/shared/hooks/usePersistSettings";
 import { useSocket } from "@/shared/hooks/useSocket";
+import { usePermissionDenied } from "@/shared/hooks/usePermissionDenied";
+import { PermissionDeniedModal } from "@/shared/components/PermissionDeniedModal";
+import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { AnimatedBg } from "@/shared/components/AnimatedBg";
+import { ToastContainer } from "@/shared/components/ToastContainer";
 import { PublicLayout } from "@/pages/PublicLayout";
 import { AuthPage } from "@/pages/AuthPage";
 import { LandingPage } from "@/pages/LandingPage";
@@ -31,6 +35,8 @@ function App() {
   const hydrate = useAuthStore((state) => state.hydrate);
   const location = useLocation();
   const navigate = useNavigate();
+  const { pendingRequest, sendRequest, dismiss, isSubmitting, alreadyPending } =
+    usePermissionDenied();
 
   useEffect(() => {
     void hydrate();
@@ -40,47 +46,67 @@ function App() {
     location.pathname === "/" || location.pathname === "/login";
 
   return (
-    <div className="mx-auto flex min-h-screen w-full flex-col">
-      <AnimatedBg />
-      {isAuthenticated && !isLandingOrLogin && <Header />}
-      <main className="flex flex-1 flex-col">
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/login"
-              element={
-                isAuthenticated ? <Navigate to="/boards" replace /> : <AuthPage />
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                isAuthenticated ? <Navigate to="/boards" replace /> : <RegisterPage />
-              }
-            />
-          </Route>
-
-          {isAuthenticated ? (
-            <>
-              <Route path="/invitations" element={<InvitationsPage />} />
-              <Route path="/config/*" element={<UserConfigPage />} />
+    <ErrorBoundary>
+      <div className="mx-auto flex min-h-screen w-full flex-col">
+        <AnimatedBg />
+        <ToastContainer />
+        {pendingRequest && (
+          <PermissionDeniedModal
+            request={pendingRequest}
+            onSendRequest={sendRequest}
+            onDismiss={dismiss}
+            isSubmitting={isSubmitting}
+            alreadyPending={alreadyPending}
+          />
+        )}
+        {isAuthenticated && !isLandingOrLogin && <Header />}
+        <main className="flex flex-1 flex-col">
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
               <Route
-                path="/boards/:boardId/config/*"
-                element={<BoardConfigPage />}
+                path="/login"
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/boards" replace />
+                  ) : (
+                    <AuthPage />
+                  )
+                }
               />
-              <Route path="/boards/:boardId" element={<BoardRoute />} />
-              <Route path="/board/:boardId" element={<BoardRoute />} />
-              <Route path="/boards" element={<BoardsPage />} />
-              <Route path="*" element={<Navigate to="/boards" replace />} />
-            </>
-          ) : (
-            <Route path="*" element={<Navigate to="/" replace />} />
-          )}
-        </Routes>
-      </main>
-      {isAuthenticated && location.pathname === "/boards" && <Footer />}
-    </div>
+              <Route
+                path="/register"
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/boards" replace />
+                  ) : (
+                    <RegisterPage />
+                  )
+                }
+              />
+            </Route>
+
+            {isAuthenticated ? (
+              <>
+                <Route path="/invitations" element={<InvitationsPage />} />
+                <Route path="/config/*" element={<UserConfigPage />} />
+                <Route
+                  path="/boards/:boardId/config/*"
+                  element={<BoardConfigPage />}
+                />
+                <Route path="/boards/:boardId" element={<BoardRoute />} />
+                <Route path="/board/:boardId" element={<BoardRoute />} />
+                <Route path="/boards" element={<BoardsPage />} />
+                <Route path="*" element={<Navigate to="/boards" replace />} />
+              </>
+            ) : (
+              <Route path="*" element={<Navigate to="/" replace />} />
+            )}
+          </Routes>
+        </main>
+        {isAuthenticated && location.pathname === "/boards" && <Footer />}
+      </div>
+    </ErrorBoundary>
   );
 }
 

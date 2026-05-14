@@ -1,10 +1,14 @@
-import { UsersThreeIcon, StackIcon, CardsIcon } from '@phosphor-icons/react'
 import type { Board } from '@/shared/types/domain'
 import { getBoardBackgroundClasses } from '@/shared/utils/constants'
 
 interface BoardCardProps {
   board: Board
   onClick: () => void
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  owner: 'Propietario',
+  member: 'Miembro',
 }
 
 export function BoardCard({ board, onClick }: BoardCardProps) {
@@ -17,24 +21,25 @@ export function BoardCard({ board, onClick }: BoardCardProps) {
   return (
     <button
       onClick={onClick}
-      className={`group relative h-32 w-full cursor-pointer overflow-hidden rounded-xl p-4 text-left shadow-md transition-all hover:shadow-xl hover:scale-[1.03] duration-200 ${gradientClass} ${textColorClass}`}
+      className={`group relative flex h-44 w-full cursor-pointer flex-col overflow-hidden rounded-xl p-5 text-left shadow-md transition-all hover:shadow-xl hover:scale-[1.03] duration-200 ${gradientClass} ${textColorClass}`}
     >
-      <div className="relative z-10">
-        <h3 className="text-lg font-semibold leading-tight">{board.name}</h3>
-        <div className="mt-auto flex items-center gap-3 pt-8 text-sm opacity-80">
-          <span className="flex items-center gap-1">
-            <StackIcon size={18} weight="duotone" />
-            {stagesCount}
-          </span>
-          <span className="flex items-center gap-1">
-            <UsersThreeIcon size={18} weight="duotone" />
-            {membersCount}
-          </span>
-          <span className="flex items-center gap-1">
-            <CardsIcon size={18} weight="duotone" />
-            {cardsCount}
-          </span>
+      <div className="relative z-10 flex flex-1 flex-col">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-xl font-semibold leading-tight">{board.name}</h3>
+          {board.role && (
+            <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
+              {ROLE_LABELS[board.role] ?? board.role}
+            </span>
+          )}
         </div>
+
+        <p className="mt-2 text-sm opacity-80">
+          {stagesCount} etapa{stagesCount !== 1 ? 's' : ''} &middot; {cardsCount} tarjeta{cardsCount !== 1 ? 's' : ''}
+        </p>
+
+        <p className="mt-1 text-sm opacity-70">
+          {membersCount} miembro{membersCount !== 1 ? 's' : ''}
+        </p>
       </div>
       <div className="absolute inset-0 bg-black/0 transition-colors duration-200 group-hover:bg-black/10" />
     </button>
