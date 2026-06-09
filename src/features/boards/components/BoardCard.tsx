@@ -1,14 +1,9 @@
 import type { Board } from '@/shared/types/domain'
-import { getBoardBackgroundClasses } from '@/shared/utils/constants'
+import { getBoardBackgroundClasses, ROLE_LABELS } from '@/shared/utils/constants'
 
 interface BoardCardProps {
   board: Board
   onClick: () => void
-}
-
-const ROLE_LABELS: Record<string, string> = {
-  owner: 'Propietario',
-  member: 'Miembro',
 }
 
 export function BoardCard({ board, onClick }: BoardCardProps) {

@@ -7,13 +7,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
 import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
 import { useMountFade } from "@/shared/hooks/useGsapAnimation";
-
-const INITIAL_FORM = {
-  name: '', email: '', password: '',
-  username: '', displayName: '', jobTitle: '', company: '',
-};
-
-type FormField = keyof typeof INITIAL_FORM;
+import { INITIAL_FORM, type FormField } from '../utils/constants'
 
 function formReducer(state: typeof INITIAL_FORM, action: { field: FormField; value: string }) {
   return { ...state, [action.field]: action.value };

@@ -1,27 +1,12 @@
-import { cardsApi } from "@/services/cards";
-import { useAuthStore } from "@/stores/authStore";
-import { useActivityStore } from "@/stores/activityStore";
-import { useToastStore } from "@/stores/toastStore";
-import type { ActivityType, Board, Card } from "@/shared/types";
+import { CardsService } from "@/services/cards";
+import { eventBus } from "@/shared/utils/eventBus";
+import { handleError } from "@/shared/utils/errorHandler";
+import type { Board, Card } from "@/shared/types";
 import type { BoardState } from "./types";
 import { normalizeCard } from "./helpers/normalizers";
 import { forBoard, forCard } from "./helpers/boardHelpers";
 
 const cardLoadPromises = new Map<string, Promise<Card | null>>();
-
-function logActivity(
-  boardId: string,
-  type: ActivityType,
-  detail: string,
-  meta?: Record<string, unknown>,
-) {
-  const user = useAuthStore.getState().user;
-  const userName =
-    user?.profile?.profile?.displayName || user?.name || "Usuario";
-  useActivityStore
-    .getState()
-    .log(boardId, { type, user: userName, detail, meta });
-}
 
 function processCardMove(
   state: BoardState,
@@ -56,23 +41,27 @@ function processCardMove(
 export function createCardActions(set: any, get: any) {
   return {
     addCard: async (boardId: string, stageId: string, title: string) => {
-      const res = await cardsApi.create(stageId, { title });
-      const card = normalizeCard(res);
-      set((state: BoardState) => {
-        forBoard(state, boardId, (b) => {
-          const stage = b.stages.find((s) => s.id === stageId);
-          if (stage) stage.cards.push(card);
+      try {
+        const res = await CardsService.create(stageId, { title });
+        const card = normalizeCard(res);
+        set((state: BoardState) => {
+          forBoard(state, boardId, (b) => {
+            const stage = b.stages.find((s) => s.id === stageId);
+            if (stage) stage.cards.push(card);
+          });
         });
-      });
-      logActivity(boardId, "card_created", `creó la tarjeta "${title}"`);
-      return card;
+        eventBus.emit("card:created", { boardId, detail: `creó la tarjeta "${title}"`, userName: "" });
+        return card;
+      } catch (err) {
+        throw handleError(err, "Error al crear la tarjeta");
+      }
     },
 
     updateCard: async (
       boardId: string,
       stageId: string,
       cardId: string,
-      updates: Parameters<typeof cardsApi.update>[1],
+      updates: Parameters<typeof CardsService.update>[1],
     ) => {
       const syncable: Partial<Card> = {};
       if (updates.title !== undefined) syncable.title = updates.title;
@@ -90,33 +79,34 @@ export function createCardActions(set: any, get: any) {
 
       if (Object.keys(syncable).length > 0) {
         try {
-          await cardsApi.update(cardId, syncable);
+          await CardsService.update(cardId, syncable);
         } catch (err) {
-          console.error("[boardStore] updateCard API failed:", err);
-          set({
-            error: `Failed to sync card update: ${(err as Error).message}`,
-          });
+          handleError(err, "Error al guardar cambios de la tarjeta");
         }
       }
     },
 
     deleteCard: async (boardId: string, stageId: string, cardId: string) => {
-      const board =
-        get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
-      const stage = board?.stages.find((s: any) => s.id === stageId);
-      const card = stage?.cards.find((c: any) => c.id === cardId);
-      const cardTitle = card?.title ?? cardId;
+      try {
+        const board =
+          get().currentBoard ?? get().boards.find((b: Board) => b.id === boardId);
+        const stage = board?.stages.find((s: any) => s.id === stageId);
+        const card = stage?.cards.find((c: any) => c.id === cardId);
+        const cardTitle = card?.title ?? cardId;
 
-      await cardsApi.remove(cardId);
+        await CardsService.remove(cardId);
 
-      set((state: BoardState) => {
-        forBoard(state, boardId, (b) => {
-          const s = b.stages.find((stage) => stage.id === stageId);
-          if (s) s.cards = s.cards.filter((card) => card.id !== cardId);
+        set((state: BoardState) => {
+          forBoard(state, boardId, (b) => {
+            const s = b.stages.find((stage) => stage.id === stageId);
+            if (s) s.cards = s.cards.filter((card) => card.id !== cardId);
+          });
         });
-      });
 
-      logActivity(boardId, "card_deleted", `eliminó la tarjeta "${cardTitle}"`);
+        eventBus.emit("card:deleted", { boardId, detail: `eliminó la tarjeta "${cardTitle}"`, userName: "" });
+      } catch (err) {
+        handleError(err, "Error al eliminar la tarjeta");
+      }
     },
 
     moveCard: async (
@@ -141,21 +131,17 @@ export function createCardActions(set: any, get: any) {
       });
 
       try {
-        await cardsApi.move(cardId, toStageId, newIndex);
+        await CardsService.move(cardId, toStageId, newIndex);
         const toStage = get().currentBoard?.stages.find(
           (s: any) => s.id === toStageId,
         );
         const stageName = toStage?.name ?? toStageId;
-        logActivity(
-          boardId,
-          "card_moved",
-          `movió "${card.title}" a "${stageName}"`,
-        );
-      } catch {
+        eventBus.emit("card:moved", { boardId, detail: `movió "${card.title}" a "${stageName}"`, userName: "" });
+      } catch (err) {
         set((state: BoardState) => {
           processCardMove(state, boardId, toStageId, fromStageId, cardId, oldIndex);
         });
-        useToastStore.getState().addToast({ type: "error", message: "Error al mover la tarjeta" });
+        handleError(err, "Error al mover la tarjeta");
       }
     },
 
@@ -173,7 +159,7 @@ export function createCardActions(set: any, get: any) {
 
       const promise = (async () => {
         try {
-          const res = await cardsApi.get(cardId);
+          const res = await CardsService.get(cardId);
           const card = normalizeCard(res);
 
           set((state: BoardState) => {
@@ -192,8 +178,8 @@ export function createCardActions(set: any, get: any) {
           });
 
           return card;
-        } catch {
-          useToastStore.getState().addToast({ type: "error", message: "Error al cargar la tarjeta" });
+        } catch (err) {
+          handleError(err, "Error al cargar la tarjeta");
           return null;
         } finally {
           cardLoadPromises.delete(cardId);

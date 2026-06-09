@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import { SetOnForbidden, api, ApiError } from "@/services/api";
-import { useToastStore } from "@/stores/toastStore";
+import { setForbiddenHandler, ApiClient, ApiError } from "@/services/api";
+import { handleError } from "@/shared/utils/errorHandler";
 import { useAuthStore } from "@/stores/authStore";
 
 export interface PermissionRequestInfo {
@@ -23,7 +23,7 @@ export function usePermissionDenied() {
   const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    SetOnForbidden((error: ApiError) => {
+    setForbiddenHandler((error: ApiError) => {
       const payload = error.payload as Record<string, unknown> | null;
       const permission = payload?.permission as string | undefined;
       setAlreadyPending(false);
@@ -34,7 +34,7 @@ export function usePermissionDenied() {
       });
     });
     return () => {
-      SetOnForbidden(null);
+      setForbiddenHandler(null);
     };
   }, []);
 
@@ -42,23 +42,15 @@ export function usePermissionDenied() {
     if (!pendingRequest || !pendingRequest.boardId || !user) return;
     setIsSubmitting(true);
     try {
-      await api(`/boards/${pendingRequest.boardId}/permission-requests`, {
-        method: "POST",
-        body: { permission: pendingRequest.permission },
-      });
-      useToastStore.getState().addToast({
-        type: "success",
-        message: "Solicitud enviada al propietario del tablero",
+      await ApiClient.post(`/boards/${pendingRequest.boardId}/permission-requests`, {
+        permission: pendingRequest.permission,
       });
       setPendingRequest(null);
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setAlreadyPending(true);
       } else {
-        useToastStore.getState().addToast({
-          type: "error",
-          message: "Error al enviar la solicitud. Intenta de nuevo.",
-        });
+        handleError(err, "Error al enviar la solicitud. Intenta de nuevo.");
       }
     } finally {
       setIsSubmitting(false);

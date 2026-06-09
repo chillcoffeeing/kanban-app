@@ -1,35 +1,25 @@
-import { stagesApi } from "@/services/boards";
-import { useAuthStore } from "@/stores/authStore";
-import { useActivityStore } from "@/stores/activityStore";
-import type { ActivityType, Board, Stage } from "@/shared/types";
+import { StagesService } from "@/services/boards";
+import { eventBus } from "@/shared/utils/eventBus";
+import { handleError } from "@/shared/utils/errorHandler";
+import type { Board, Stage } from "@/shared/types";
 import type { BoardState } from "./types";
 import { normalizeStage } from "./helpers/normalizers";
 import { forBoard } from "./helpers/boardHelpers";
 
-function logActivity(
-  boardId: string,
-  type: ActivityType,
-  detail: string,
-  meta?: Record<string, unknown>,
-) {
-  const user = useAuthStore.getState().user;
-  const userName =
-    user?.profile?.profile?.displayName || user?.name || "Usuario";
-  useActivityStore
-    .getState()
-    .log(boardId, { type, user: userName, detail, meta });
-}
-
 export function createStageActions(set: any, get: any) {
   return {
     addStage: async (boardId: string, name: string) => {
-      const res = await stagesApi.create(boardId, name);
-      const stage = normalizeStage(res, []);
-      set((state: BoardState) => {
-        forBoard(state, boardId, (b) => { b.stages.push(stage); });
-      });
-      logActivity(boardId, "stage_created", `creó la etapa "${name}"`);
-      return stage;
+      try {
+        const res = await StagesService.create(boardId, name);
+        const stage = normalizeStage(res, []);
+        set((state: BoardState) => {
+          forBoard(state, boardId, (b) => { b.stages.push(stage); });
+        });
+        eventBus.emit("stage:created", { boardId, detail: `creó la etapa "${name}"`, userName: "" });
+        return stage;
+      } catch (err) {
+        throw handleError(err, "Error al crear la etapa");
+      }
     },
 
     updateStage: async (
@@ -44,7 +34,7 @@ export function createStageActions(set: any, get: any) {
         const oldStage = board?.stages.find((stage: Stage) => stage.id === stageId);
         const oldName = oldStage?.name ?? stageId;
 
-        const res = await stagesApi.update(stageId, { name: updates.name });
+        const res = await StagesService.update(stageId, { name: updates.name });
         set((state: BoardState) => {
           forBoard(state, boardId, (b) => {
             const s = b.stages.find((stage) => stage.id === stageId);
@@ -53,14 +43,15 @@ export function createStageActions(set: any, get: any) {
         });
 
         if (oldName !== res.name) {
-          logActivity(
+          eventBus.emit("stage:renamed", {
             boardId,
-            "stage_renamed",
-            `renombró la etapa "${oldName}" a "${res.name}"`,
-          );
+            detail: `renombró la etapa "${oldName}" a "${res.name}"`,
+            userName: "",
+            meta: { oldName, newName: res.name },
+          });
         }
       } catch (err) {
-        console.error("[boardStore] updateStage API failed:", err);
+        handleError(err, "Error al actualizar la etapa");
         set({
           error: `Failed to sync stage update: ${(err as Error).message}`,
         });
@@ -75,20 +66,17 @@ export function createStageActions(set: any, get: any) {
         const stage = board?.stages.find((stage: Stage) => stage.id === stageId);
         const stageName = stage?.name ?? stageId;
 
-        await stagesApi.remove(stageId);
+        await StagesService.remove(stageId);
+
         set((state: BoardState) => {
           forBoard(state, boardId, (b) => {
             b.stages = b.stages.filter((stage) => stage.id !== stageId);
           });
         });
 
-        logActivity(
-          boardId,
-          "stage_deleted",
-          `eliminó la etapa "${stageName}"`,
-        );
+        eventBus.emit("stage:deleted", { boardId, detail: `eliminó la etapa "${stageName}"`, userName: "" });
       } catch (err) {
-        console.error("[boardStore] deleteStage API failed:", err);
+        handleError(err, "Error al eliminar la etapa");
         set({
           error: `Failed to sync stage delete: ${(err as Error).message}`,
         });

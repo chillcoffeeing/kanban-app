@@ -1,22 +1,24 @@
-import { api } from "./api";
-import type {
-  UserResponse,
-  UserProfileJson,
-  UserPreferenceJson,
-  UserProfile,
-  UserPreference,
-} from "@/shared/types";
+import { ApiClient } from "./api";
+import type { UserResponse, UserProfile, UserPreference, UserProfileJson, UserPreferenceJson } from "@/shared/types";
 
-export const usersApi = {
-  account: () => api<UserResponse>("/users/account"),
+export class UsersService {
+  static account() {
+    return ApiClient.get<UserResponse>("/users/account");
+  }
 
-  getProfile: () => api<UserProfile>("/users/profile"),
+  static getProfile() {
+    return ApiClient.get<UserProfile>("/users/profile");
+  }
 
-  getPreferences: () => api<UserPreference>("/users/preferences"),
+  static getPreferences() {
+    return ApiClient.get<UserPreference>("/users/preferences");
+  }
 
-  updateProfile: (body: { profile?: UserProfileJson }) =>
-    api<UserProfile>("/users/account", { method: "PATCH", body }),
+  static updateProfile(data: { profile?: UserProfileJson }) {
+    return ApiClient.patch<UserProfile>("/users/account", data);
+  }
 
-  updatePreferences: (body: { settings?: UserPreferenceJson }) =>
-    api<UserPreference>("/users/preferences", { method: "PATCH", body }),
-};
+  static updatePreferences(data: { settings?: UserPreferenceJson }) {
+    return ApiClient.patch<UserPreference>("/users/preferences", data);
+  }
+}

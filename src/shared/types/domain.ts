@@ -76,7 +76,6 @@ export interface Board {
 /* -------------------------- Activity feed --------------------------- */
 
 export type ActivityType =
-  | "board_created"
   | "board_renamed"
   | "stage_created"
   | "stage_renamed"
@@ -102,4 +101,5 @@ export interface ActivityEntry {
   detail: string;
   meta: Record<string, unknown>;
   timestamp: string;
+  membershipId?: string;
 }

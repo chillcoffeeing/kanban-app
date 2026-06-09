@@ -10,6 +10,7 @@ export interface ActivityState {
       user: string;
       detail: string;
       meta?: Record<string, unknown>;
+      membershipId?: string;
     },
   ) => void;
   clearActivities: (boardId: string) => void;

@@ -2,28 +2,8 @@ import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import {
   KanbanIcon,
   ShieldCheckIcon,
-  LightningIcon,
-  UsersThreeIcon,
-  ChartLineUpIcon,
 } from "@phosphor-icons/react";
-
-const features = [
-  {
-    icon: LightningIcon,
-    title: "Flujos de trabajo ágiles",
-    desc: "Organiza tareas y proyectos con tableros diseñados para equipos de alto rendimiento.",
-  },
-  {
-    icon: UsersThreeIcon,
-    title: "Colaboración en tiempo real",
-    desc: "Sincroniza a todo tu equipo con actualizaciones instantáneas y permisos granulares.",
-  },
-  {
-    icon: ChartLineUpIcon,
-    title: "Visibilidad ejecutiva",
-    desc: "Métricas y reportes claros para tomar decisiones basadas en datos.",
-  },
-];
+import { LANDING_FEATURES } from "@/shared/utils/constants";
 
 export function RegisterPage() {
   return (
@@ -71,7 +51,7 @@ export function RegisterPage() {
           </p>
 
           <ul className="mt-10 space-y-5">
-            {features.map(({ icon: Icon, title, desc }) => (
+            {LANDING_FEATURES.map(({ icon: Icon, title, desc }) => (
               <li key={title} className="flex gap-4">
                 <div className="mt-0.5 flex size-14 flex-none items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
                   <Icon size={30} weight="duotone" className="text-white" />

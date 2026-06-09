@@ -1,24 +1,27 @@
+// Libraries
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  PlusIcon,
-  GearIcon,
-  BellIcon,
-  UserPlusIcon,
-} from "@phosphor-icons/react";
+
+// Components
 import { Button } from "@/shared/components/Button";
 import { CardSearch } from "@/features/cards/components/CardSearch";
 import { MemberAvatar } from "@/shared/components/MemberAvatar";
-import type { Board } from "@/shared/types/domain";
+
+// Utils
 import { getBoardBackgroundClasses } from "@/shared/utils/constants";
+
+// Types
+import type { Board } from "@/shared/types/domain";
+
+// Icons
+import { GearIcon, BellIcon, UserPlusIcon } from "@phosphor-icons/react";
 
 interface BoardHeaderProps {
   board: Board;
   isOwner: boolean;
   onInviteMember: (email: string) => void;
   onToggleActivity: () => void;
-  onToggleInvite: () => void;
-  showInvite: boolean;
 }
 
 export function BoardHeader({
@@ -26,13 +29,11 @@ export function BoardHeader({
   isOwner,
   onInviteMember,
   onToggleActivity,
-  onToggleInvite,
-  showInvite,
 }: BoardHeaderProps) {
   const { gradientClass, textColorClass } = getBoardBackgroundClasses(
     board.background,
   );
-
+  const [showInvite, setShowInvite] = useState(false);
   const navigate = useNavigate();
 
   const handleInvite = (e: FormEvent<HTMLFormElement>) => {
@@ -79,7 +80,7 @@ export function BoardHeader({
               variant="ghost"
               size="sm"
               className="text-white/80! hover:bg-white/20! hover:text-white! transition-colors"
-              onClick={onToggleInvite}
+              onClick={() => setShowInvite(!showInvite)}
             >
               <UserPlusIcon size={18} weight="duotone" /> Invitar
             </Button>

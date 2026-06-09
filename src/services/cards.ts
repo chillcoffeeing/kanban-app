@@ -1,95 +1,106 @@
-import { api } from "./api";
-import type {
-  CardResponse,
-  CardMember,
-  ChecklistItem,
-  Label,
-} from "@/shared/types";
+import { ApiClient } from "./api";
+import type { CardResponse, ChecklistItem, Label } from "@/shared/types";
 
-export const cardsApi = {
-  // Operaciones básicas de cards
-  create: (
+export class CardsService {
+  static create(
     stageId: string,
-    body: {
+    data: {
       title: string;
       description?: string;
       startDate?: string;
       dueDate?: string;
     },
-  ) => api<CardResponse>(`/stages/${stageId}/cards`, { method: "POST", body }),
+  ) {
+    return ApiClient.post<CardResponse>(`/stages/${stageId}/cards`, data);
+  }
 
-  get: (id: string) => api<CardResponse>(`/cards/${id}`),
+  static get(id: string) {
+    return ApiClient.get<CardResponse>(`/cards/${id}`);
+  }
 
-  update: (
+  static update(
     id: string,
-    body: {
+    data: {
       title?: string;
       description?: string;
       startDate?: string | null;
       dueDate?: string | null;
     },
-  ) => api<CardResponse>(`/cards/${id}`, { method: "PATCH", body }),
+  ) {
+    return ApiClient.patch<CardResponse>(`/cards/${id}`, data);
+  }
 
-  move: (id: string, stageId: string, index: number) =>
-    api<CardResponse>(`/cards/${id}/move`, {
-      method: "PATCH",
-      body: { stageId, index },
-    }),
+  static move(id: string, stageId: string, index: number) {
+    return ApiClient.patch<CardResponse>(`/cards/${id}/move`, {
+      stageId,
+      index,
+    });
+  }
 
-  remove: (id: string) => api<void>(`/cards/${id}`, { method: "DELETE" }),
+  static remove(id: string) {
+    return ApiClient.delete<void>(`/cards/${id}`);
+  }
 
-  search: (boardId: string, q: string) =>
-    api<CardResponse[]>(
-      `/boards/${boardId}/cards/search?q=${encodeURIComponent(q)}`,
-    ),
+  static search(boardId: string, query: string) {
+    return ApiClient.get<CardResponse[]>(
+      `/boards/${boardId}/cards/search?q=${encodeURIComponent(query)}`,
+    );
+  }
 
-  addMember: (cardId: string, body: { boardMembershipId: string }) =>
-    api<CardResponse>(`/cards/${cardId}/members`, { method: "POST", body }),
+  static addMember(cardId: string, data: { boardMembershipId: string }) {
+    return ApiClient.post<CardResponse>(`/cards/${cardId}/members`, data);
+  }
 
-  removeMember: (cardId: string, boardMembershipId: string) =>
-    api(`/cards/${cardId}/members/${boardMembershipId}`, {
-      method: "DELETE",
-    }),
+  static removeMember(cardId: string, boardMembershipId: string) {
+    return ApiClient.delete(`/cards/${cardId}/members/${boardMembershipId}`);
+  }
 
-  getChecklist: (cardId: string) =>
-    api<ChecklistItem[]>(`/cards/${cardId}/checklist`),
+  static getChecklist(cardId: string) {
+    return ApiClient.get<ChecklistItem[]>(`/cards/${cardId}/checklist`);
+  }
 
-  createChecklistItem: (cardId: string, body: { text: string }) =>
-    api<ChecklistItem>(`/cards/${cardId}/checklist`, {
-      method: "POST",
-      body,
-    }),
+  static createChecklistItem(cardId: string, data: { text: string }) {
+    return ApiClient.post<ChecklistItem>(`/cards/${cardId}/checklist`, data);
+  }
 
-  updateChecklistItem: (
+  static updateChecklistItem(
     cardId: string,
     itemId: string,
-    body: { text?: string; done?: boolean },
-  ) =>
-    api<ChecklistItem>(`/cards/${cardId}/checklist/${itemId}`, {
-      method: "PATCH",
-      body,
-    }),
+    data: { text?: string; done?: boolean },
+  ) {
+    return ApiClient.patch<ChecklistItem>(
+      `/cards/${cardId}/checklist/${itemId}`,
+      data,
+    );
+  }
 
-  deleteChecklistItem: (cardId: string, itemId: string) =>
-    api<void>(`/cards/${cardId}/checklist/${itemId}`, { method: "DELETE" }),
+  static deleteChecklistItem(cardId: string, itemId: string) {
+    return ApiClient.delete<void>(`/cards/${cardId}/checklist/${itemId}`);
+  }
 
-  getLabels: (boardId: string) =>
-    api<Label[]>(`/boards/${boardId}/labels`),
+  static getLabels(boardId: string) {
+    return ApiClient.get<Label[]>(`/boards/${boardId}/labels`);
+  }
 
-  createLabel: (boardId: string, body: { name: string; color: string }) =>
-    api<Label>(`/boards/${boardId}/labels`, { method: "POST", body }),
+  static createLabel(boardId: string, data: { name: string; color: string }) {
+    return ApiClient.post<Label>(`/boards/${boardId}/labels`, data);
+  }
 
-  deleteLabel: (labelId: string) =>
-    api<void>(`/labels/${labelId}`, { method: "DELETE" }),
+  static deleteLabel(labelId: string) {
+    return ApiClient.delete<void>(`/labels/${labelId}`);
+  }
 
-  getCardLabels: (cardId: string) =>
-    api<Label[]>(`/cards/${cardId}/labels`),
+  static getCardLabels(cardId: string) {
+    return ApiClient.get<Label[]>(`/cards/${cardId}/labels`);
+  }
 
-  attachLabel: (cardId: string, labelId: string) =>
-    api<{ success: true }>(`/cards/${cardId}/labels/${labelId}`, {
-      method: "POST",
-    }),
+  static attachLabel(cardId: string, labelId: string) {
+    return ApiClient.post<{ success: true }>(
+      `/cards/${cardId}/labels/${labelId}`,
+    );
+  }
 
-  detachLabel: (cardId: string, labelId: string) =>
-    api<void>(`/cards/${cardId}/labels/${labelId}`, { method: "DELETE" }),
-};
+  static detachLabel(cardId: string, labelId: string) {
+    return ApiClient.delete<void>(`/cards/${cardId}/labels/${labelId}`);
+  }
+}

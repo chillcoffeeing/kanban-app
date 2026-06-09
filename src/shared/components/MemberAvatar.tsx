@@ -7,12 +7,14 @@ export function MemberAvatar({
   userId,
   onClick,
   stopPropagation = true,
+  size = "md",
 }: {
   name: string;
   avatar?: string;
   userId?: string;
   onClick?: () => void;
   stopPropagation?: boolean;
+  size?: "sm" | "md" | "lg";
 }) {
   const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
 
@@ -51,7 +53,9 @@ export function MemberAvatar({
     <div
       role="button"
       tabIndex={0}
-      className="size-8 rounded-full text-primary-fg flex items-center justify-center ring-2 ring-neutral-light cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+      className={`${
+        size === "sm" ? "size-6 text-xs" : size === "lg" ? "size-10" : "size-8"
+      } rounded-full text-primary-fg flex items-center justify-center ring-2 ring-neutral-light cursor-pointer hover:ring-2 hover:ring-primary transition-all`}
       style={{ backgroundColor: color }}
       title={name}
       onClick={handleProfileClick}

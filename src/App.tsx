@@ -26,11 +26,17 @@ import { BoardRoute } from "@/pages/BoardRoute";
 import { BoardConfigPage } from "@/pages/BoardConfigPage";
 import { UserConfigPage } from "@/pages/UserConfigPage";
 import { InvitationsPage } from "@/pages/InvitationsPage";
+import { initActivityIntegration } from "@/features/activity/activityIntegration";
 
 function App() {
   usePersistSettings();
   useApplySettings();
   useSocket();
+
+  useEffect(() => {
+    const cleanup = initActivityIntegration();
+    return () => cleanup();
+  }, []);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hydrate = useAuthStore((state) => state.hydrate);
   const location = useLocation();

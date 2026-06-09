@@ -1,4 +1,5 @@
-import { cardsApi } from "@/services/cards";
+import { CardsService } from "@/services/cards";
+import { handleError } from "@/shared/utils/errorHandler";
 import type { ChecklistItem } from "@/shared/types";
 import type { BoardState } from "./types";
 import { forCard } from "./helpers/boardHelpers";
@@ -27,16 +28,16 @@ export function createCardChecklistActions(set: any, get: any) {
       });
 
       try {
-        const res = await cardsApi.createChecklistItem(cardId, { text });
+        const res = await CardsService.createChecklistItem(cardId, { text });
         set((state: BoardState) => {
           forCard(state, boardId, stageId, cardId, (card) => {
             const item = card.checklist.find((item) => item.id === newItem.id);
             if (item) item.id = res.id;
           });
         });
-      } catch (error) {
+      } catch (err) {
         set(currentState);
-        throw error;
+        handleError(err, "Error al añadir elemento al checklist");
       }
     },
 
@@ -57,10 +58,10 @@ export function createCardChecklistActions(set: any, get: any) {
       });
 
       try {
-        await cardsApi.updateChecklistItem(cardId, itemId, updates);
-      } catch (error) {
+        await CardsService.updateChecklistItem(cardId, itemId, updates);
+      } catch (err) {
         set(currentState);
-        throw error;
+        handleError(err, "Error al actualizar el checklist");
       }
     },
 
@@ -79,10 +80,10 @@ export function createCardChecklistActions(set: any, get: any) {
       });
 
       try {
-        await cardsApi.deleteChecklistItem(cardId, itemId);
-      } catch (error) {
+        await CardsService.deleteChecklistItem(cardId, itemId);
+      } catch (err) {
         set(currentState);
-        throw error;
+        handleError(err, "Error al eliminar elemento del checklist");
       }
     },
   };

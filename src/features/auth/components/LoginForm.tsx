@@ -7,18 +7,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
 import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
 import { useMountFade } from "@/shared/hooks/useGsapAnimation";
-
-const TEST_ACCOUNTS = [
-  { email: 'alice@kanban.dev', label: 'Tech Lead (dueño Board 1)' },
-  { email: 'bob@kanban.dev', label: 'Frontend Dev (dueño Board 2)' },
-  { email: 'carol@kanban.dev', label: 'UX Designer' },
-  { email: 'dave@kanban.dev', label: 'Backend Dev' },
-  { email: 'eve@kanban.dev', label: 'Mobile Dev (dueño Board 3)' },
-  { email: 'frank@kanban.dev', label: 'DevOps Engineer' },
-  { email: 'grace@kanban.dev', label: 'Data Engineer' },
-];
-
-const PASSWORD = 'Passw0rd!';
+import { TEST_ACCOUNTS, PASSWORD } from '../utils/constants'
 
 export function LoginForm() {
   const navigate = useNavigate()

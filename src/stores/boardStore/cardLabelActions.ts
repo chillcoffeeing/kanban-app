@@ -1,4 +1,5 @@
-import { cardsApi } from "@/services/cards";
+import { CardsService } from "@/services/cards";
+import { handleError } from "@/shared/utils/errorHandler";
 import type { Board, Label } from "@/shared/types";
 import type { BoardState } from "./types";
 import { forBoard, forCard } from "./helpers/boardHelpers";
@@ -28,10 +29,10 @@ export function createCardLabelActions(set: any, get: any) {
       });
 
       try {
-        await cardsApi.attachLabel(cardId, labelId);
-      } catch {
+        await CardsService.attachLabel(cardId, labelId);
+      } catch (err) {
         set(currentState);
-        throw new Error("Failed to attach label");
+        handleError(err, "Error al añadir etiqueta");
       }
     },
 
@@ -50,37 +51,46 @@ export function createCardLabelActions(set: any, get: any) {
       });
 
       try {
-        await cardsApi.detachLabel(cardId, labelId);
-      } catch {
+        await CardsService.detachLabel(cardId, labelId);
+      } catch (err) {
         set(currentState);
-        throw new Error("Failed to detach label");
+        handleError(err, "Error al quitar etiqueta");
       }
     },
 
     createLabel: async (boardId: string, name: string, color: string) => {
-      const res = await cardsApi.createLabel(boardId, { name, color });
-      const label: Label = { id: res.id, boardId, name: res.name, color: res.color };
+      try {
+        const res = await CardsService.createLabel(boardId, { name, color });
+        const label: Label = { id: res.id, boardId, name: res.name, color: res.color };
 
-      set((state: BoardState) => {
-        forBoard(state, boardId, (b) => { b.labels.push(label); });
-      });
+        set((state: BoardState) => {
+          forBoard(state, boardId, (b) => { b.labels.push(label); });
+        });
 
-      return label;
+        return label;
+      } catch (err) {
+        handleError(err, "Error al crear etiqueta");
+        return null;
+      }
     },
 
     deleteLabel: async (boardId: string, labelId: string) => {
-      await cardsApi.deleteLabel(labelId);
+      try {
+        await CardsService.deleteLabel(labelId);
 
-      set((state: BoardState) => {
-        forBoard(state, boardId, (b) => {
-          b.labels = b.labels.filter((label) => label.id !== labelId);
-          b.stages.forEach((stage) => {
-            stage.cards.forEach((card) => {
-              card.labels = card.labels.filter((label) => label.id !== labelId);
+        set((state: BoardState) => {
+          forBoard(state, boardId, (b) => {
+            b.labels = b.labels.filter((label) => label.id !== labelId);
+            b.stages.forEach((stage) => {
+              stage.cards.forEach((card) => {
+                card.labels = card.labels.filter((label) => label.id !== labelId);
+              });
             });
           });
         });
-      });
+      } catch (err) {
+        handleError(err, "Error al eliminar etiqueta");
+      }
     },
   };
 }

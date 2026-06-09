@@ -1,59 +1,14 @@
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { useActivityStore, ACTIVITY_TYPES } from '@/stores/activityStore'
-import type { ActivityType } from '@/shared/types/domain'
+import { useActivityStore } from '@/stores/activityStore'
+import { useBoardStore } from '@/stores/boardStore'
+import { MemberAvatar } from '@/shared/components/MemberAvatar'
 import {
   KanbanIcon,
-  StackIcon,
-  FileTextIcon,
-  ArrowsLeftRightIcon,
-  TrashIcon,
-  TagIcon,
-  CalendarBlankIcon,
-  CheckCircleIcon,
-  UserPlusIcon,
-  UserMinusIcon,
-  NotePencilIcon,
+  ArrowSquareOut,
 } from '@phosphor-icons/react'
-import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
-import { useMemo } from 'react'
-
-const ICON_MAP: Partial<Record<ActivityType, PhosphorIcon>> = {
-  [ACTIVITY_TYPES.BOARD_CREATED]: KanbanIcon,
-  [ACTIVITY_TYPES.BOARD_RENAMED]: NotePencilIcon,
-  [ACTIVITY_TYPES.STAGE_CREATED]: StackIcon,
-  [ACTIVITY_TYPES.STAGE_RENAMED]: NotePencilIcon,
-  [ACTIVITY_TYPES.STAGE_DELETED]: TrashIcon,
-  [ACTIVITY_TYPES.CARD_CREATED]: FileTextIcon,
-  [ACTIVITY_TYPES.CARD_UPDATED]: NotePencilIcon,
-  [ACTIVITY_TYPES.CARD_MOVED]: ArrowsLeftRightIcon,
-  [ACTIVITY_TYPES.CARD_DELETED]: TrashIcon,
-  [ACTIVITY_TYPES.CARD_LABEL_ADDED]: TagIcon,
-  [ACTIVITY_TYPES.CARD_LABEL_REMOVED]: TagIcon,
-  [ACTIVITY_TYPES.CARD_DATE_SET]: CalendarBlankIcon,
-  [ACTIVITY_TYPES.CARD_CHECKLIST_ADDED]: CheckCircleIcon,
-  [ACTIVITY_TYPES.CARD_CHECKLIST_TOGGLED]: CheckCircleIcon,
-  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: UserPlusIcon,
-  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: UserMinusIcon,
-  [ACTIVITY_TYPES.MEMBER_INVITED]: UserPlusIcon,
-  [ACTIVITY_TYPES.MEMBER_REMOVED]: UserMinusIcon,
-}
-
-const COLOR_MAP: Partial<Record<ActivityType, string>> = {
-  [ACTIVITY_TYPES.CARD_DELETED]: 'text-danger bg-danger',
-  [ACTIVITY_TYPES.STAGE_DELETED]: 'text-danger bg-danger',
-  [ACTIVITY_TYPES.MEMBER_REMOVED]: 'text-danger bg-danger',
-  [ACTIVITY_TYPES.MEMBER_LEFT_CARD]: 'text-warning bg-warning',
-  [ACTIVITY_TYPES.CARD_MOVED]: 'text-info bg-info',
-  [ACTIVITY_TYPES.MEMBER_INVITED]: 'text-success bg-success',
-  [ACTIVITY_TYPES.MEMBER_JOINED_CARD]: 'text-success bg-success',
-  [ACTIVITY_TYPES.CARD_CREATED]: 'text-success bg-success',
-  [ACTIVITY_TYPES.STAGE_CREATED]: 'text-success bg-success',
-}
-
-function formatRelative(timestamp: string): string {
-  return formatDistanceToNow(new Date(timestamp), { locale: es, addSuffix: true })
-}
+import { useMemo, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 interface ActivityFeedProps {
   isOpen: boolean
@@ -62,11 +17,21 @@ interface ActivityFeedProps {
 
 export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
   const activities = useActivityStore((activityState) => activityState.activities)
+  const currentBoard = useBoardStore((s) => s.currentBoard)
+  const loadCard = useBoardStore((s) => s.loadCard)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const getRelativeTime = useMemo(() => {
     return (timestamp: string): string =>
       formatDistanceToNow(new Date(timestamp), { locale: es, addSuffix: true })
   }, [])
+
+  const handleCardClick = useCallback((cardId: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("card-id", cardId);
+    setSearchParams(params, { replace: false });
+    loadCard(cardId);
+  }, [searchParams, setSearchParams, loadCard])
 
   return (
     <div
@@ -93,20 +58,44 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
         ) : (
           <div className="divide-y divide-neutral-light/50">
             {activities.map((activity) => {
-              const Icon = ICON_MAP[activity.type] || FileTextIcon
-              const colorClass = COLOR_MAP[activity.type] || 'text-primary bg-primary/10'
+              const cardId = activity.type !== "card_deleted"
+                ? (activity.meta?.cardId as string | undefined)
+                : undefined
+              const member = activity.membershipId
+                ? currentBoard?.members.find((m) => m.id === activity.membershipId)?.user
+                : undefined
 
               return (
-                 <div key={activity.id} className="flex gap-3 px-4 py-3 hover:bg-neutral-light-hover/50 transition-colors">
-                  <div className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full ${colorClass}`}>
-                    <Icon size={18} weight="duotone" />
-                  </div>
+                <div key={activity.id} className="flex gap-3 px-4 py-3 hover:bg-neutral-light-hover/50 transition-colors">
+                  {member ? (
+                    <MemberAvatar
+                      name={member.name}
+                      avatar={member.avatarUrl ?? undefined}
+                      userId={member.id}
+                      size="sm"
+                    />
+                  ) : (
+                    <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-neutral-light text-xs font-semibold text-neutral-dark/60">
+                      {activity.user[0]?.toUpperCase()}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-neutral-dark leading-snug">
+                    <div className="text-sm text-neutral-dark leading-snug">
                       <span className="font-medium text-neutral-dark">{activity.user}</span>{' '}
                       {activity.detail}
-                    </p>
-                    <p className="mt-0.5 text-xs text-neutral-dark/50">{getRelativeTime(activity.timestamp)}</p>
+                    </div>
+                    <div className="mt-0.5 text-xs text-neutral-dark/50">
+                      {getRelativeTime(activity.timestamp)}
+                      {cardId && (
+                        <button
+                          onClick={() => handleCardClick(cardId)}
+                          className="ml-2 inline-flex items-center gap-0.5 text-primary hover:text-primary-hover cursor-pointer transition-colors"
+                        >
+                          <ArrowSquareOut size={12} weight="bold" />
+                          Ver tarjeta
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

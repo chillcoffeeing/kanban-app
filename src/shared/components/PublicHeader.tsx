@@ -2,18 +2,9 @@ import { useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import {
-  KanbanIcon, List, X, Sun, Moon, MoonStars, Palette,
+  KanbanIcon, List, X,
 } from "@phosphor-icons/react";
-import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
-
-const PUBLIC_THEME_KEY = "kanban-public-theme";
-
-const THEME_OPTIONS: Array<{ id: string; label: string; Icon: PhosphorIcon }> = [
-  { id: "light", label: "Claro", Icon: Sun },
-  { id: "dark", label: "Oscuro", Icon: Moon },
-  { id: "midnight", label: "Medianoche", Icon: MoonStars },
-  { id: "solarized", label: "Solarized", Icon: Palette },
-];
+import { PUBLIC_THEME_KEY, THEME_OPTIONS } from "@/shared/utils/constants";
 
 function getPublicTheme(): string {
   return localStorage.getItem(PUBLIC_THEME_KEY) || "light";

@@ -1,5 +1,5 @@
-import { usersApi } from "@/services/users";
-import { useToastStore } from "@/stores/toastStore";
+import { UsersService } from "@/services/users";
+import { handleError } from "@/shared/utils/errorHandler";
 import type { UserResponse, UserProfileJson, UserPreferenceJson } from "@/shared/types/api";
 
 export function createUserActions(set: any, get: any) {
@@ -14,7 +14,7 @@ export function createUserActions(set: any, get: any) {
       };
 
       try {
-        const result = await usersApi.updateProfile({
+        const result = await UsersService.updateProfile({
           profile: updatedProfileJson,
         });
 
@@ -27,14 +27,14 @@ export function createUserActions(set: any, get: any) {
             },
           },
         });
-      } catch {
+      } catch (err) {
         set({
           user: {
             ...current,
             profile: { ...current.profile, profile: updatedProfileJson },
           },
         });
-        useToastStore.getState().addToast({ type: "error", message: "Error al actualizar perfil" });
+        handleError(err, "Error al actualizar perfil");
       }
     },
 
@@ -48,7 +48,7 @@ export function createUserActions(set: any, get: any) {
       };
 
       try {
-        const result = await usersApi.updatePreferences({
+        const result = await UsersService.updatePreferences({
           settings: updatedSettings,
         });
 
@@ -61,14 +61,14 @@ export function createUserActions(set: any, get: any) {
             },
           },
         });
-      } catch {
+      } catch (err) {
         set({
           user: {
             ...current,
             preference: { ...current.preference, settings: updatedSettings },
           },
         });
-        useToastStore.getState().addToast({ type: "error", message: "Error al actualizar preferencias" });
+        handleError(err, "Error al actualizar preferencias");
       }
     },
   };

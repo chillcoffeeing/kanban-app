@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { getAccessToken } from "@/services/api";
+import { TokenManager } from "@/services/api";
 
 let socketInstance: Socket | null = null;
 
@@ -9,7 +9,7 @@ class SocketService {
   connect(): Socket {
     if (socketInstance?.connected) return socketInstance;
 
-    const token = getAccessToken();
+    const token = TokenManager.getAccess();
     if (!token) throw new Error("No access token available");
 
     socketInstance = io(

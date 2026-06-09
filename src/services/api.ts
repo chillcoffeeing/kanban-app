@@ -1,92 +1,136 @@
-const API_BASE =
+const API_BASE_URL =
   (import.meta.env.VITE_API_BASE as string | undefined) ??
   "http://localhost:3000/api/v1";
 
-const TOKEN_KEY = "canvan_token";
-const REFRESH_KEY = "canvan_refresh_token";
+const ACCESS_TOKEN_KEY = "canvan_token";
+const REFRESH_TOKEN_KEY = "canvan_refresh_token";
 
 export class ApiError extends Error {
   status: number;
   payload: unknown;
   constructor(message: string, status: number, payload: unknown) {
     super(message);
+    this.name = "ApiError";
     this.status = status;
     this.payload = payload;
   }
 }
 
-export function getAccessToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-export function setTokens(access: string, refresh?: string | null) {
-  localStorage.setItem(TOKEN_KEY, access);
-  if (refresh) localStorage.setItem(REFRESH_KEY, refresh);
-}
-export function clearTokens() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_KEY);
-}
+export const TokenManager = {
+  getAccess: (): string | null => localStorage.getItem(ACCESS_TOKEN_KEY),
+  getRefresh: (): string | null => localStorage.getItem(REFRESH_TOKEN_KEY),
+  set: (accessToken: string, refreshToken?: string | null) => {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    if (refreshToken !== undefined && refreshToken !== null)
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  },
+  clear: () => {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  },
+};
 
-export let onForbidden: ((error: ApiError) => void) | null = null;
-export const SetOnForbidden = (
-  callback: ((error: ApiError) => void) | null,
+let forbiddenHandler: ((error: ApiError) => void) | null = null;
+
+export const setForbiddenHandler = (
+  handler: ((error: ApiError) => void) | null,
 ) => {
-  onForbidden = callback;
+  forbiddenHandler = handler;
 };
 
 interface RequestOptions {
-  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
   auth?: boolean;
+  signal?: AbortSignal;
 }
 
-export async function api<T = unknown>(
-  path: string,
-  opts: RequestOptions = {},
-): Promise<T> {
-  const { method = "GET", body, auth = true } = opts;
-  const headers: Record<string, string> = {};
-  if (body !== undefined) headers["content-type"] = "application/json";
-  if (auth) {
-    const tok = getAccessToken();
-    if (tok) headers.authorization = `Bearer ${tok}`;
+export class ApiClient {
+  static async get<T>(path: string, options?: RequestOptions): Promise<T> {
+    return this.request<T>("GET", path, options);
   }
 
-  const controller = new AbortController();
+  static async post<T>(
+    path: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return this.request<T>("POST", path, { ...options, body });
+  }
 
-  const signal = controller.signal;
+  static async patch<T>(
+    path: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return this.request<T>("PATCH", path, { ...options, body });
+  }
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-    signal,
-  });
+  static async put<T>(
+    path: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return this.request<T>("PUT", path, { ...options, body });
+  }
 
-  if (res.status === 204) return undefined as T;
-  const text = await res.text();
-  const data = text ? safeJson(text) : null;
+  static async delete<T>(path: string, options?: RequestOptions): Promise<T> {
+    return this.request<T>("DELETE", path, options);
+  }
 
-  if (!res.ok) {
-    const msg =
-      (typeof data === "object" && data && "message" in data
-        ? String((data as { message: unknown }).message)
-        : null) ||
-      res.statusText ||
-      "Request failed";
-    const error = new ApiError(msg, res.status, data);
-    if (res.status === 403 && onForbidden) {
-      onForbidden(error);
+  private static async request<T>(
+    method: string,
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    const { body, auth = true } = options;
+    const headers: Record<string, string | undefined> = {};
+    if (body !== undefined) headers["content-type"] = "application/json";
+    if (auth) {
+      const token = TokenManager.getAccess();
+      if (token) headers.authorization = `Bearer ${token}`;
     }
-    throw error;
+
+    const cleanHeaders = Object.fromEntries(
+      Object.entries(headers).filter(
+        ([, headerValue]) => headerValue !== undefined,
+      ),
+    ) as Record<string, string>;
+
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers: cleanHeaders,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: options.signal,
+    });
+
+    if (response.status === 204) return undefined as T;
+    const rawText = await response.text();
+    const parsedBody = rawText ? parseJsonSafe(rawText) : null;
+
+    if (!response.ok) {
+      const message =
+        (typeof parsedBody === "object" &&
+        parsedBody &&
+        "message" in parsedBody
+          ? String((parsedBody as { message: unknown }).message)
+          : null) ||
+        response.statusText ||
+        "Request failed";
+      const error = new ApiError(message, response.status, parsedBody);
+      if (response.status === 403 && forbiddenHandler) {
+        forbiddenHandler(error);
+      }
+      throw error;
+    }
+
+    return parsedBody as T;
   }
-  return data as T;
 }
 
-function safeJson(s: string): unknown {
+function parseJsonSafe(rawText: string): unknown {
   try {
-    return JSON.parse(s);
+    return JSON.parse(rawText);
   } catch {
-    return s;
+    return rawText;
   }
 }

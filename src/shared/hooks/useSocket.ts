@@ -18,7 +18,6 @@ const REALTIME_EVENTS = [
   "stage:deleted",
   "stage:reordered",
   "board:updated",
-  "board:deleted",
 ] as const;
 
 type RealtimeEventHandler = (payload: unknown) => void;
@@ -107,10 +106,6 @@ function buildEventHandlers(): Record<string, RealtimeEventHandler> {
       });
     },
 
-    "board:deleted": (payload) => {
-      const data = payload as { boardId: string };
-      store.realtimeDeleteBoard(data.boardId);
-    },
   };
 }
 

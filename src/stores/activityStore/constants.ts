@@ -1,7 +1,6 @@
 import type { ActivityType } from "@/shared/types/domain";
 
 export const ACTIVITY_TYPES = {
-  BOARD_CREATED: "board_created",
   BOARD_RENAMED: "board_renamed",
   STAGE_CREATED: "stage_created",
   STAGE_RENAMED: "stage_renamed",

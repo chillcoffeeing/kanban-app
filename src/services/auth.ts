@@ -1,13 +1,5 @@
-import { api } from "./api";
+import { ApiClient } from "./api";
 import type { AuthResponse, UserResponse } from "@/shared/types";
-
-export function login(email: string, password: string) {
-  return api<AuthResponse>("/auth/login", {
-    method: "POST",
-    body: { email, password },
-    auth: false,
-  });
-}
 
 interface RegisterOptions {
   email: string;
@@ -19,21 +11,20 @@ interface RegisterOptions {
   company?: string;
 }
 
-export function register(opts: RegisterOptions) {
-  return api<AuthResponse>("/auth/register", {
-    method: "POST",
-    body: opts,
-    auth: false,
-  });
-}
+export class AuthService {
+  static login(email: string, password: string) {
+    return ApiClient.post<AuthResponse>("/auth/login", { email, password }, { auth: false });
+  }
 
-export function account() {
-  return api<UserResponse>("/auth/account");
-}
+  static register(opts: RegisterOptions) {
+    return ApiClient.post<AuthResponse>("/auth/register", opts, { auth: false });
+  }
 
-export function logout(refreshToken: string) {
-  return api<void>("/auth/logout", {
-    method: "POST",
-    body: { refreshToken },
-  });
+  static account() {
+    return ApiClient.get<UserResponse>("/auth/account");
+  }
+
+  static logout(refreshToken: string) {
+    return ApiClient.post<void>("/auth/logout", { refreshToken });
+  }
 }

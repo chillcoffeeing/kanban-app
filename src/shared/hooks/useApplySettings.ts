@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuthStore } from "@/stores/authStore";
-
-const PUBLIC_THEME_KEY = "kanban-public-theme";
+import { PUBLIC_THEME_KEY } from "@/shared/utils/constants";
 
 export function useApplySettings() {
   const { theme, background, density, reducedMotion, language } =

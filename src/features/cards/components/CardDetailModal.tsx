@@ -5,7 +5,6 @@ import { useBoardStore } from "@/stores/boardStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useActivity } from "@/shared/hooks/useActivity";
 import { ACTIVITY_TYPES } from "@/stores/activityStore";
-import { useToastStore } from "@/stores/toastStore";
 import {
   UserPlusIcon,
   TrashIcon,
@@ -125,22 +124,18 @@ export function CardDetailModal({
 
   const toggleLabel = async (label: Label) => {
     const has = labels.some((existingLabel) => existingLabel.id === label.id);
-    try {
-      if (has) {
-        await detachLabel(boardId, activeStageId, activeCard.id, label.id);
-        log(
-          ACTIVITY_TYPES.CARD_LABEL_REMOVED,
-          `quitó la etiqueta "${label.name}" de "${title}"`,
-        );
-      } else {
-        await attachLabel(boardId, activeStageId, activeCard.id, label.id);
-        log(
-          ACTIVITY_TYPES.CARD_LABEL_ADDED,
-          `añadió la etiqueta "${label.name}" a "${title}"`,
-        );
-      }
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al cambiar etiqueta de la tarjeta" });
+    if (has) {
+      await detachLabel(boardId, activeStageId, activeCard.id, label.id);
+      log(
+        ACTIVITY_TYPES.CARD_LABEL_REMOVED,
+        `quitó la etiqueta "${label.name}" de "${title}"`,
+      );
+    } else {
+      await attachLabel(boardId, activeStageId, activeCard.id, label.id);
+      log(
+        ACTIVITY_TYPES.CARD_LABEL_ADDED,
+        `añadió la etiqueta "${label.name}" a "${title}"`,
+      );
     }
   };
 
@@ -148,40 +143,28 @@ export function CardDetailModal({
     e.preventDefault();
     if (!newCheckItem.trim()) return;
     const text = newCheckItem.trim();
-    try {
-      await addChecklistItem(boardId, activeStageId, activeCard.id, text);
-      log(
-        ACTIVITY_TYPES.CARD_CHECKLIST_ADDED,
-        `añadió "${text}" al checklist de "${title}"`,
-      );
-      setNewCheckItem("");
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al añadir elemento al checklist" });
-    }
+    await addChecklistItem(boardId, activeStageId, activeCard.id, text);
+    log(
+      ACTIVITY_TYPES.CARD_CHECKLIST_ADDED,
+      `añadió "${text}" al checklist de "${title}"`,
+    );
+    setNewCheckItem("");
   };
 
   const toggleCheckItem = async (itemId: string) => {
     const item = checklist.find((item) => item.id === itemId);
     if (!item) return;
-    try {
-      await updateChecklistItem(boardId, activeStageId, activeCard.id, itemId, {
-        done: !item.done,
-      });
-      log(
-        ACTIVITY_TYPES.CARD_CHECKLIST_TOGGLED,
-        `${!item.done ? "completó" : "desmarcó"} "${item.text}" en "${title}"`,
-      );
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al cambiar estado del checklist" });
-    }
+    await updateChecklistItem(boardId, activeStageId, activeCard.id, itemId, {
+      done: !item.done,
+    });
+    log(
+      ACTIVITY_TYPES.CARD_CHECKLIST_TOGGLED,
+      `${!item.done ? "completó" : "desmarcó"} "${item.text}" en "${title}"`,
+    );
   };
 
   const removeCheckItem = async (itemId: string) => {
-    try {
-      await deleteChecklistItem(boardId, activeStageId, activeCard.id, itemId);
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al eliminar elemento del checklist" });
-    }
+    await deleteChecklistItem(boardId, activeStageId, activeCard.id, itemId);
   };
 
   const joinCard = async () => {
@@ -189,15 +172,9 @@ export function CardDetailModal({
     const membership = currentBoard?.members.find(
       (boardMember) => boardMember?.user?.id === userId,
     );
-    if (!userId || !membership) {
-      throw new Error("Membership not found for current user");
-    }
-    try {
-      await addCardMember(boardId, activeStageId, activeCard.id, membership.id);
-      log(ACTIVITY_TYPES.MEMBER_JOINED_CARD, `se unió a la tarjeta "${title}"`);
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al unirse a la tarjeta" });
-    }
+    if (!userId || !membership) return;
+    await addCardMember(boardId, activeStageId, activeCard.id, membership.id);
+    log(ACTIVITY_TYPES.MEMBER_JOINED_CARD, `se unió a la tarjeta "${title}"`);
   };
 
   const leaveCard = async () => {
@@ -205,20 +182,14 @@ export function CardDetailModal({
     const membership = currentBoard?.members.find(
       (boardMember) => boardMember?.user?.id === userId,
     );
-    if (!userId || !membership) {
-      throw new Error("Membership not found for current user");
-    }
-    try {
-      await removeCardMember(
-        boardId,
-        activeStageId,
-        activeCard.id,
-        membership.id,
-      );
-      log(ACTIVITY_TYPES.MEMBER_LEFT_CARD, `dejó la tarjeta "${title}"`);
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al dejar la tarjeta" });
-    }
+    if (!userId || !membership) return;
+    await removeCardMember(
+      boardId,
+      activeStageId,
+      activeCard.id,
+      membership.id,
+    );
+    log(ACTIVITY_TYPES.MEMBER_LEFT_CARD, `dejó la tarjeta "${title}"`);
   };
 
   const handleStartDate = (value: string) => {
@@ -244,16 +215,13 @@ export function CardDetailModal({
   };
 
   const handleCreateLabel = async (name: string, color: string) => {
-    try {
-      const label = await createLabel(boardId, name, color);
-      await attachLabel(boardId, activeStageId, activeCard.id, label.id);
-      log(
-        ACTIVITY_TYPES.CARD_LABEL_ADDED,
-        `añadió la etiqueta "${label.name}" a "${title}"`,
-      );
-    } catch (error) {
-      useToastStore.getState().addToast({ type: "error", message: "Error al crear etiqueta" });
-    }
+    const label = await createLabel(boardId, name, color);
+    if (!label) return;
+    await attachLabel(boardId, activeStageId, activeCard.id, label.id);
+    log(
+      ACTIVITY_TYPES.CARD_LABEL_ADDED,
+      `añadió la etiqueta "${label.name}" a "${title}"`,
+    );
   };
 
   const handleDelete = () => {

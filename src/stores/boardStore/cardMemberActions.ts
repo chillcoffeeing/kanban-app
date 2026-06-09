@@ -1,5 +1,5 @@
-import { cardsApi } from "@/services/cards";
-import { useToastStore } from "@/stores/toastStore";
+import { CardsService } from "@/services/cards";
+import { handleError } from "@/shared/utils/errorHandler";
 import type { BoardState } from "./types";
 import { forCard } from "./helpers/boardHelpers";
 
@@ -25,15 +25,15 @@ export function createCardMemberActions(set: any, get: any) {
       });
 
       try {
-        const res = await cardsApi.addMember(cardId, { boardMembershipId });
+        const res = await CardsService.addMember(cardId, { boardMembershipId });
         set((state: BoardState) => {
           forCard(state, boardId, stageId, cardId, (card) => {
             card.members = res.members || [];
           });
         });
-      } catch {
+      } catch (err) {
         set(currentState);
-        useToastStore.getState().addToast({ type: "error", message: "Error al asignar miembro a la tarjeta" });
+        handleError(err, "Error al asignar miembro a la tarjeta");
       }
     },
 
@@ -54,10 +54,10 @@ export function createCardMemberActions(set: any, get: any) {
       });
 
       try {
-        await cardsApi.removeMember(cardId, boardMembershipId);
-      } catch {
+        await CardsService.removeMember(cardId, boardMembershipId);
+      } catch (err) {
         set(currentState);
-        useToastStore.getState().addToast({ type: "error", message: "Error al remover miembro de la tarjeta" });
+        handleError(err, "Error al remover miembro de la tarjeta");
       }
     },
   };

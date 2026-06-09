@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  SunIcon,
-  MoonIcon,
-  MoonStarsIcon,
-  PaletteIcon,
   SquaresFourIcon,
   DotsNineIcon,
   GridFourIcon,
@@ -18,6 +14,7 @@ import {
   FloppyDiskIcon,
   ArrowCounterClockwiseIcon,
   GlobeIcon,
+  SunIcon,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import {
@@ -25,13 +22,7 @@ import {
   BACKGROUNDS,
 } from "@/stores/settingsStore";
 import { Button } from "@/shared/components/Button";
-
-const THEME_OPTIONS: Array<{ id: string; label: string; Icon: PhosphorIcon }> = [
-  { id: "light", label: "Claro", Icon: SunIcon },
-  { id: "dark", label: "Oscuro", Icon: MoonIcon },
-  { id: "midnight", label: "Medianoche", Icon: MoonStarsIcon },
-  { id: "solarized", label: "Solarized", Icon: PaletteIcon },
-];
+import { THEME_OPTIONS } from "@/shared/utils/constants";
 
 const BG_ICONS: Record<string, PhosphorIcon> = {
   plain: SquaresFourIcon,

@@ -1,4 +1,9 @@
 import type { Permission } from '@/shared/types/domain'
+import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
+import {
+  Sun, Moon, MoonStars, Palette,
+  LightningIcon, UsersThreeIcon, ChartLineUpIcon,
+} from '@phosphor-icons/react'
 
 export const LABEL_COLORS: Array<{ name: string; value: string }> = [
   { name: 'Rojo', value: '#ef4444' },
@@ -21,6 +26,45 @@ export const PERMISSIONS = {
 
 export const ALL_PERMISSIONS: Permission[] = Object.values(PERMISSIONS)
 
+export const PERMISSION_LABELS: Record<Permission, string> = {
+  [PERMISSIONS.CREATE_STAGE]: "Crear etapas",
+  [PERMISSIONS.CREATE_CARD]: "Crear tarjetas",
+  [PERMISSIONS.MODIFY_CARD]: "Modificar tarjetas",
+  [PERMISSIONS.DELETE_CARD]: "Eliminar tarjetas",
+  [PERMISSIONS.INVITE_MEMBER]: "Invitar miembros",
+}
+
+export const ROLE_LABELS: Record<string, string> = {
+  owner: 'Propietario',
+  member: 'Miembro',
+}
+
+export const PUBLIC_THEME_KEY = "kanban-public-theme";
+
+export const THEME_OPTIONS: Array<{ id: string; label: string; Icon: PhosphorIcon }> = [
+  { id: "light", label: "Claro", Icon: Sun },
+  { id: "dark", label: "Oscuro", Icon: Moon },
+  { id: "midnight", label: "Medianoche", Icon: MoonStars },
+  { id: "solarized", label: "Solarized", Icon: Palette },
+]
+
+export const LANDING_FEATURES: Array<{ icon: PhosphorIcon; title: string; desc: string }> = [
+  {
+    icon: LightningIcon,
+    title: "Flujos de trabajo ágiles",
+    desc: "Organiza tareas y proyectos con tableros diseñados para equipos de alto rendimiento.",
+  },
+  {
+    icon: UsersThreeIcon,
+    title: "Colaboración en tiempo real",
+    desc: "Sincroniza a todo tu equipo con actualizaciones instantáneas y permisos granulares.",
+  },
+  {
+    icon: ChartLineUpIcon,
+    title: "Visibilidad ejecutiva",
+    desc: "Métricas y reportes claros para tomar decisiones basadas en datos.",
+  },
+]
 export const BOARD_BACKGROUNDS = [
   { id: 'blue-purple', gradientClass: 'bg-gradient-to-br from-blue-500 to-purple-600', textColorClass: 'text-white' },
   { id: 'green-cyan', gradientClass: 'bg-gradient-to-br from-green-400 to-cyan-500', textColorClass: 'text-white' },
@@ -35,11 +79,9 @@ export const BOARD_BACKGROUNDS = [
 export const DEFAULT_BACKGROUND_ID = BOARD_BACKGROUNDS[0].id
 
 export function getBoardBackgroundClasses(backgroundId: string): { gradientClass: string; textColorClass: string } {
-  // Handle legacy JSON format
   try {
     const parsed = JSON.parse(backgroundId)
     if (parsed.gradient && parsed.textColor) {
-      // Find matching background by gradient to get the ID
       const matchById = BOARD_BACKGROUNDS.find(bg => bg.gradientClass === parsed.gradient)
       if (matchById) {
         return {
@@ -47,14 +89,12 @@ export function getBoardBackgroundClasses(backgroundId: string): { gradientClass
           textColorClass: matchById.textColorClass
         }
       }
-      // Fallback: return parsed values directly (legacy support)
       return {
         gradientClass: parsed.gradient,
         textColorClass: parsed.textColor
       }
     }
   } catch {
-    // Not JSON, treat as ID
   }
 
   const found = BOARD_BACKGROUNDS.find(bg => bg.id === backgroundId)

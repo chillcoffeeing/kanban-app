@@ -1,25 +1,10 @@
 import { generateId } from "@/shared/utils/helpers";
-import { membersApi } from "@/services/boards";
-import { useAuthStore } from "@/stores/authStore";
-import { useActivityStore } from "@/stores/activityStore";
-import { useToastStore } from "@/stores/toastStore";
-import type { ActivityType, BoardMember, Permission } from "@/shared/types";
+import { MembersService } from "@/services/boards";
+import { eventBus } from "@/shared/utils/eventBus";
+import { handleError } from "@/shared/utils/errorHandler";
+import type { BoardMember, Permission } from "@/shared/types";
 import type { BoardState } from "./types";
 import { forBoard } from "./helpers/boardHelpers";
-
-function logActivity(
-  boardId: string,
-  type: ActivityType,
-  detail: string,
-  meta?: Record<string, unknown>,
-) {
-  const user = useAuthStore.getState().user;
-  const userName =
-    user?.profile?.profile?.displayName || user?.name || "Usuario";
-  useActivityStore
-    .getState()
-    .log(boardId, { type, user: userName, detail, meta });
-}
 
 export function createMemberActions(set: any, get: any) {
   return {
@@ -29,10 +14,11 @@ export function createMemberActions(set: any, get: any) {
       permissions: Permission[] = [],
     ) => {
       try {
-        await membersApi.invite(boardId, email, "member");
-      } catch {
-        useToastStore.getState().addToast({ type: "error", message: "Error al invitar al miembro" });
+        await MembersService.invite(boardId, email, "member");
+      } catch (err) {
+        handleError(err, "Error al invitar al miembro");
       }
+
       const placeholderId = `pending_${generateId()}`;
 
       const newMember: BoardMember = {
@@ -47,7 +33,7 @@ export function createMemberActions(set: any, get: any) {
         forBoard(state, boardId, (b) => { b.members.push(newMember); });
       });
 
-      logActivity(boardId, "member_invited", `invitó a "${email}" al tablero`);
+      eventBus.emit("member:joined", { boardId, detail: `invitó a "${email}" al tablero`, userName: "" });
     },
 
     updateMemberPermissions: async (
@@ -57,12 +43,9 @@ export function createMemberActions(set: any, get: any) {
     ) => {
       if (!membershipId.startsWith("pending_")) {
         try {
-          await membersApi.update(boardId, membershipId, { permissions });
+          await MembersService.update(boardId, membershipId, { permissions });
         } catch (err) {
-          console.error(
-            "[boardStore] updateMemberPermissions API failed:",
-            err,
-          );
+          handleError(err, "Error al actualizar permisos del miembro");
           set({
             error: `Failed to sync member permissions: ${(err as Error).message}`,
           });
@@ -80,9 +63,9 @@ export function createMemberActions(set: any, get: any) {
     removeMember: async (boardId: string, membershipId: string) => {
       if (!membershipId.startsWith("pending_")) {
         try {
-          await membersApi.remove(boardId, membershipId);
+          await MembersService.remove(boardId, membershipId);
         } catch (err) {
-          console.error("[boardStore] removeMember API failed:", err);
+          handleError(err, "Error al eliminar miembro");
           set({
             error: `Failed to sync member removal: ${(err as Error).message}`,
           });
@@ -102,11 +85,7 @@ export function createMemberActions(set: any, get: any) {
         });
       });
 
-      logActivity(
-        boardId,
-        "member_removed",
-        `eliminó a "${memberEmail}" del tablero`,
-      );
+      eventBus.emit("member:left", { boardId, detail: `eliminó a "${memberEmail}" del tablero`, userName: "" });
     },
   };
 }

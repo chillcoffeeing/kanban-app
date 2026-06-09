@@ -8,40 +8,24 @@ import {
   GithubLogoIcon,
   LinkedinLogoIcon,
   GlobeIcon,
-  UserIcon,
+  XLogoIcon,
+  InstagramLogoIcon,
 } from "@phosphor-icons/react";
 import { Modal } from "./Modal";
-import { api } from "@/services/api";
+import { ApiClient } from "@/services/api";
 import { useBoardStore } from "@/stores/boardStore";
-
-interface MemberProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl?: string;
-  profile?: {
-    displayName?: string;
-    bio?: string;
-    jobTitle?: string;
-    company?: string;
-    location?: string;
-    coverUrl?: string;
-    socials?: {
-      website?: string;
-      github?: string;
-      linkedin?: string;
-    };
-  };
-  createdAt?: string;
-}
+import type { UserResponse, UserProfileJson } from "@/shared/types";
 
 export function MemberProfileModal() {
   const userId = useBoardStore((boardState) => boardState.selectedUserId);
-  const setSelectedUserId = useBoardStore((boardState) => boardState.setSelectedUserId);
+  const setSelectedUserId = useBoardStore(
+    (boardState) => boardState.setSelectedUserId,
+  );
   const [state, setState] = useState<{
-    user: MemberProfile | null;
+    user: UserResponse | null;
     loading: boolean;
   }>({ user: null, loading: false });
+  const [coverError, setCoverError] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -49,11 +33,12 @@ export function MemberProfileModal() {
       return;
     }
 
+    setCoverError(false);
     setState((prev) => ({ ...prev, loading: true }));
 
     const fetchUser = async () => {
       try {
-        const data = await api<MemberProfile>(`/users/${userId}`);
+        const data = await ApiClient.get<UserResponse>(`/users/${userId}`);
         setState({ user: data, loading: false });
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -85,26 +70,43 @@ export function MemberProfileModal() {
   const user = state.user;
   if (!user) return null;
 
-  const profile = user.profile || {};
+  const profile: UserProfileJson = user.profile?.profile ?? {};
   const displayName = profile.displayName || user.name || "Usuario";
   const bio = profile.bio;
   const jobTitle = profile.jobTitle;
   const company = profile.company;
   const location = profile.location;
   const coverUrl = profile.coverUrl;
-  const avatarUrl = user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`;
+  const avatarUrl =
+    user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`;
+
+  const socialWebsite = profile.socialWebsite;
+  const socialGithub = profile.socialGithub;
+  const socialLinkedin = profile.socialLinkedin;
+  const socialTwitter = profile.socialTwitter;
+  const socialInstagram = profile.socialInstagram;
+
+  const hasSocials =
+    socialWebsite ||
+    socialGithub ||
+    socialLinkedin ||
+    socialTwitter ||
+    socialInstagram;
 
   return (
     <Modal isOpen={!!userId} onClose={handleClose} size="md">
       <div>
         {coverUrl ? (
-          <div className="relative h-32 w-full overflow-hidden rounded-t-lg -m-8 mb-0">
-            <img
-              src={coverUrl}
-              alt="Cover"
-              className="h-full w-full object-cover"
-            />
-            <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
+          <div className="relative h-32 w-full rounded-t-lg bg-linear-to-r from-blue-500 via-purple-500 to-pink-500">
+            {!coverError && (
+              <img
+                src={coverUrl}
+                alt="Cover"
+                className="h-full w-full object-cover rounded-t-lg"
+                onError={() => setCoverError(true)}
+              />
+            )}
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2">
               <img
                 src={avatarUrl}
                 alt={displayName}
@@ -162,11 +164,11 @@ export function MemberProfileModal() {
             )}
           </div>
 
-          {(profile.socials?.website || profile.socials?.github || profile.socials?.linkedin) && (
+          {hasSocials && (
             <div className="flex flex-wrap gap-4 mb-6">
-              {profile.socials.website && (
+              {socialWebsite && (
                 <a
-                  href={profile.socials.website}
+                  href={socialWebsite}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
@@ -175,9 +177,9 @@ export function MemberProfileModal() {
                   Web
                 </a>
               )}
-              {profile.socials.github && (
+              {socialGithub && (
                 <a
-                  href={`https://github.com/${profile.socials.github}`}
+                  href={`https://github.com/${socialGithub}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-neutral-dark/70 hover:text-neutral-dark"
@@ -186,15 +188,36 @@ export function MemberProfileModal() {
                   GitHub
                 </a>
               )}
-              {profile.socials.linkedin && (
+              {socialLinkedin && (
                 <a
-                  href={`https://linkedin.com/in/${profile.socials.linkedin}`}
+                  href={`https://linkedin.com/in/${socialLinkedin}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-primary/70 hover:text-primary"
                 >
                   <LinkedinLogoIcon size={18} />
                   LinkedIn
+                </a>
+              )}
+              {socialTwitter && (
+                <a
+                  href={`https://x.com/${socialTwitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-neutral-dark/70 hover:text-neutral-dark"
+                >
+                  <XLogoIcon size={18} />X / Twitter
+                </a>
+              )}
+              {socialInstagram && (
+                <a
+                  href={`https://instagram.com/${socialInstagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-[#E4405F] hover:text-[#D3314A]"
+                >
+                  <InstagramLogoIcon size={18} />
+                  Instagram
                 </a>
               )}
             </div>
