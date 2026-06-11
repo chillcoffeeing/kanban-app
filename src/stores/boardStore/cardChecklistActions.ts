@@ -13,8 +13,9 @@ export function createCardChecklistActions(set: any, get: any) {
       text: string,
     ) => {
       const currentState = get();
+      const tempId = `temp-${Date.now()}`;
       const newItem: ChecklistItem = {
-        id: `temp-${Date.now()}`,
+        id: tempId,
         cardId,
         text,
         done: false,
@@ -31,8 +32,12 @@ export function createCardChecklistActions(set: any, get: any) {
         const res = await CardsService.createChecklistItem(cardId, { text });
         set((state: BoardState) => {
           forCard(state, boardId, stageId, cardId, (card) => {
-            const item = card.checklist.find((item) => item.id === newItem.id);
-            if (item) item.id = res.id;
+            const idx = card.checklist.findIndex((item) => item.id === tempId);
+            if (idx !== -1) {
+              card.checklist[idx] = res;
+            } else {
+              card.checklist.push(res);
+            }
           });
         });
       } catch (err) {

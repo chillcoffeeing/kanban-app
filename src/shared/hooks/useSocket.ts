@@ -3,6 +3,7 @@ import { socketService } from "@/services/socket";
 import { useAuthStore } from "@/stores/authStore";
 import { useBoardStore } from "@/stores/boardStore";
 import type { Stage } from "@/shared/types";
+import type { CardResponse } from "@/shared/types/api";
 import {
   normalizeCard,
   normalizeStage,
@@ -13,6 +14,9 @@ const REALTIME_EVENTS = [
   "card:created",
   "card:deleted",
   "card:moved",
+  "card:member_added",
+  "card:member_removed",
+  "checklist:changed",
   "stage:updated",
   "stage:created",
   "stage:deleted",
@@ -22,91 +26,146 @@ const REALTIME_EVENTS = [
 
 type RealtimeEventHandler = (payload: unknown) => void;
 
-function buildEventHandlers(): Record<string, RealtimeEventHandler> {
-  const store = useBoardStore.getState();
+function getStore() {
+  return useBoardStore.getState();
+}
 
-  return {
-    "card:updated": (payload) => {
-      const card = payload as {
-        id: string;
-        stageId: string;
-        title?: string;
-        description?: string;
-        position?: number;
-        startDate?: string | null;
-        dueDate?: string | null;
+function findCardInCurrentBoard(
+  store: ReturnType<typeof useBoardStore.getState>,
+  cardId: string,
+) {
+  const board = store.currentBoard;
+  if (!board) return null;
+  for (const stage of board.stages) {
+    const card = stage.cards.find((c) => c.id === cardId);
+    if (card) return card;
+  }
+  return null;
+}
+
+function buildHandlersForEvent(event: string): RealtimeEventHandler {
+  switch (event) {
+    case "card:updated": {
+      return (payload) => {
+        const data = payload as CardResponse;
+        getStore().realtimeUpdateCard(data.id, {
+          title: data.title,
+          description: data.description,
+          position: data.position,
+          startDate: data.startDate ?? null,
+          dueDate: data.dueDate ?? null,
+          stageId: data.stageId,
+          labels: data.labels,
+          members: data.members,
+          checklist: data.checklist,
+        });
       };
-      store.realtimeUpdateCard(card.id, {
-        title: card.title,
-        description: card.description,
-        position: card.position,
-        startDate: card.startDate ?? null,
-        dueDate: card.dueDate ?? null,
-        stageId: card.stageId,
-      });
-    },
-
-    "card:created": (payload) => {
-      const backendCard = payload as Parameters<typeof normalizeCard>[0];
-      const card = normalizeCard(backendCard);
-      store.realtimeAddCard({ ...card, stageId: backendCard.stageId });
-    },
-
-    "card:deleted": (payload) => {
-      const data = payload as { id: string };
-      store.realtimeDeleteCard(data.id);
-    },
-
-    "card:moved": (payload) => {
-      const card = payload as { id: string; stageId: string; position: number };
-      store.realtimeUpdateCard(card.id, {
-        stageId: card.stageId,
-        position: card.position,
-      });
-    },
-
-    "stage:updated": (payload) => {
-      const stage = payload as { id: string; name: string };
-      store.realtimeUpdateStage(stage.id, { name: stage.name });
-    },
-
-    "stage:created": (payload) => {
-      const backendStage = payload as {
-        id: string;
-        name: string;
-        boardId: string;
-        position: number;
-        createdAt: string;
+    }
+    case "card:created": {
+      return (payload) => {
+        const backendCard = payload as Parameters<typeof normalizeCard>[0];
+        const card = normalizeCard(backendCard);
+        getStore().realtimeAddCard({ ...card, stageId: backendCard.stageId });
       };
-      const stage = normalizeStage(backendStage, []);
-      store.realtimeAddStage(stage);
-    },
-
-    "stage:deleted": (payload) => {
-      const data = payload as { id: string };
-      store.realtimeDeleteStage(data.id);
-    },
-
-    "stage:reordered": (payload) => {
-      const stage = payload as { id: string; position: number };
-      store.realtimeUpdateStage(stage.id, {
-        position: stage.position,
-      } as Partial<Stage> & { position: number });
-    },
-
-    "board:updated": (payload) => {
-      const board = payload as {
-        id: string;
-        name?: string;
-        background?: string;
+    }
+    case "card:deleted": {
+      return (payload) => {
+        const data = payload as { id: string };
+        getStore().realtimeDeleteCard(data.id);
       };
-      store.realtimeUpdateBoard(board.id, {
-        name: board.name,
-        background: board.background,
-      });
-    },
-
-  };
+    }
+    case "card:moved": {
+      return (payload) => {
+        const data = payload as { id: string; stageId: string; position: number };
+        getStore().realtimeUpdateCard(data.id, {
+          stageId: data.stageId,
+          position: data.position,
+        });
+      };
+    }
+    case "card:member_added":
+    case "card:member_removed": {
+      return (payload) => {
+        const data = payload as CardResponse;
+        getStore().realtimeUpdateCard(data.id, { members: data.members });
+      };
+    }
+    case "checklist:changed": {
+      return (payload) => {
+        const ev = payload as {
+          event: "added" | "toggled";
+          cardId: string;
+          item?: { id: string; cardId: string; text: string; done: boolean; position: number };
+          itemId?: string;
+          done?: boolean;
+        };
+        const store = getStore();
+        const card = findCardInCurrentBoard(store, ev.cardId);
+        if (!card) return;
+        if (ev.event === "added" && ev.item) {
+          store.realtimeUpdateCard(ev.cardId, {
+            checklist: [...(card.checklist ?? []), ev.item],
+          });
+        } else if (ev.event === "toggled" && ev.itemId) {
+          store.realtimeUpdateCard(ev.cardId, {
+            checklist: (card.checklist ?? []).map((c) =>
+              c.id === ev.itemId
+                ? { ...c, done: ev.done ?? !c.done }
+                : c,
+            ),
+          });
+        }
+      };
+    }
+    case "stage:updated": {
+      return (payload) => {
+        const stage = payload as { id: string; name: string };
+        getStore().realtimeUpdateStage(stage.id, { name: stage.name });
+      };
+    }
+    case "stage:created": {
+      return (payload) => {
+        const backendStage = payload as {
+          id: string;
+          name: string;
+          boardId: string;
+          position: number;
+          createdAt: string;
+        };
+        const stage = normalizeStage(backendStage, []);
+        getStore().realtimeAddStage(stage);
+      };
+    }
+    case "stage:deleted": {
+      return (payload) => {
+        const data = payload as { id: string };
+        getStore().realtimeDeleteStage(data.id);
+      };
+    }
+    case "stage:reordered": {
+      return (payload) => {
+        const stage = payload as { id: string; position: number };
+        getStore().realtimeUpdateStage(stage.id, {
+          position: stage.position,
+        } as Partial<Stage> & { position: number });
+      };
+    }
+    case "board:updated": {
+      return (payload) => {
+        const board = payload as {
+          id: string;
+          name?: string;
+          background?: string;
+        };
+        getStore().realtimeUpdateBoard(board.id, {
+          name: board.name,
+          background: board.background,
+        });
+      };
+    }
+    default:
+      return () => {};
+  }
 }
 
 const useSocketImpl = () => {
@@ -116,6 +175,8 @@ const useSocketImpl = () => {
   const socketRef = useRef<ReturnType<typeof socketService.connect> | null>(
     null,
   );
+  const joinBoardRef = useRef(socketService.joinBoard.bind(socketService));
+  const leaveBoardRef = useRef(socketService.leaveBoard.bind(socketService));
 
   useEffect(() => {
     if (!user) {
@@ -132,10 +193,8 @@ const useSocketImpl = () => {
     socketRef.current = socket;
 
     if (!listenersRef.current) {
-      const handlers = buildEventHandlers();
-
       REALTIME_EVENTS.forEach((event) => {
-        socket.on(event, handlers[event]);
+        socket.on(event, buildHandlersForEvent(event));
       });
 
       listenersRef.current = true;
@@ -155,8 +214,8 @@ const useSocketImpl = () => {
   }, [user]);
 
   return {
-    joinBoard: socketService.joinBoard.bind(socketService),
-    leaveBoard: socketService.leaveBoard.bind(socketService),
+    joinBoard: joinBoardRef.current,
+    leaveBoard: leaveBoardRef.current,
     isConnected: socketService.isConnected,
   };
 };

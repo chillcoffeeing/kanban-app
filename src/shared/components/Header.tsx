@@ -86,7 +86,7 @@ export function Header() {
                   <EnvelopeIcon size={20} weight="duotone" /> Invitaciones
                 </span>
               </DropdownItem>
-              <DropdownItem onClick={logout} danger>
+              <DropdownItem onClick={async () => { await logout(); navigate('/'); }} danger>
                 <span className="flex items-center gap-2">
                   <SignOutIcon size={20} weight="duotone" /> Cerrar sesión
                 </span>

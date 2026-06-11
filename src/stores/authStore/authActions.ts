@@ -6,18 +6,35 @@ export function createAuthActions(set: any, get: any) {
     login: async (email: string, password: string) => {
       const res = await AuthService.login(email, password);
       TokenManager.set(res.accessToken, res.refreshToken);
-      window.location.href = "/boards";
+      await get().hydrate();
     },
 
     register: async (email: string, name: string, password: string, extra?: { username?: string; displayName?: string; jobTitle?: string; company?: string }) => {
       const res = await AuthService.register({ email, name, password, ...extra });
       TokenManager.set(res.accessToken, res.refreshToken);
-      window.location.href = "/boards";
+      await get().hydrate();
     },
 
     hydrate: async () => {
-      const token = TokenManager.getAccess();
-      if (!token) return;
+      let token = TokenManager.getAccess();
+
+      if (!token) {
+        const refreshToken = TokenManager.getRefresh();
+        if (refreshToken) {
+          try {
+            const res = await AuthService.refresh(refreshToken);
+            TokenManager.set(res.accessToken, res.refreshToken);
+            token = res.accessToken;
+          } catch {
+            TokenManager.clear();
+            set({ user: null, token: null, isAuthenticated: false });
+            return;
+          }
+        } else {
+          return;
+        }
+      }
+
       try {
         const user = await AuthService.account();
         set({ user, token, isAuthenticated: true });
@@ -42,7 +59,6 @@ export function createAuthActions(set: any, get: any) {
       }
       TokenManager.clear();
       set({ user: null, token: null, isAuthenticated: false });
-      window.location.href = "/";
     },
   };
 }

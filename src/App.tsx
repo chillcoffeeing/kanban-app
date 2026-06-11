@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Routes,
   Route,
@@ -17,6 +17,7 @@ import { PermissionDeniedModal } from "@/shared/components/PermissionDeniedModal
 import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { AnimatedBg } from "@/shared/components/AnimatedBg";
 import { ToastContainer } from "@/shared/components/ToastContainer";
+import { ColdStartLoader } from "@/shared/components/ColdStartLoader";
 import { PublicLayout } from "@/pages/PublicLayout";
 import { AuthPage } from "@/pages/AuthPage";
 import { LandingPage } from "@/pages/LandingPage";
@@ -29,6 +30,11 @@ import { InvitationsPage } from "@/pages/InvitationsPage";
 import { initActivityIntegration } from "@/features/activity/activityIntegration";
 
 function App() {
+  const [isHydrating, setIsHydrating] = useState(
+    () => !sessionStorage.getItem("cold_start_done"),
+  );
+  const hydrateOnce = useRef(false);
+
   usePersistSettings();
   useApplySettings();
   useSocket();
@@ -45,7 +51,15 @@ function App() {
     usePermissionDenied();
 
   useEffect(() => {
-    void hydrate();
+    if (hydrateOnce.current) return;
+    hydrateOnce.current = true;
+    setIsHydrating(true);
+    hydrate()
+      .catch(() => {})
+      .finally(() => {
+        setIsHydrating(false);
+        sessionStorage.setItem("cold_start_done", "true");
+      });
   }, [hydrate]);
 
   const isLandingOrLogin =
@@ -54,6 +68,7 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="mx-auto flex min-h-screen w-full flex-col">
+        {isHydrating && !isAuthenticated && <ColdStartLoader />}
         <AnimatedBg />
         <ToastContainer />
         {pendingRequest && (

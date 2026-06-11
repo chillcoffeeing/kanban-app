@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import type { FormEvent } from "react";
+import type { SyntheticEvent } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useBoardStore } from "@/stores/boardStore";
@@ -83,7 +83,7 @@ export function BoardMembersPage() {
 
   if (!currentBoard || !boardId) return null;
 
-  const handleInvite = (e: FormEvent<HTMLFormElement>) => {
+  const handleInvite = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!inviteEmail.trim()) return;
     const email = inviteEmail.trim();

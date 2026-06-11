@@ -1,6 +1,6 @@
 // Libraries
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Components
@@ -36,7 +36,7 @@ export function BoardHeader({
   const [showInvite, setShowInvite] = useState(false);
   const navigate = useNavigate();
 
-  const handleInvite = (e: FormEvent<HTMLFormElement>) => {
+  const handleInvite = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;

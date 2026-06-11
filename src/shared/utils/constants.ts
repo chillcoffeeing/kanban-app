@@ -1,7 +1,7 @@
 import type { Permission } from '@/shared/types/domain'
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
 import {
-  Sun, Moon, MoonStars, Palette,
+  SunIcon, MoonIcon, MoonStarsIcon, PaletteIcon,
   LightningIcon, UsersThreeIcon, ChartLineUpIcon,
 } from '@phosphor-icons/react'
 
@@ -42,10 +42,10 @@ export const ROLE_LABELS: Record<string, string> = {
 export const PUBLIC_THEME_KEY = "kanban-public-theme";
 
 export const THEME_OPTIONS: Array<{ id: string; label: string; Icon: PhosphorIcon }> = [
-  { id: "light", label: "Claro", Icon: Sun },
-  { id: "dark", label: "Oscuro", Icon: Moon },
-  { id: "midnight", label: "Medianoche", Icon: MoonStars },
-  { id: "solarized", label: "Solarized", Icon: Palette },
+  { id: "light", label: "Claro", Icon: SunIcon },
+  { id: "dark", label: "Oscuro", Icon: MoonIcon },
+  { id: "midnight", label: "Medianoche", Icon: MoonStarsIcon },
+  { id: "solarized", label: "Solarized", Icon: PaletteIcon },
 ]
 
 export const LANDING_FEATURES: Array<{ icon: PhosphorIcon; title: string; desc: string }> = [

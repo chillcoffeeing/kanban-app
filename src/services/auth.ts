@@ -24,6 +24,10 @@ export class AuthService {
     return ApiClient.get<UserResponse>("/auth/account");
   }
 
+  static refresh(refreshToken: string) {
+    return ApiClient.post<AuthResponse>("/auth/refresh", { refreshToken }, { auth: false });
+  }
+
   static logout(refreshToken: string) {
     return ApiClient.post<void>("/auth/logout", { refreshToken });
   }

@@ -139,7 +139,7 @@ export function CardDetailModal({
     }
   };
 
-  const addCheckItem = async (e: React.FormEvent<HTMLFormElement>) => {
+  const addCheckItem = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newCheckItem.trim()) return;
     const text = newCheckItem.trim();

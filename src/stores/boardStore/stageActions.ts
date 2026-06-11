@@ -13,7 +13,10 @@ export function createStageActions(set: any, get: any) {
         const res = await StagesService.create(boardId, name);
         const stage = normalizeStage(res, []);
         set((state: BoardState) => {
-          forBoard(state, boardId, (b) => { b.stages.push(stage); });
+          forBoard(state, boardId, (b) => {
+            if (b.stages.some((s) => s.id === stage.id)) return;
+            b.stages.push(stage);
+          });
         });
         eventBus.emit("stage:created", { boardId, detail: `creó la etapa "${name}"`, userName: "" });
         return stage;

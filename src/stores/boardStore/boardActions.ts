@@ -5,6 +5,7 @@ import type { Board, FullBoardResponse } from "@/shared/types";
 import type { BoardState } from "./types";
 import { normalizeBoard, normalizeStage } from "./helpers/normalizers";
 import { forBoard } from "./helpers/boardHelpers";
+import { clearCardCache } from "./cardActions";
 
 export function createBoardActions(set: any, get: any) {
   return {
@@ -26,6 +27,7 @@ export function createBoardActions(set: any, get: any) {
         return;
       }
 
+      clearCardCache();
       set({ loading: true, error: null });
 
       try {

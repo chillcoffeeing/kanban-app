@@ -19,6 +19,9 @@ function upsertCardInBoard(
   const entry = buildCardIndex(board).get(cardId);
   if (entry) {
     Object.assign(entry.stage.cards[entry.index], updates);
+    if ("position" in updates) {
+      entry.stage.cards.sort((a, b) => a.position - b.position);
+    }
     return entry.stage.id;
   }
   return null;
@@ -122,11 +125,14 @@ export function createRealtimeActions(set: any, get: any) {
 
     realtimeAddCard: (card: Card & { stageId: string }) => {
       set((state: BoardState) => {
+        const alreadyExists = (board: Board) =>
+          board.stages.some((s) => s.cards.some((c) => c.id === card.id));
         for (const board of state.boards) {
+          if (alreadyExists(board)) continue;
           const stage = board.stages.find((stage) => stage.id === card.stageId);
           if (stage) stage.cards.push(card);
         }
-        if (state.currentBoard) {
+        if (state.currentBoard && !alreadyExists(state.currentBoard)) {
           const stage = state.currentBoard.stages.find(
             (stage) => stage.id === card.stageId,
           );
@@ -164,10 +170,14 @@ export function createRealtimeActions(set: any, get: any) {
 
     realtimeAddStage: (stage: Stage) => {
       set((state: BoardState) => {
+        const exists = (b: Board) => b.stages.some((s) => s.id === stage.id);
         for (const board of state.boards) {
+          if (exists(board)) continue;
           board.stages.push(stage);
         }
-        if (state.currentBoard) state.currentBoard.stages.push(stage);
+        if (state.currentBoard && !exists(state.currentBoard)) {
+          state.currentBoard.stages.push(stage);
+        }
       });
     },
 

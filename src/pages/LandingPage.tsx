@@ -5,19 +5,19 @@ import { useAuthStore } from "@/stores/authStore";
 import { Modal } from "@/shared/components/Modal";
 import {
   KanbanIcon,
-  SquaresFour,
-  Cards,
-  ArrowsLeftRight,
-  UsersThree,
-  GearSix,
-  Bell,
-  MagnifyingGlass,
-  Tag,
-  ListChecks,
-  Sparkle,
-  ArrowDown,
-  PlusCircle,
-  Handshake,
+  SquaresFourIcon,
+  CardsIcon,
+  ArrowsLeftRightIcon,
+  UsersThreeIcon,
+  GearSixIcon,
+  BellIcon,
+  MagnifyingGlassIcon,
+  TagIcon,
+  ListChecksIcon,
+  SparkleIcon,
+  ArrowDownIcon,
+  PlusCircleIcon,
+  HandshakeIcon,
   CheckCircleIcon,
   MagnifyingGlassPlusIcon,
 } from "@phosphor-icons/react";
@@ -298,47 +298,47 @@ export function LandingPage() {
 
   const features = [
     {
-      icon: <SquaresFour size={24} weight="duotone" />,
+      icon: <SquaresFourIcon size={24} weight="duotone" />,
       title: "Tableros Visuales",
       desc: "Crea múltiples tableros con fondos personalizables. Organiza proyectos personales o de equipo con una vista clara y ordenada.",
     },
     {
-      icon: <Cards size={24} weight="duotone" />,
+      icon: <CardsIcon size={24} weight="duotone" />,
       title: "Tarjetas enriquecidas",
       desc: "Añade descripciones, checklist con progreso, etiquetas de colores, fechas de inicio y vencimiento, y miembros asignados.",
     },
     {
-      icon: <ArrowsLeftRight size={24} weight="duotone" />,
+      icon: <ArrowsLeftRightIcon size={24} weight="duotone" />,
       title: "Drag & Drop fluido",
       desc: "Arrastra tarjetas entre etapas o reordena dentro de la misma columna. La posición se guarda automáticamente en el servidor.",
     },
     {
-      icon: <UsersThree size={24} weight="duotone" />,
+      icon: <UsersThreeIcon size={24} weight="duotone" />,
       title: "Colaboración en equipo",
       desc: "Invita miembros por email, asigna roles y configura permisos granulares para cada acción del tablero.",
     },
     {
-      icon: <GearSix size={24} weight="duotone" />,
+      icon: <GearSixIcon size={24} weight="duotone" />,
       title: "Personalización total",
       desc: "Temas claro, oscuro, midnight y solarized. Densidad compacta o cómoda. Fondos con patrones configurables.",
     },
     {
-      icon: <Bell size={24} weight="duotone" />,
+      icon: <BellIcon size={24} weight="duotone" />,
       title: "Actividad en tiempo real",
       desc: "Feed de actividad en vivo con Socket.IO. Ve quién creó, movió o actualizó qué, y cuándo, al instante.",
     },
     {
-      icon: <MagnifyingGlass size={24} weight="duotone" />,
+      icon: <MagnifyingGlassIcon size={24} weight="duotone" />,
       title: "Búsqueda global",
       desc: "Encuentra cualquier tarjeta por título, descripción, etiquetas, miembros o contenido del checklist.",
     },
     {
-      icon: <Tag size={24} weight="duotone" />,
+      icon: <TagIcon size={24} weight="duotone" />,
       title: "Etiquetas y filtros",
       desc: "Crea etiquetas con nombre y color para categorizar tarjetas. Filtra visualmente por tipo o prioridad.",
     },
     {
-      icon: <ListChecks size={24} weight="duotone" />,
+      icon: <ListChecksIcon size={24} weight="duotone" />,
       title: "Checklists inteligentes",
       desc: "Checklists con progreso visual, items reordenables y marcado completado. El progreso se muestra en la tarjeta.",
     },
@@ -381,17 +381,17 @@ export function LandingPage() {
 
   const steps = [
     {
-      icon: <PlusCircle size={28} weight="duotone" />,
+      icon: <PlusCircleIcon size={28} weight="duotone" />,
       title: "Crea un tablero",
       desc: "Define las columnas de tu flujo de trabajo: Pendiente, En Progreso, Completado. Personaliza el fondo y las preferencias.",
     },
     {
-      icon: <Cards size={28} weight="duotone" />,
+      icon: <CardsIcon size={28} weight="duotone" />,
       title: "Añade tarjetas",
       desc: "Crea tarjetas con descripciones, checklist, etiquetas, fechas y miembros. Arrastra para reordenar entre columnas.",
     },
     {
-      icon: <Handshake size={28} weight="duotone" />,
+      icon: <HandshakeIcon size={28} weight="duotone" />,
       title: "Colabora en vivo",
       desc: "Invita a tu equipo, asigna permisos, y ve los cambios reflejarse en tiempo real gracias a Socket.IO.",
     },
@@ -465,7 +465,7 @@ export function LandingPage() {
             className="mb-6 inline-flex animate-pulse items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary sm:px-5 sm:py-2 sm:text-base"
             style={{ animationDuration: "2s" }}
           >
-            <Sparkle size={16} weight="duotone" />
+            <SparkleIcon size={16} weight="duotone" />
             Plataforma Kanban moderna y open-source
           </div>
           <h1             className="mb-4 text-4xl font-semibold leading-tight tracking-tight text-neutral-dark sm:mb-6 sm:text-6xl md:text-8xl">
@@ -509,7 +509,7 @@ export function LandingPage() {
             )}
           </div>
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-pulse text-neutral-dark/30">
-            <ArrowDown size={24} />
+            <ArrowDownIcon size={24} />
           </div>
         </div>
       </section>

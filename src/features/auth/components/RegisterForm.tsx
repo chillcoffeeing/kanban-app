@@ -1,11 +1,11 @@
 import { useState, useReducer } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
-import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
+import { WarningCircleIcon, CaretDownIcon } from '@phosphor-icons/react'
 import { useMountFade } from "@/shared/hooks/useGsapAnimation";
 import { INITIAL_FORM, type FormField } from '../utils/constants'
 
@@ -27,7 +27,7 @@ export function RegisterForm() {
 
   const { name, email, password, username, displayName, jobTitle, company } = form;
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
 
@@ -48,6 +48,7 @@ export function RegisterForm() {
         jobTitle: jobTitle.trim() || undefined,
         company: company.trim() || undefined,
       })
+      navigate('/boards')
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setError('Ya existe una cuenta con ese email')
@@ -116,7 +117,7 @@ export function RegisterForm() {
         onClick={() => setShowExtra((p) => !p)}
         className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
       >
-        <CaretDown
+        <CaretDownIcon
           size={14}
           weight="bold"
           className={`transition-transform duration-200 ${showExtra ? 'rotate-0' : '-rotate-90'}`}

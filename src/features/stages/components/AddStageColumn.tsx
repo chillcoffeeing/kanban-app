@@ -1,6 +1,6 @@
 // Libraries
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { SyntheticEvent } from "react";
 
 // Components
 import { Button } from "@/shared/components/Button";
@@ -16,7 +16,7 @@ export function AddStageColumn({ onAddStage }: AddStageColumnProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState("");
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim()) return;
     onAddStage(name.trim());
@@ -38,7 +38,7 @@ export function AddStageColumn({ onAddStage }: AddStageColumnProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-72 shrink-0 rounded-xl border border-neutral-light bg-surface p-[var(--density-padding,1rem)] shadow-sm animate-scaleIn"
+      className="w-72 shrink-0 rounded-xl border h-full border-neutral-light bg-surface p-(--density-padding,1rem) shadow-sm animate-scaleIn"
     >
       <input
         placeholder="Nombre de la etapa..."
@@ -47,7 +47,7 @@ export function AddStageColumn({ onAddStage }: AddStageColumnProps) {
         onKeyDown={(e) => e.key === "Escape" && setIsAdding(false)}
         className="mb-3 w-full rounded-lg border border-neutral-light bg-surface px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
       />
-      <div className="flex gap-[var(--density-gap,0.5rem)]">
+      <div className="flex gap-(--density-gap,0.5rem)">
         <Button size="sm" type="submit">
           Añadir etapa
         </Button>

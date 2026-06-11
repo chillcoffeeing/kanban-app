@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import {
-  KanbanIcon, List, X,
+  KanbanIcon, ListIcon, XIcon,
 } from "@phosphor-icons/react";
 import { PUBLIC_THEME_KEY, THEME_OPTIONS } from "@/shared/utils/constants";
 
@@ -139,7 +139,7 @@ export function PublicHeader() {
           onClick={() => setMenuOpen((p) => !p)}
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
         >
-          {menuOpen ? <X size={24} /> : <List size={24} />}
+          {menuOpen ? <XIcon size={24} /> : <ListIcon size={24} />}
         </button>
       </div>
 

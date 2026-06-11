@@ -47,7 +47,8 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
     transition: isDragging ? "none" : transition,
   };
 
-  const completedChecks = card.checklist?.filter((checkItem) => checkItem.done).length || 0;
+  const completedChecks =
+    card.checklist?.filter((checkItem) => checkItem.done).length || 0;
   const totalChecks = card.checklist?.length || 0;
   const isComplete = totalChecks > 0 && completedChecks === totalChecks;
 
@@ -75,7 +76,7 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
       {coverColor ? (
         <div className="h-2 w-full" style={{ backgroundColor: coverColor }} />
       ) : null}
-      <div className="p-[var(--density-padding,0.75rem)]">
+      <div className="p-(--density-padding,0.75rem)">
         {prefs.coversEnabled && card.labels?.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-1">
             {card.labels.map((label) => (
@@ -93,7 +94,7 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
           {card.title}
         </p>
 
-        <div className="mt-2 flex flex-wrap items-center gap-[var(--density-gap,0.5rem)] text-xs text-neutral-dark/60">
+        <div className="mt-2 flex flex-wrap items-center gap-(--density-gap,0.5rem) text-xs text-neutral-dark/60">
           {prefs.showCompletedOnCard && isComplete && (
             <span className="flex items-center gap-1 rounded-full bg-success/10 px-1.5 py-0.5 text-xs text-success">
               <CheckCircleIcon size={16} weight="fill" /> Completado

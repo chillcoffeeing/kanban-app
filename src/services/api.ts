@@ -31,12 +31,53 @@ export const TokenManager = {
 };
 
 let forbiddenHandler: ((error: ApiError) => void) | null = null;
+let unauthorizedHandler: ((error: ApiError) => void) | null = null;
+let refreshPromise: Promise<boolean> | null = null;
 
 export const setForbiddenHandler = (
   handler: ((error: ApiError) => void) | null,
 ) => {
   forbiddenHandler = handler;
 };
+
+export const setUnauthorizedHandler = (
+  handler: ((error: ApiError) => void) | null,
+) => {
+  unauthorizedHandler = handler;
+};
+
+async function executeRefresh(): Promise<boolean> {
+  if (refreshPromise) return refreshPromise;
+
+  const refreshToken = TokenManager.getRefresh();
+  if (!refreshToken) return false;
+
+  refreshPromise = (async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!res.ok) {
+        TokenManager.clear();
+        return false;
+      }
+
+      const data: { accessToken: string; refreshToken: string } =
+        await res.json();
+      TokenManager.set(data.accessToken, data.refreshToken);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
 
 interface RequestOptions {
   body?: unknown;
@@ -90,18 +131,30 @@ export class ApiClient {
       if (token) headers.authorization = `Bearer ${token}`;
     }
 
-    const cleanHeaders = Object.fromEntries(
-      Object.entries(headers).filter(
-        ([, headerValue]) => headerValue !== undefined,
-      ),
-    ) as Record<string, string>;
+    const exec = async (): Promise<Response> => {
+      const cleanHeaders = Object.fromEntries(
+        Object.entries(headers).filter(
+          ([, headerValue]) => headerValue !== undefined,
+        ),
+      ) as Record<string, string>;
 
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers: cleanHeaders,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal: options.signal,
-    });
+      return fetch(`${API_BASE_URL}${path}`, {
+        method,
+        headers: cleanHeaders,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: options.signal,
+      });
+    };
+
+    let response = await exec();
+
+    if (response.status === 401 && auth) {
+      const refreshed = await executeRefresh();
+      if (refreshed) {
+        headers.authorization = `Bearer ${TokenManager.getAccess()}`;
+        response = await exec();
+      }
+    }
 
     if (response.status === 204) return undefined as T;
     const rawText = await response.text();
@@ -119,6 +172,9 @@ export class ApiClient {
       const error = new ApiError(message, response.status, parsedBody);
       if (response.status === 403 && forbiddenHandler) {
         forbiddenHandler(error);
+      }
+      if (response.status === 401 && unauthorizedHandler) {
+        unauthorizedHandler(error);
       }
       throw error;
     }

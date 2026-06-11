@@ -5,7 +5,7 @@ import { useBoardStore } from '@/stores/boardStore'
 import { MemberAvatar } from '@/shared/components/MemberAvatar'
 import {
   KanbanIcon,
-  ArrowSquareOut,
+  ArrowSquareOutIcon,
 } from '@phosphor-icons/react'
 import { useMemo, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -91,7 +91,7 @@ export function ActivityFeed({ isOpen, onClose }: ActivityFeedProps) {
                           onClick={() => handleCardClick(cardId)}
                           className="ml-2 inline-flex items-center gap-0.5 text-primary hover:text-primary-hover cursor-pointer transition-colors"
                         >
-                          <ArrowSquareOut size={12} weight="bold" />
+                          <ArrowSquareOutIcon size={12} weight="bold" />
                           Ver tarjeta
                         </button>
                       )}

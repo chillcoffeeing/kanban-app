@@ -36,6 +36,8 @@ export function useHorizontalScroll(
   useEffect(() => {
     if (!el) return;
 
+    el.style.overscrollBehaviorX = "contain";
+
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY === 0) return;
       const maxScroll = el.scrollWidth - el.clientWidth;

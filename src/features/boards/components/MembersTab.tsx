@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
+import type { SyntheticEvent } from "react";
 import { UserPlusIcon, ClockIcon } from "@phosphor-icons/react";
 import { Input } from "@/shared/components/Input";
 import { Button } from "@/shared/components/Button";
@@ -33,7 +33,7 @@ export function MembersTab({ board }: MembersTabProps) {
       .catch(() => setPendingInvites([]));
   }, [board?.id]);
 
-  const handleInvite = (e: FormEvent<HTMLFormElement>) => {
+  const handleInvite = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!inviteEmail.trim()) return;
     const email = inviteEmail.trim();

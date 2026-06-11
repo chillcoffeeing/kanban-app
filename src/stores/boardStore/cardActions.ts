@@ -6,7 +6,12 @@ import type { BoardState } from "./types";
 import { normalizeCard } from "./helpers/normalizers";
 import { forBoard, forCard } from "./helpers/boardHelpers";
 
+const CARD_CACHE_MAX = 50;
 const cardLoadPromises = new Map<string, Promise<Card | null>>();
+
+export function clearCardCache() {
+  cardLoadPromises.clear();
+}
 
 function processCardMove(
   state: BoardState,
@@ -47,7 +52,8 @@ export function createCardActions(set: any, get: any) {
         set((state: BoardState) => {
           forBoard(state, boardId, (b) => {
             const stage = b.stages.find((s) => s.id === stageId);
-            if (stage) stage.cards.push(card);
+            if (!stage || stage.cards.some((c) => c.id === card.id)) return;
+            stage.cards.push(card);
           });
         });
         eventBus.emit("card:created", { boardId, detail: `creó la tarjeta "${title}"`, userName: "" });
@@ -186,6 +192,10 @@ export function createCardActions(set: any, get: any) {
         }
       })();
 
+      if (cardLoadPromises.size >= CARD_CACHE_MAX) {
+        const firstKey = cardLoadPromises.keys().next().value;
+        if (firstKey !== undefined) cardLoadPromises.delete(firstKey);
+      }
       cardLoadPromises.set(cardId, promise);
       return promise;
     },

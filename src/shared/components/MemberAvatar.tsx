@@ -1,6 +1,22 @@
 import { useBoardStore } from "@/stores/boardStore";
 import { useMemo } from "react";
 
+const AVATAR_PALETTE = [
+  "#6366f1", "#8b5cf6", "#a855f7", "#d946ef",
+  "#ec4899", "#f43f5e", "#ef4444", "#f97316",
+  "#eab308", "#22c55e", "#14b8a6", "#06b6d4",
+  "#3b82f6", "#2563eb", "#7c3aed", "#db2777",
+];
+
+function hashSeed(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
 export function MemberAvatar({
   name,
   avatar,
@@ -32,8 +48,9 @@ export function MemberAvatar({
   const color = useMemo(() => {
     if (avatar) return "transparent";
 
-    return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-  }, [avatar]);
+    const seed = userId ?? name;
+    return AVATAR_PALETTE[hashSeed(seed) % AVATAR_PALETTE.length];
+  }, [avatar, userId, name]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" || e.key === " ") {

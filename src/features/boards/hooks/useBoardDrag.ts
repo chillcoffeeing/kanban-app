@@ -1,17 +1,12 @@
-// Libraries
 import { useState, useRef, useCallback } from "react";
 import {
-  closestCorners,
+  closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import type { DragStartEvent, DragEndEvent, UniqueIdentifier } from "@dnd-kit/core";
-
-// Stores
+import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { useBoardStore } from "@/stores/boardStore";
-
-// Types
 import type { Card, Board, ActivityType } from "@/shared/types/domain";
 
 interface DragData {
@@ -29,22 +24,19 @@ export function useBoardDrag(
   boardId: string,
   log: (type: ActivityType, detail: string) => void,
 ) {
-  // Stores
   const moveCard = useBoardStore((s) => s.moveCard);
   const currentBoard = useBoardStore((s) => s.currentBoard);
 
-  // State
-  const activeId = useRef<UniqueIdentifier | null>(null);
+  const activeId = useRef<string | null>(null);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
 
-  // Sensors
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 5 },
   });
   const sensors = useSensors(pointerSensor);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    const id = event.active.id;
+    const id = String(event.active.id);
     activeId.current = id;
     const dragData = event.active.data.current as DragData | undefined;
     if (dragData?.type === "card" && dragData.card) {
@@ -98,7 +90,7 @@ export function useBoardDrag(
 
   return {
     sensors,
-    collisionDetection: closestCorners,
+    collisionDetection: closestCenter,
     activeCard,
     handleDragStart,
     handleDragEnd,
@@ -111,7 +103,7 @@ function resolveDropTarget(
   board: Board | null,
   fromStageId: string,
   overData: DragData | undefined,
-  overId: UniqueIdentifier,
+  overId: string | number,
 ): DropTarget {
   if (overData?.type === "stage") {
     const toStage = board?.stages.find((s) => s.id === overData.stageId);

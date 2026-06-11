@@ -18,7 +18,10 @@ class SocketService {
       {
         auth: { token },
         transports: ["websocket", "polling"],
-        reconnection: false,
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 10000,
       },
     );
 

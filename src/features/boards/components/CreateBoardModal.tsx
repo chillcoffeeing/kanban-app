@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { Modal } from '@/shared/components/Modal'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
@@ -15,7 +15,7 @@ export function CreateBoardModal({ isOpen, onClose, onCreate }: CreateBoardModal
   const [name, setName] = useState('')
   const [background, setBackground] = useState(DEFAULT_BACKGROUND_ID)
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!name.trim()) return
     onCreate(name.trim(), background)

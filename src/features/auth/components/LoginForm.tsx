@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/shared/components/Button'
 import { Input } from '@/shared/components/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { ApiError } from '@/services/api'
-import { WarningCircleIcon, CaretDown } from '@phosphor-icons/react'
+import { WarningCircleIcon, CaretDownIcon } from '@phosphor-icons/react'
 import { useMountFade } from "@/shared/hooks/useGsapAnimation";
 import { TEST_ACCOUNTS, PASSWORD } from '../utils/constants'
 
@@ -19,12 +19,13 @@ export function LoginForm() {
   const [showDropdown, setShowDropdown] = useState(false)
   const login = useAuthStore((state) => state.login)
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
       await login(email, password)
+      navigate('/boards')
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Email o contraseña incorrectos')
@@ -68,7 +69,7 @@ export function LoginForm() {
           className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-neutral-light bg-neutral-light/50 px-3 py-2 text-sm text-neutral-dark/60 transition-colors hover:border-primary/40 hover:text-neutral-dark"
         >
           <span>Credenciales de prueba</span>
-          <CaretDown
+          <CaretDownIcon
             size={14}
             weight="bold"
             className={`transition-transform ${showDropdown ? 'rotate-180' : ''}`}
