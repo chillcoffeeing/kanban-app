@@ -92,6 +92,7 @@ export type ActivityType =
   | "member_joined_card"
   | "member_left_card"
   | "member_invited"
+  | "member_joined"
   | "member_removed";
 
 export interface ActivityEntry {

@@ -41,7 +41,7 @@ function mapEventType(event: string): ActivityType | null {
     [ACTIVITY_EVENTS.CARD_DATE_SET]: "card_date_set",
     [ACTIVITY_EVENTS.CARD_CHECKLIST_ADDED]: "card_checklist_added",
     [ACTIVITY_EVENTS.CARD_CHECKLIST_TOGGLED]: "card_checklist_toggled",
-    [ACTIVITY_EVENTS.MEMBER_JOINED]: "member_invited",
+    [ACTIVITY_EVENTS.MEMBER_JOINED]: "member_joined",
     [ACTIVITY_EVENTS.MEMBER_LEFT]: "member_removed",
   };
   return map[event] ?? null;

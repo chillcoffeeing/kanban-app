@@ -1,4 +1,4 @@
-import type { Board, Card, Stage } from "@/shared/types";
+import type { Board, Card, Stage, BoardMember } from "@/shared/types";
 import type { BoardState } from "./types";
 
 function buildCardIndex(board: Board) {
@@ -190,6 +190,34 @@ export function createRealtimeActions(set: any, get: any) {
           state.currentBoard.stages = state.currentBoard.stages.filter(
             (stage) => stage.id !== stageId,
           );
+        }
+      });
+    },
+
+    realtimeAddMember: (boardId: string, member: BoardMember) => {
+      set((state: BoardState) => {
+        for (const board of state.boards) {
+          if (board.id !== boardId) continue;
+          if (board.members.some((m) => m.id === member.id)) return;
+          board.members.push(member);
+        }
+        if (state.currentBoard?.id === boardId) {
+          if (!state.currentBoard.members.some((m) => m.id === member.id)) {
+            state.currentBoard.members.push(member);
+          }
+        }
+      });
+    },
+
+    realtimeRemoveMember: (boardId: string, membershipId: string) => {
+      set((state: BoardState) => {
+        const remove = (members: BoardMember[]) =>
+          members.filter((m) => m.id !== membershipId);
+        for (const board of state.boards) {
+          if (board.id === boardId) board.members = remove(board.members);
+        }
+        if (state.currentBoard?.id === boardId) {
+          state.currentBoard.members = remove(state.currentBoard.members);
         }
       });
     },

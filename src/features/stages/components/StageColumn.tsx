@@ -174,18 +174,14 @@ export function StageColumn({ stage, boardId, onOpenCard }: StageColumnProps) {
 
         <div
           ref={setNodeRef}
-          className="flex flex-1 flex-col overflow-y-auto px-2 pb-2"
+          className="flex flex-1 flex-col overflow-y-auto px-2 "
         >
           <SortableContext
             items={visibleCards.map((card) => card.id)}
             strategy={verticalListSortingStrategy}
           >
             {visibleCards.map((card) => (
-              <div
-                key={card.id}
-                data-card-id={card.id}
-                className="pb-4 last:pb-0"
-              >
+              <div key={card.id} className="pb-2 last:pb-0">
                 <CardItem
                   card={card}
                   stageId={stage.id}

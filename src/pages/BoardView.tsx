@@ -133,7 +133,7 @@ export function BoardView({ boardId, openCardId }: BoardViewProps) {
       >
         <div
           ref={scrollRef}
-          className="flex flex-1 gap-(--density-gap,1rem) overflow-x-auto p-(--density-padding,1rem) bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-size-[20px_20px]"
+          className="flex flex-1 min-h-0 gap-(--density-gap,1rem) overflow-x-auto p-(--density-padding,1rem) bg-[repeating-conic-gradient(var(--color-neutral-light)_0%_25%,transparent_0%_50%)] bg-size-[20px_20px]"
         >
           {currentBoard.stages.map((stage) => (
             <StageColumn

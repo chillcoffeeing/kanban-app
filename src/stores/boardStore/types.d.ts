@@ -130,4 +130,6 @@ export interface BoardState {
   ) => void;
   realtimeAddStage: (stage: Stage) => void;
   realtimeDeleteStage: (stageId: string) => void;
+  realtimeAddMember: (boardId: string, member: BoardMember) => void;
+  realtimeRemoveMember: (boardId: string, membershipId: string) => void;
 }

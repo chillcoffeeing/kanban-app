@@ -1,5 +1,4 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import {
   CalendarBlankIcon,
   CheckCircleIcon,
@@ -30,22 +29,10 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
   const prefs = getBoardPreferences(board);
   const formatDate = useFormatDate();
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: card.id,
     data: { type: "card", card, stageId, boardId },
   });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition: isDragging ? "none" : transition,
-  };
 
   const completedChecks =
     card.checklist?.filter((checkItem) => checkItem.done).length || 0;
@@ -57,7 +44,6 @@ export function CardItem({ card, stageId, boardId, onClick }: CardItemProps) {
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...attributes}
       {...listeners}
       role="button"

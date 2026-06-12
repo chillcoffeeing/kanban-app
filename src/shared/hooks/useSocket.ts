@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import { socketService } from "@/services/socket";
 import { useAuthStore } from "@/stores/authStore";
 import { useBoardStore } from "@/stores/boardStore";
-import type { Stage } from "@/shared/types";
+import { eventBus } from "@/shared/utils/eventBus";
+import type { Stage, BoardMember } from "@/shared/types";
 import type { CardResponse } from "@/shared/types/api";
 import {
   normalizeCard,
@@ -22,6 +23,8 @@ const REALTIME_EVENTS = [
   "stage:deleted",
   "stage:reordered",
   "board:updated",
+  "member:joined",
+  "member:left",
 ] as const;
 
 type RealtimeEventHandler = (payload: unknown) => void;
@@ -148,6 +151,40 @@ function buildHandlersForEvent(event: string): RealtimeEventHandler {
         getStore().realtimeUpdateStage(stage.id, {
           position: stage.position,
         } as Partial<Stage> & { position: number });
+      };
+    }
+    case "member:joined": {
+      return (payload: unknown) => {
+        const data = payload as Record<string, unknown>;
+        const user = data.user as Record<string, unknown> | undefined;
+        const memberName = (user?.name as string) ?? "";
+        const member: BoardMember = {
+          id: data.id as string,
+          role: data.role as BoardMember["role"],
+          permissions: data.permissions as BoardMember["permissions"],
+          invitedAt: data.invitedAt as string,
+          email: (user?.email as string) ?? "",
+          user: user
+            ? {
+                id: user.id as string,
+                name: user.name as string,
+                avatarUrl: (user.avatarUrl as string) ?? null,
+                createdAt: user.createdAt as string,
+              }
+            : undefined,
+        };
+        getStore().realtimeAddMember(data.boardId as string, member);
+        eventBus.emit("member:joined", {
+          boardId: data.boardId,
+          detail: "entró al tablero",
+          userName: memberName,
+        });
+      };
+    }
+    case "member:left": {
+      return (payload) => {
+        const data = payload as { boardId: string; membershipId: string };
+        getStore().realtimeRemoveMember(data.boardId, data.membershipId);
       };
     }
     case "board:updated": {
